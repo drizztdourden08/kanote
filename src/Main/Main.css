@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Kufam:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+/* Kufam */
+/* Roboto */
+/* Poppins */
+/* Montserrat */
+
+.App {
+  padding: 20px 0;
+}
+
+.columns{
+  display: flex;
+  flex-direction: row;
+}
+
+.column{
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  padding: 0 5px;
+}
+
+.column_title{
+  -webkit-app-region: drag;
+  display: flex;
+  background: rgba(0, 0, 0, 0.3);
+  height: 30px;
+  padding: 5px 15px;
+  margin: 5px;
+  align-items: center;
+  justify-content: left;
+  color: #fefefe;
+  border-radius: 3px;
+  font-family: 'kufam';
+  font-size: 1.25em;
+}
+
+.AddIcon{
+  font-size: 1.5em;
+  color: #eee;
+}
+
+.column_cards{
+  display: flex;
+  flex-direction: column;
+}
+
+.card{
+  display: flex;
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: grayscale(30%);
+  margin: 5px;
+  padding: 10px 15px;
+  border-left: 4px solid #cc2222;
+  border-radius: 3px;
+  color: #eee;
+  cursor:grab;
+}
+
+.card_priority{
+  align-self: flex-start;
+  padding: 2px 10px;
+  font-family: 'Poppins';
+  font-size: 0.8em;
+  background: #229922;
+  border-radius: 3px;
+  color: #ccc;
+}
+
+.card_title{
+  display: flex;
+  font-weight: 200;
+  font-family: 'kufam';
+  justify-content: space-between;
+  margin: 10px 0;
+}
+
+.card_tags{
+  display: flex;
+  flex-direction: row;
+}
+
+.tag{
+  padding: 0px 10px;
+  font-family: 'Poppins';
+  font-size: 0.7em;
+  background: #bbb;
+  color: #555;
+  border-radius: 10px;
+  margin-right: 3px;
+}
+
+.tag::before{
+  content: '#';
+}

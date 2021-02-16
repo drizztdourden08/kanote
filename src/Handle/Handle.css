@@ -1,0 +1,17 @@
+.Handle{
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100px;
+    height: 40px;
+}
+
+.puller{
+    background: #cc2222;
+    width: 100px;
+    height: 15px;
+    font-size: 1em;
+    text-align: center;
+    color: white;
+    cursor: pointer;
+}
