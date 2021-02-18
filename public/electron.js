@@ -39,7 +39,7 @@ function createMain() {
         show: false
     }); 
 
-    // mainWin.webContents.openDevTools();
+    mainWin.webContents.openDevTools();
 
     mainWin.loadURL(isDev ? "http://localhost:3000" : `file://${path.join(__dirname, "../build/index.html")}`); 
     mainWin.on("closed", () => (mainWin = null));

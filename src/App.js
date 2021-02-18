@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react'
-import Main from './Main/Main'
-import Handle from './Handle/Handle'
+import React, { useEffect } from 'react';
+
+import Main from './main/Main';
+import Handle from './handle/Handle';
 
 import {
   BrowserRouter as Router,

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect } from 'react';
 import './Handle.css';
 
 import {BiDotsHorizontalRounded} from 'react-icons/bi';
