@@ -23,7 +23,7 @@ function createMain() {
     mainWin = new BrowserWindow({ 
         y:0,
         x:0,
-        width: 1200, 
+        width: 930, 
         height: 600,
         frame: false,
         transparent: true,
@@ -100,20 +100,43 @@ app.whenReady().then(() => {
 app.on("window-all-closed", () => { if (process.platform !== "darwin") { app.quit(); } });     
 app.on("activate", () => { if (mainWindow === null) { createWindow(); }}); 
 
+ResizeCenterMain = (columnCount, rowMax) => {
+    console.log("Resizing");
+
+    screenWidth = getScreenWidth();
+    const [appWidth, appHeight] = mainWindow.getSize();
+    let [appX, appY] = mainWindow.getPosition()
+
+    const TargetWidth = (((300 + 10) * columnCount));
+    const centeredX = (screenWidth / 2) - (TargetWidth / 2);
+    mainWindow.setSize(TargetWidth, appHeight);
+    mainWindow.setPosition(centeredX, appY);
+
+    
+
+};
+
+
+ipc.on('ResizeMainWindow', (event, args) => {
+    console.log("Received: ResizeMainWindow");
+    console.log(args[0]);
+    console.log(args[1]);
+    //ResizeCenterMain(args[0], args[1]);
+});
+
 // --------------- POST READY STUFF --------------- //
 ipc.on('ToggleScroll', (event, args) => {
     
     screenWidth = getScreenWidth();
     const [appWidth, appHeight] = mainWindow.getSize();
     let [appX, appY] = mainWindow.getPosition()
+    let [handleX, handleY] = handle.getPosition()
 
     let appToggled;
     (appY < 0) ? appToggled = false : appToggled = true;
     console.log(appY);
     console.log(appHeight);
     console.log("Received");
-    const centeredMain = (screenWidth / 2) - ((310 * 3) / 2);
-    const centeredHandle = (screenWidth / 2) - (100 / 2);
 
     let intervalCount = 0;
     let intervalMax;
@@ -130,14 +153,13 @@ ipc.on('ToggleScroll', (event, args) => {
     const iID = setInterval(() => {
         if (intervalCount <= intervalMax) {
             let y = appY + (intervalCount * modifier);            
-            mainWindow.setPosition(centeredMain, y);
-            handle.setPosition(centeredHandle, y + appHeight);
-
+            mainWindow.setPosition(appX, y);
+            handle.setPosition(handleX, y + appHeight);
         }
         else{
             let y = appY + (intervalMax * modifier);
-            mainWindow.setPosition(centeredMain, y);
-            handle.setPosition(centeredHandle, y + appHeight);            
+            mainWindow.setPosition(appX, y);
+            handle.setPosition(handleX, y + appHeight);            
             clearInterval(iID);
             console.log("Moved at " + y);
         };
