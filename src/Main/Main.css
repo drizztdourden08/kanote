@@ -1,96 +1,155 @@
 @import url('https://fonts.googleapis.com/css2?family=Kufam:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 /* Kufam */
+
 /* Roboto */
+
 /* Poppins */
+
 /* Montserrat */
 
+body {
+    overflow-x: hidden;
+    overflow-y: hidden;
+    height: 100%;
+    background: transparent;
+}
+
+body {
+    padding: 5px;
+    pointer-events: none;
+}
+
+#root, .App, .columns, .column{
+    pointer-events: none; 
+}
+
+* {pointer-events: all;}
+.draggable {-webkit-app-region: drag;}
+
 .App {
-  padding: 20px 0;
+    padding: 20px 0;
 }
 
-.columns{
-  display: flex;
-  flex-direction: row;
+.columns {
+    display: flex;
+    flex-direction: row;
 }
 
-.column{
-  display: flex;
-  flex-direction: column;
-  width: 300px;
-  padding: 0 5px;
+.column {
+    display: flex;
+    flex-direction: column;
+
+    width: 300px;
+
+    margin: 0 10px;
 }
 
-.column_title{
-  -webkit-app-region: drag;
-  display: flex;
-  background: rgba(0, 0, 0, 0.3);
-  height: 30px;
-  padding: 5px 15px;
-  margin: 5px;
-  align-items: center;
-  justify-content: left;
-  color: #fefefe;
-  border-radius: 3px;
-  font-family: 'kufam';
-  font-size: 1.25em;
+.column-visible {
+    background: rgba(0, 0, 0, 0.4);
 }
 
-.AddIcon{
-  font-size: 1.5em;
-  color: #eee;
+.column_title {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+
+    height: 40px;
+
+    padding: 5px 10px;
+    
+    background: rgba(0, 0, 0, 0.7);
+    color: #fefefe;
+    border-top: solid 3px #F05D60;
+
+    font-family: 'kufam';
+    font-size: 1.25em;
+
+    cursor: pointer;
 }
 
-.column_cards{
-  display: flex;
-  flex-direction: column;
+.AddIcon, .AddIcon:focus {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+
+    height: 40px;
+    width: 40px;
+
+    margin-top: 10px;
+
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: solid 1px #F05D60;
+
+    font-size: 1.6em;    
+
+    cursor: pointer;
 }
 
-.card{
-  display: flex;
-  flex-direction: column;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: grayscale(30%);
-  margin: 5px;
-  padding: 10px 15px;
-  border-left: 4px solid #cc2222;
-  border-radius: 3px;
-  color: #eee;
-  cursor:grab;
+.AddIcon:hover {
+    background: linear-gradient(#F05D60, #CE4F51);
 }
 
-.card_priority{
-  align-self: flex-start;
-  padding: 2px 10px;
-  font-family: 'Poppins';
-  font-size: 0.8em;
-  background: #229922;
-  border-radius: 3px;
-  color: #ccc;
+.AddIcon:active {
+
+    background: linear-gradient(#CE4F51, #F05D60);
 }
 
-.card_title{
-  display: flex;
-  font-weight: 200;
-  font-family: 'kufam';
-  justify-content: space-between;
-  margin: 10px 0;
+.column_cards {
+    display: flex;
+    flex-direction: column;
 }
 
-.card_tags{
-  display: flex;
-  flex-direction: row;
+.card {
+    display: flex;
+    flex-direction: column;
+
+    height: 100px;
+    
+    margin: 10px 0;
+    padding: 5px 10px;
+
+    background: rgba(0, 0, 0, 0.7);
+    color: #eee;
+    border-left: 4px solid #F05D60;
+
+    cursor: grab;
 }
 
-.tag{
-  padding: 0px 10px;
-  font-family: 'Poppins';
-  font-size: 0.7em;
-  background: #bbb;
-  color: #555;
-  border-radius: 10px;
-  margin-right: 3px;
+.card_priority {
+    align-self: flex-start;
+    padding: 2px 10px;
+    font-family: 'Poppins';
+    font-size: 0.8em;
+    background: #229922;
+    border-radius: 3px;
+    color: #ccc;
 }
 
-.tag::before{
-  content: '#';
+.card_title {
+    display: flex;
+    font-weight: 200;
+    font-family: 'kufam';
+    justify-content: space-between;
+    margin: 10px 0;
+}
+
+.card_tags {
+    display: flex;
+    flex-direction: row;
+}
+
+.tag {
+    padding: 0px 10px;
+    font-family: 'Poppins';
+    font-size: 0.7em;
+    background: #bbb;
+    color: #555;
+    border-radius: 10px;
+    margin-right: 3px;
+}
+
+.tag::before {
+    content: '#';
 }

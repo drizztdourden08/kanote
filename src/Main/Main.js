@@ -8,6 +8,20 @@ import Column from './components/Column';
 const electron = window.require('electron');
 const remote = electron.remote;
 
+const mainWin = remote.getCurrentWindow();
+
+var t
+
+window.addEventListener('mousemove', event => {
+  if (event.target === document.documentElement) {
+    mainWin.setIgnoreMouseEvents(true, {forward: true})
+    if (t) clearTimeout(t)
+    t = setTimeout(function() {
+        mainWin.setIgnoreMouseEvents(false)
+    }, 150)
+  } else mainWin.setIgnoreMouseEvents(false)
+})
+
 var screen = remote.screen;
 var mainScreen = screen.getPrimaryDisplay()
 const dimensions = mainScreen.size;
@@ -24,6 +38,10 @@ const itemsFromBackend = [
     { id: uuidv4(), content: "", priority: "High", title: "fix Drag Bug", tags: ["UI"] },
     { id: uuidv4(), content: "", priority: "High", title: "Improve performance", tags: ["Code", "Performance"] }
 ];
+
+window.onscroll = function() { 
+    window.scrollTo(0, 0); 
+}; 
 
 const columnsFromBackend = {
     [uuidv4()]: {
@@ -81,10 +99,11 @@ const onDragEnd = (result, columns, setColumns, CallResizeUpdate) => {
 
 
 
+
 const Main = (props) => {
     const [columns, setColumns] = useState(columnsFromBackend);
 
-    const CallResizeUpdate = () => {
+    const CallResizeUpdate = (modifierRow = 1) => {
         const columnCount = Object.keys(columns).length;;
         let maxRow = 0;
         
@@ -92,13 +111,13 @@ const Main = (props) => {
             ([key, column]) => maxRow = Math.max(maxRow, column.items.length)
         );
     
-        ipc.send('ResizeMainWindow', [columnCount, maxRow]);
+        ipc.send('ResizeMainWindow', [columnCount, maxRow + modifierRow, true]);
     };
 
     useEffect(() => {
         console.log("After Render change")
         CallResizeUpdate();
-    }, [])
+    }, [columns])
 
     return (
         <div className="App">
