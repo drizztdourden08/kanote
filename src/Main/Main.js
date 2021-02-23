@@ -58,6 +58,8 @@ const columnsFromBackend = {
     }
 };
 
+console.log("Something");
+
 const onDragEnd = (result, columns, setColumns, CallResizeUpdate) => {
     if (!result.destination) {
         return;
@@ -97,13 +99,10 @@ const onDragEnd = (result, columns, setColumns, CallResizeUpdate) => {
     }
 };
 
-
-
-
 const Main = (props) => {
     const [columns, setColumns] = useState(columnsFromBackend);
 
-    const CallResizeUpdate = (modifierRow = 1) => {
+    const CallResizeUpdate = (modifierRow = 0) => {
         const columnCount = Object.keys(columns).length;;
         let maxRow = 0;
         
@@ -115,7 +114,6 @@ const Main = (props) => {
     };
 
     useEffect(() => {
-        console.log("After Render change")
         CallResizeUpdate();
     }, [columns])
 

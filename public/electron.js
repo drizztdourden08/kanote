@@ -46,8 +46,6 @@ function createMain() {
     return mainWin;
 };
 
-
-
 function createHandle() {
     handleWin = new standardWindow({ 
         y:-35,
@@ -121,10 +119,14 @@ ResizeCenterMain = (columnCount, rowMax, toggled) => {
     const colAddH = 40;
     const cardH = 120;
     const cardMarginH = 10;
-    const appMarginH = 20;
-    const bottomBuffer = 50;
-    const TargetWidth = (((300 + 20) * c));
-    const TargetHeight = colTitleH + colAddH + (cardH * r) + (cardMarginH * (r + 1)) + (appMarginH * 2) + bottomBuffer;
+    const appMarginTopH = 20;
+    const bottomBuffer = 120;
+    
+   // const TargetHeight = colTitleH + colAddH + (cardH * r) + (cardMarginH * (r + 1)) + (appMarginH * 2) + bottomBuffer;
+    const TargetHeight = colTitleH + colAddH + (cardH * r) + (cardMarginH * (r + 1)) + appMarginTopH + bottomBuffer;
+    console.log(TargetHeight);
+
+    const TargetWidth = ((300 + 20) * c);
     const centeredX = (screenWidth / 2) - (TargetWidth / 2);
 
     mainWindow.resizable = true;
@@ -133,14 +135,9 @@ ResizeCenterMain = (columnCount, rowMax, toggled) => {
     mainWindow.resizable = false;
 
     let handleWidth = TargetWidth + 10;
-    let handleHeight = 0; 
+    let handleHeight = 45; 
 
-    toggled ? handleHeight = 45 + 10 : handleHeight = 35; // +10 compensate for unclickable reserved zone for resize
     const handleCenteredX = (screenWidth / 2) - (handleWidth / 2);
-
-    console.log("toggle during resize: " + toggled);
-    console.log("New resize handle width: " + handleWidth);
-    console.log("New resize handle height:: " + handleHeight);
 
     handle.resizable = true;
     handle.setPosition(handleCenteredX, -5);
@@ -161,11 +158,9 @@ const ToggleScroll = () => {
 
     let appToggled;
     if(appY < 0) {
-        console.log("OFF BEFORE");
         appToggled = false;
     }
     else{
-        console.log("ON BEFORE");
         appToggled = true;
     }
 
@@ -184,6 +179,8 @@ const ToggleScroll = () => {
     }
 
     intervalMax = Math.round((appHeight + 35) / Math.abs(modifier));
+    const animationMsTotal = 200;
+    const msInterval = animationMsTotal / intervalMax
     const iID = setInterval(() => {
         if (intervalCount <= intervalMax) {
             let y = appY + (intervalCount * modifier);            
@@ -195,13 +192,12 @@ const ToggleScroll = () => {
             clearInterval(iID);
         };
         intervalCount++;
-    }, 5);
+    }, msInterval);
     return appToggled;
 }
 
 ipc.handle('ToggleScroll', (event, args) => {
     const toggleState =  ToggleScroll();
-    console.log("AFTER: " + toggleState);
     return toggleState;
 });
 

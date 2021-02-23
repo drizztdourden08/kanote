@@ -6,20 +6,16 @@
 /* Poppins */
 
 /* Montserrat */
-
+html{height: 100%;}
 body {
     overflow-x: hidden;
     overflow-y: hidden;
     height: 100%;
     background: transparent;
-}
-
-body {
     padding: 5px;
-    pointer-events: none;
 }
-
-#root, .App, .columns, .column{
+#root{height: 100%;}
+html, body, #root, .App, .columns, .column{
     pointer-events: none; 
 }
 
@@ -27,7 +23,8 @@ body {
 .draggable {-webkit-app-region: drag;}
 
 .App {
-    padding: 20px 0;
+    height: 100%;
+    padding-top: 20px;
 }
 
 .columns {
