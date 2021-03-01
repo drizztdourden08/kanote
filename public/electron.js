@@ -1,3 +1,5 @@
+const { CreateDataDirectory, LoadCurrentUserBoard } = require('./scripts/DataManagement.js');
+
 const electron = require("electron");
 const { app, Menu, Tray } = require("electron");
 
@@ -10,6 +12,9 @@ let mainWindow;
 let handle;
 
 ipc = electron.ipcMain;
+
+CreateDataDirectory();
+LoadCurrentUserBoard();
 
 function createMain() {
     vOptions = {
@@ -38,7 +43,7 @@ function createMain() {
         show: false
     }); 
 
-    //mainWin.webContents.openDevTools();
+    mainWin.webContents.openDevTools();
 
     mainWin.loadURL(isDev ? "http://localhost:3000" : `file://${path.join(__dirname, "../build/index.html")}`); 
     mainWin.on("closed", () => (mainWin = null));
@@ -65,7 +70,7 @@ function createHandle() {
         show: false
     }); 
 
-    //handleWin.webContents.openDevTools();
+    handleWin.webContents.openDevTools();
 
     handleWin.loadURL(isDev ? "http://localhost:3000/handle" : `file://${path.join(__dirname, "../build/index.html/handle")}`); 
     handleWin.on("closed", () => (handleWin = null));
@@ -96,37 +101,25 @@ app.whenReady().then(() => {
 app.on("window-all-closed", () => { if (process.platform !== "darwin") { app.quit(); } });     
 app.on("activate", () => { if (mainWindow === null) { createWindow(); }}); 
 
-let lastColumnCount;
-let lastrowMax;
+let lastAppWidth;
+let lastAppHeight;
 
-ResizeCenterMain = (columnCount, rowMax, toggled) => {
-    let c, r;    
-    columnCount==='last' ? c = lastColumnCount: c = parseInt(columnCount);
-    rowMax==='last' ? r = lastrowMax: r = parseInt(rowMax);
-    
-    //Size is minimum for 3 columns and 3 rows.
-    c = Math.max(3, c);
-    r = Math.max(3, r);
+ResizeCenterMain = (appWidth, appHeight) => {
+    let w, h;    
+    appWidth==='last' ? w = lastAppWidth: w = parseInt(appWidth);
+    appHeight==='last' ? h = lastAppHeight: h = parseInt(appHeight);
 
-    lastColumnCount = c;
-    lastrowMax = r;
+    lastAppWidth = w;
+    lastAppHeight = h;
 
     screenWidth = getScreenWidth();
-    const [appWidth, appHeight] = mainWindow.getSize();
     let [appX, appY] = mainWindow.getPosition()
 
-    const colTitleH = 50;
-    const colAddH = 40;
-    const cardH = 120;
-    const cardMarginH = 10;
-    const appMarginTopH = 20;
     const bottomBuffer = 120;
     
-   // const TargetHeight = colTitleH + colAddH + (cardH * r) + (cardMarginH * (r + 1)) + (appMarginH * 2) + bottomBuffer;
-    const TargetHeight = colTitleH + colAddH + (cardH * r) + (cardMarginH * (r + 1)) + appMarginTopH + bottomBuffer;
-    console.log(TargetHeight);
+    const TargetHeight = h + bottomBuffer;
 
-    const TargetWidth = ((300 + 20) * c);
+    const TargetWidth = w;
     const centeredX = (screenWidth / 2) - (TargetWidth / 2);
 
     mainWindow.resizable = true;
@@ -145,16 +138,14 @@ ResizeCenterMain = (columnCount, rowMax, toggled) => {
     handle.resizable = false;
 };
 
-ipc.on('ResizeMainWindow', (event, args) => {
-    ResizeCenterMain(args[0], args[1], args[2]);
+ipc.on('ResizeMainWindow', (event, [appWidth, appHeight] = args) => {
+    ResizeCenterMain(appWidth, appHeight);
 });
-
 
 const ToggleScroll = () => {
     screenWidth = getScreenWidth();
     const [appWidth, appHeight] = mainWindow.getSize();
     let [appX, appY] = mainWindow.getPosition()
-    let [handleX, handleY] = handle.getPosition()
 
     let appToggled;
     if(appY < 0) {
@@ -200,8 +191,6 @@ ipc.handle('ToggleScroll', (event, args) => {
     const toggleState =  ToggleScroll();
     return toggleState;
 });
-
-
 
 getScreenWidth = () => {
     var screen = electron.screen;

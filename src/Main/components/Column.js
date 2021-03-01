@@ -14,7 +14,7 @@ const Column = (props) => {
             <div className="column_title">
                 <span>{props.column.title}</span>
             </div>
-            <a className="AddIcon">
+            <a className="add-icon add-icon_card">
                 <AiOutlinePlus />
             </a>
             <div className="column_cards">

@@ -12,7 +12,7 @@ body {
     overflow-y: hidden;
     height: 100%;
     background: transparent;
-    padding: 5px;
+    padding: 0;
 }
 #root{height: 100%;}
 html, body, #root, .App, .columns, .column{
@@ -23,13 +23,25 @@ html, body, #root, .App, .columns, .column{
 .draggable {-webkit-app-region: drag;}
 
 .App {
-    height: 100%;
+    display: flex;
+    flex-direction: row;
     padding-top: 20px;
 }
 
 .columns {
     display: flex;
     flex-direction: row;
+}
+
+.columns_add{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+
+    background: #00000022;
 }
 
 .column {
@@ -64,16 +76,18 @@ html, body, #root, .App, .columns, .column{
     cursor: pointer;
 }
 
-.AddIcon, .AddIcon:focus {
+.add-icon_card{
+    margin-top: 10px;
+    align-self: center;
+}
+
+.add-icon, .add-icon:focus {
     display: flex;
     align-items: center;
     justify-content: center;
-    align-self: center;
 
     height: 40px;
     width: 40px;
-
-    margin-top: 10px;
 
     background: rgba(0, 0, 0, 0.5);
     color: #fff;
@@ -84,11 +98,11 @@ html, body, #root, .App, .columns, .column{
     cursor: pointer;
 }
 
-.AddIcon:hover {
+.add-icon:hover {
     background: linear-gradient(#F05D60, #CE4F51);
 }
 
-.AddIcon:active {
+.add-icon:active {
 
     background: linear-gradient(#CE4F51, #F05D60);
 }

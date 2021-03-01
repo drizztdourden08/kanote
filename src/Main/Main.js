@@ -1,26 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
+
+import { MouseMoveDetect } from '../scripts/ElectronClickThrough';
 
 import './Main.css';
 
 import Column from './components/Column';
 
+import { AiOutlinePlus } from 'react-icons/ai';
+
+MouseMoveDetect();
+
+
 const electron = window.require('electron');
 const remote = electron.remote;
-
-const mainWin = remote.getCurrentWindow();
-
-var t
-
-window.addEventListener('mousemove', event => {
-  if (event.target === document.documentElement) {
-    mainWin.setIgnoreMouseEvents(true, {forward: true})
-    if (t) clearTimeout(t)
-    t = setTimeout(function() {
-        mainWin.setIgnoreMouseEvents(false)
-    }, 150)
-  } else mainWin.setIgnoreMouseEvents(false)
-})
 
 var screen = remote.screen;
 var mainScreen = screen.getPrimaryDisplay()
@@ -31,6 +24,10 @@ const { v4: uuidv4 } = require('uuid');
 
 const ipc = window.require('electron').ipcRenderer;
 
+window.onscroll = function () {
+    window.scrollTo(0, 0);
+};
+
 const itemsFromBackend = [
     { id: uuidv4(), content: "", priority: "High", title: "Correct Err:35", tags: ["Code", "Table"] },
     { id: uuidv4(), content: "", priority: "Medium", title: "Test", tags: ["Plan", "Testing"] },
@@ -38,10 +35,6 @@ const itemsFromBackend = [
     { id: uuidv4(), content: "", priority: "High", title: "fix Drag Bug", tags: ["UI"] },
     { id: uuidv4(), content: "", priority: "High", title: "Improve performance", tags: ["Code", "Performance"] }
 ];
-
-window.onscroll = function() { 
-    window.scrollTo(0, 0); 
-}; 
 
 const columnsFromBackend = {
     [uuidv4()]: {
@@ -58,9 +51,7 @@ const columnsFromBackend = {
     }
 };
 
-console.log("Something");
-
-const onDragEnd = (result, columns, setColumns, CallResizeUpdate) => {
+const onDragEnd = (result, columns, setColumns) => {
     if (!result.destination) {
         return;
     }
@@ -101,31 +92,40 @@ const onDragEnd = (result, columns, setColumns, CallResizeUpdate) => {
 
 const Main = (props) => {
     const [columns, setColumns] = useState(columnsFromBackend);
+    const columnsRef = useRef(null);
+    const columnsAddRef = useRef(null);
 
-    const CallResizeUpdate = (modifierRow = 0) => {
+    const CallResizeUpdate = (appHeight, appWidth) => {
         const columnCount = Object.keys(columns).length;;
         let maxRow = 0;
-        
+
         Object.entries(columns).forEach(
             ([key, column]) => maxRow = Math.max(maxRow, column.items.length)
         );
-    
-        ipc.send('ResizeMainWindow', [columnCount, maxRow + modifierRow, true]);
+
+        ipc.send('ResizeMainWindow', [appWidth, appHeight]);
     };
 
     useEffect(() => {
-        CallResizeUpdate();
-    }, [columns])
+        const appHeight = columnsRef.current.offsetHeight;
+        const appWidth = columnsRef.current.offsetWidth + columnsAddRef.current.offsetWidth;
+        CallResizeUpdate(appHeight, appWidth);
+    }, [columnsRef, columnsAddRef, columns]);
 
     return (
-        <div className="App">
-            <DragDropContext onDragEnd={result => onDragEnd(result, columns, setColumns, CallResizeUpdate)}>
-                <div className="columns">
-                    {Object.entries(columns).map(([columnId, column], index) => { 
-                        return(
+        <div className="App" >
+            <DragDropContext onDragEnd={result => onDragEnd(result, columns, setColumns)}>
+                <div className="columns" ref={columnsRef}>
+                    {Object.entries(columns).map(([columnId, column], index) => {
+                        return (
                             <Column columnId={columnId} column={column} key={index} />
                         );
                     })}
+                </div>
+                <div className="columns_add" ref={columnsAddRef}>
+                    <a className="add-icon add-icon_column">
+                        <AiOutlinePlus />
+                    </a>
                 </div>
             </DragDropContext>
         </div>
