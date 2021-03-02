@@ -14,7 +14,7 @@ const Column = (props) => {
             <div className="column_title">
                 <span>{props.column.title}</span>
             </div>
-            <a className="add-icon add-icon_card">
+            <a className="add-icon add-icon_card" onClick={props.addFunction}>
                 <AiOutlinePlus />
             </a>
             <div className="column_cards">
@@ -26,7 +26,7 @@ const Column = (props) => {
                                 ref={provided.innerRef}
                                 className={snapshot.isDraggingOver ? 'column-visible' : ''}
                             >
-                                {props.column.items.map((item, index) => { return (<Card item={item} index={index} key={index} />); })}
+                                {props.column.items ? props.column.items.map((item, index) => { return (<Card item={item} index={index} key={index} />); }) : null}
                                 {provided.placeholder}
                             </div>
                         );

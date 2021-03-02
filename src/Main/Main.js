@@ -28,29 +28,6 @@ window.onscroll = function () {
     window.scrollTo(0, 0);
 };
 
-const itemsFromBackend = [
-    { id: uuidv4(), content: "", priority: "High", title: "Correct Err:35", tags: ["Code", "Table"] },
-    { id: uuidv4(), content: "", priority: "Medium", title: "Test", tags: ["Plan", "Testing"] },
-    { id: uuidv4(), content: "", priority: "Low", title: "Add items", tags: ["Content", "Team 3"] },
-    { id: uuidv4(), content: "", priority: "High", title: "fix Drag Bug", tags: ["UI"] },
-    { id: uuidv4(), content: "", priority: "High", title: "Improve performance", tags: ["Code", "Performance"] }
-];
-
-const columnsFromBackend = {
-    [uuidv4()]: {
-        title: "To do",
-        items: itemsFromBackend
-    },
-    [uuidv4()]: {
-        title: "In Progress",
-        items: []
-    },
-    [uuidv4()]: {
-        title: "Done",
-        items: []
-    }
-};
-
 const onDragEnd = (result, columns, setColumns) => {
     if (!result.destination) {
         return;
@@ -90,21 +67,60 @@ const onDragEnd = (result, columns, setColumns) => {
     }
 };
 
+const AddItem = (columnKey, columns, setColumns) => {
+    console.log("Adding to..." + columnKey)
+    const newItem = { id: '' + (Math.random() * 1000 + 15) + '', category: '1', content: "", priority: "High", title: "xcvbdf", tags: ["Test", "New"] };
+    let tempColumns = {...columns};
+    tempColumns[columnKey].items.push(newItem);
+    setColumns(tempColumns);
+};
+
+const AddColumn = (columns, setColumns) => {
+    console.log("Adding column...")
+    const newColumn = {
+        title: "Test Column",
+        items: []
+    };
+    let tempColumns = {...columns};
+    tempColumns['' + (Math.random() * 1000 + 15) + ''] = newColumn;
+    setColumns(tempColumns);
+};
+
 const Main = (props) => {
-    const [columns, setColumns] = useState(columnsFromBackend);
+    const GetInitialData = () => {       
+        ipc.invoke('GetInitialData', null).then((result) => {
+            let columns = {...result[0]};
+            const items = [...result[1]];
+
+            columns = calculateColumns(columns, items);
+            setColumns(columns);
+        });
+    }
+    
+    const calculateColumns = (columns = [], _items = []) => {
+        if (columns.length === 0) return;
+
+        if (_items.length > 0) {
+            Object.entries(columns).forEach(([key]) => {
+                    columns[key].items = Array.from(_items.filter(item => item.category === key))
+                });
+        }
+
+        return columns;
+    };
+
+    const [columns, setColumns] = useState([]);
+
     const columnsRef = useRef(null);
     const columnsAddRef = useRef(null);
 
     const CallResizeUpdate = (appHeight, appWidth) => {
-        const columnCount = Object.keys(columns).length;;
-        let maxRow = 0;
-
-        Object.entries(columns).forEach(
-            ([key, column]) => maxRow = Math.max(maxRow, column.items.length)
-        );
-
         ipc.send('ResizeMainWindow', [appWidth, appHeight]);
     };
+
+    useEffect(() => { //Initial Render load Data
+        GetInitialData();
+      }, []);
 
     useEffect(() => {
         const appHeight = columnsRef.current.offsetHeight;
@@ -116,14 +132,14 @@ const Main = (props) => {
         <div className="App" >
             <DragDropContext onDragEnd={result => onDragEnd(result, columns, setColumns)}>
                 <div className="columns" ref={columnsRef}>
-                    {Object.entries(columns).map(([columnId, column], index) => {
+                    {columns ? Object.entries(columns).map(([columnId, column], index) => {
                         return (
-                            <Column columnId={columnId} column={column} key={index} />
+                            <Column columnId={columnId} column={column} key={index} addFunction={() => AddItem(columnId, columns, setColumns)}/>
                         );
-                    })}
+                    }):null}
                 </div>
                 <div className="columns_add" ref={columnsAddRef}>
-                    <a className="add-icon add-icon_column">
+                    <a className="add-icon add-icon_column" onClick={() => AddColumn(columns, setColumns)} >
                         <AiOutlinePlus />
                     </a>
                 </div>

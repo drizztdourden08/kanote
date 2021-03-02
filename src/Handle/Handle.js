@@ -7,11 +7,8 @@ import {IoIosArrowUp} from 'react-icons/io';
 const ipc = window.require('electron').ipcRenderer;
 
 const electron = window.require('electron');
-console.log(electron);
 const remote = electron.remote;
-console.log(remote);
 const handleWin = remote.getCurrentWindow();
-console.log(handleWin);
 
 var t
 
