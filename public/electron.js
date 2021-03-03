@@ -207,29 +207,33 @@ getScreenHeight = () => {
 }
 
 ipc.handle('GetInitialData', (event, args) => {
-    const itemsFromBackend = [
-        { id: '4', category: '1', content: "", priority: "High", title: "Correct Err:35", tags: ["Code", "Table"] },
-        { id: '5', category: '1', content: "", priority: "Medium", title: "Test", tags: ["Plan", "Testing"] },
-        { id: '6', category: '1', content: "", priority: "Low", title: "Add items", tags: ["Content", "Team 3"] },
-        { id: '7', category: '2', content: "", priority: "High", title: "fix Drag Bug", tags: ["UI"] },
-        { id: '9', category: '2', content: "", priority: "High", title: "fix Drag Bug", tags: ["UI"] },
-        { id: '8', category: '3', content: "", priority: "High", title: "Improve performance", tags: ["Code", "Performance"] }
-    ];
+    const itemsFromBackend = [];
     
-    const columnsFromBackend = {
-        ['1']: {
-            title: "To do",
-            items: []
-        },
-        ['2']: {
-            title: "In Progress",
-            items: []
-        },
-        ['3']: {
-            title: "Done",
-            items: []
-        }
-    };
+    const columnsFromBackend = {};
 
     return [columnsFromBackend, itemsFromBackend];
 });
+
+// const itemsFromBackend = [
+//     { id: '4', category: '1', content: "", priority: "High", title: "Correct Err:35", tags: ["Code", "Table"] },
+//     { id: '5', category: '1', content: "", priority: "Medium", title: "Test", tags: ["Plan", "Testing"] },
+//     { id: '6', category: '1', content: "", priority: "Low", title: "Add items", tags: ["Content", "Team 3"] },
+//     { id: '7', category: '2', content: "", priority: "High", title: "fix Drag Bug", tags: ["UI"] },
+//     { id: '9', category: '2', content: "", priority: "High", title: "fix Drag Bug", tags: ["UI"] },
+//     { id: '8', category: '3', content: "", priority: "High", title: "Improve performance", tags: ["Code", "Performance"] }
+// ];
+
+// const columnsFromBackend = {
+//     ['1']: {
+//         title: "To do",
+//         items: []
+//     },
+//     ['2']: {
+//         title: "In Progress",
+//         items: []
+//     },
+//     ['3']: {
+//         title: "Done",
+//         items: []
+//     }
+// };

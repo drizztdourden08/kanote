@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
-
 import { MouseMoveDetect } from '../scripts/ElectronClickThrough';
 
 import './Main.css';
@@ -9,25 +8,20 @@ import Column from './components/Column';
 
 import { AiOutlinePlus } from 'react-icons/ai';
 
-MouseMoveDetect();
-
-
 const electron = window.require('electron');
 const remote = electron.remote;
-
-var screen = remote.screen;
-var mainScreen = screen.getPrimaryDisplay()
-const dimensions = mainScreen.size;
-const screenWidth = dimensions.width;
+const ipc = window.require('electron').ipcRenderer;
 
 const { v4: uuidv4 } = require('uuid');
 
-const ipc = window.require('electron').ipcRenderer;
+//General Functions for windows functionalities
+MouseMoveDetect();
 
 window.onscroll = function () {
     window.scrollTo(0, 0);
 };
 
+//Draging Functions
 const onDragEnd = (result, columns, setColumns) => {
     if (!result.destination) {
         return;
@@ -67,24 +61,45 @@ const onDragEnd = (result, columns, setColumns) => {
     }
 };
 
-const AddItem = (columnKey, columns, setColumns) => {
-    console.log("Adding to..." + columnKey)
-    const newItem = { id: '' + (Math.random() * 1000 + 15) + '', category: '1', content: "", priority: "High", title: "xcvbdf", tags: ["Test", "New"] };
+//Kaban Board Functions
+const AddColumn = (columns, setColumns) => {
+    const newColumnTemplate = {
+        title: "Test Column",
+        items: [],
+        editing: true
+    };
     let tempColumns = {...columns};
-    tempColumns[columnKey].items.push(newItem);
+    tempColumns[uuidv4()] = newColumnTemplate;
     setColumns(tempColumns);
 };
 
-const AddColumn = (columns, setColumns) => {
-    console.log("Adding column...")
-    const newColumn = {
-        title: "Test Column",
-        items: []
-    };
+const UpdateColumn = (key, updatedColumn, columns, setColumns) => {
     let tempColumns = {...columns};
-    tempColumns['' + (Math.random() * 1000 + 15) + ''] = newColumn;
+    const items = tempColumns[key].items;
+    tempColumns[key] = updatedColumn;
+    console.log(tempColumns);
+    console.log(items);
+    tempColumns[key].items = items;
+    tempColumns[key].editing = false;
+
     setColumns(tempColumns);
 };
+
+const AddItem = (columnKey, columns, setColumns) => {
+    console.log("Adding to..." + columnKey)
+    const newItemTemplate = { 
+        id: '' + (Math.random() * 1000 + 15) + '',
+        category: '1',
+        content: "", 
+        priority: "High", 
+        title: "xcvbdf", 
+        tags: ["Test", "New"] };
+    let tempColumns = {...columns};
+    tempColumns[columnKey].items.push(newItemTemplate);
+    setColumns(tempColumns);
+};
+
+
 
 const Main = (props) => {
     const GetInitialData = () => {       
@@ -134,7 +149,7 @@ const Main = (props) => {
                 <div className="columns" ref={columnsRef}>
                     {columns ? Object.entries(columns).map(([columnId, column], index) => {
                         return (
-                            <Column columnId={columnId} column={column} key={index} addFunction={() => AddItem(columnId, columns, setColumns)}/>
+                            <Column columnId={columnId} column={column} key={index} addItem={() => AddItem(columnId, columns, setColumns)} updateColumn={(updatedColumn) => UpdateColumn(columnId, updatedColumn, columns, setColumns)} />
                         );
                     }):null}
                 </div>
