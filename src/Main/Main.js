@@ -88,7 +88,7 @@ const UpdateColumn = (key, updatedColumn, columns, setColumns) => {
 const AddItem = (columnKey, columns, setColumns) => {
     console.log("Adding to..." + columnKey)
     const newItemTemplate = { 
-        id: '' + (Math.random() * 1000 + 15) + '',
+        id: uuidv4(),
         category: '1',
         content: "", 
         priority: "High", 
