@@ -59,9 +59,10 @@ html, body, #root, .App, .columns, .column{
 
 .column_title {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    height: 40px;
+    
+
 
     padding: 5px 10px;
     
@@ -73,8 +74,38 @@ html, body, #root, .App, .columns, .column{
     font-size: 1.25em;
 }
 
-.column_title .icons{
+.column_title div{
+    width: 100%;
+}
+
+.column_title div div:first-child{
     display: flex;
+    flex-direction: row;
+    
+    width: 100%;
+    margin: 3px 0;
+}
+
+.column_title div div:first-child span{
+    display: flex;
+    align-self: center;
+    flex-grow: 1;
+}
+
+.column_title div div:first-child div{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    flex-basis: 3em;
+    flex-shrink: 0;
+}
+
+.column_title div div:nth-child(2){
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;   
+    width: 100%;
+    margin: 3px 0;
 }
 
 .add-icon_card{
@@ -94,7 +125,7 @@ html, body, #root, .App, .columns, .column{
     color: #fff;
     border: solid 1px #F05D60;
 
-    font-size: 1.6em;    
+    font-size: 1.6em;
 
     cursor: pointer;
 }
@@ -166,7 +197,7 @@ html, body, #root, .App, .columns, .column{
     content: '#';
 }
 
-.accept-button, .cancel-button, .modify-button{
+.accept-button, .cancel-button, .standard-button{
     display: flex;
     align-items: center;
     justify-content: center;
@@ -185,7 +216,7 @@ html, body, #root, .App, .columns, .column{
     color:#dd7a7a;
 }
 
-.modify-button:hover{
+.standard-button:hover{
     color:#fff;
 }
 
@@ -199,6 +230,7 @@ input[type="text"]{
     border-bottom:solid 1px #F05D60;
     background: none;
 
+    font-family: 'kufam';
     font-size: 1.05em;
     color:#ddd;
 }

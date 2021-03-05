@@ -29,105 +29,159 @@ const onDragEnd = (result, columns, setColumns) => {
     const { source, destination } = result;
 
     if (source.droppableId !== destination.droppableId) {
-        const sourceColumn = columns[source.droppableId];
-        const destColumn = columns[destination.droppableId];
+        let tempColumns = [...columns];
+
+        const sourceIndex = tempColumns.findIndex((c) => c.id === source.droppableId);
+        let sourceColumn = tempColumns.splice(sourceIndex, 1)[0];
+
+        const destIndex = tempColumns.findIndex((c) => c.id === destination.droppableId);
+        let destColumn = tempColumns.splice(destIndex, 1)[0];
+        
         const sourceItems = [...sourceColumn.items];
         const destItems = [...destColumn.items];
         const [removed] = sourceItems.splice(source.index, 1);
         destItems.splice(destination.index, 0, removed);
-        setColumns({
-            ...columns,
-            [source.droppableId]: {
-                ...sourceColumn,
-                items: sourceItems
-            },
-            [destination.droppableId]: {
-                ...destColumn,
-                items: destItems
-            }
-        });
+
+        sourceColumn = {...sourceColumn, items: sourceItems};
+        destColumn = {...destColumn, items: destItems};
+        
+        tempColumns = [...tempColumns, sourceColumn, destColumn];
+        tempColumns.sort((a, b) => a.position - b.position); 
+
+        setColumns(tempColumns);
+
     } else {
-        const column = columns[source.droppableId];
+        let tempColumns = [...columns];
+        
+        const cIndex = tempColumns.findIndex((c) => c.id === source.droppableId);
+        let column = tempColumns.splice(cIndex, 1)[0];
+
         const copiedItems = [...column.items];
         const [removed] = copiedItems.splice(source.index, 1);
         copiedItems.splice(destination.index, 0, removed);
-        setColumns({
-            ...columns,
-            [source.droppableId]: {
-                ...column,
-                items: copiedItems
-            }
-        });
+        
+        column = {...column, items: copiedItems};
+
+        tempColumns = [...tempColumns, column];
+        tempColumns.sort((a, b) => a.position - b.position); 
+
+        setColumns(tempColumns);
     }
 };
 
 //Kaban Board Functions
 const AddColumn = (columns, setColumns) => {
+    let tempColumns = [...columns];
+    const columnsCount = tempColumns.length;
+
     const newColumnTemplate = {
-        title: "Test Column",
+        id: uuidv4(),
+        title: "",
+        position: columnsCount, //zero-based
         items: [],
-        editing: true
+        editing: true,
+        moveColumnBy: 0,
+        toDelete: false,
+        cancelChanges: false,
+        originalColumn: {}
     };
-    let tempColumns = {...columns};
-    tempColumns[uuidv4()] = newColumnTemplate;
+    tempColumns.push(newColumnTemplate);
+    tempColumns.sort((a, b) => a.position - b.position); 
     setColumns(tempColumns);
 };
 
-const UpdateColumn = (key, updatedColumn, columns, setColumns) => {
-    let tempColumns = {...columns};
-    const items = tempColumns[key].items;
-    tempColumns[key] = updatedColumn;
-    console.log(tempColumns);
-    console.log(items);
-    tempColumns[key].items = items;
-    tempColumns[key].editing = false;
+const UpdateColumn = (newProps, key, columns, setColumns) => {
+    let tempColumns = [...columns];
 
+    const cIndex = tempColumns.findIndex((c) => c.id === key);
+    let column = tempColumns.splice(cIndex, 1)[0];
+    
+    const items = [...column.items];
+
+    newProps.map((prop) => {
+        column[prop.property] = prop.newValue;
+        if (prop.property === "editing" && prop.newValue === true) column.originalColumn = {...column};
+    });
+
+    if (column.cancelChanges){
+        column.title = column.originalColumn.title;
+        column.originalColumn = {};
+        column.cancelChanges = false;
+    }
+    
+
+    if (!column.toDelete){
+        if  (
+                column.moveColumnBy != 0 
+                && 
+                (((column.position + column.moveColumnBy) >= 0) && ((column.position + column.moveColumnBy) <= tempColumns.length))  
+            ){
+            
+            let columnToMoveIndex = tempColumns.findIndex((c) => c.position === (column.position + column.moveColumnBy))
+            let columnToMove = tempColumns.splice(columnToMoveIndex, 1)[0];
+            columnToMove.position -= column.moveColumnBy;
+
+            column.position += column.moveColumnBy;
+            column.moveColumnBy = 0;
+
+            tempColumns = [...tempColumns, columnToMove]
+        }
+
+        tempColumns = [...tempColumns, column]
+    }
+
+    tempColumns.sort((a, b) => a.position - b.position); 
     setColumns(tempColumns);
 };
 
-const AddItem = (columnKey, columns, setColumns) => {
-    console.log("Adding to..." + columnKey)
+const AddItem = (key, columns, setColumns) => {
     const newItemTemplate = { 
         id: uuidv4(),
         category: '1',
         content: "", 
         priority: "High", 
-        title: "xcvbdf", 
+        title: "" + Math.random() *1000 + "", 
         tags: ["Test", "New"] };
-    let tempColumns = {...columns};
-    tempColumns[columnKey].items.push(newItemTemplate);
+    let tempColumns = [...columns];
+
+    const cIndex = tempColumns.findIndex((c) => c.id === key);
+    let column = tempColumns.splice(cIndex, 1)[0];
+
+    column.items.push(newItemTemplate);
+    tempColumns = [...tempColumns, column]
+
+    tempColumns.sort((a, b) => a.position - b.position); 
     setColumns(tempColumns);
 };
 
-
-
 const Main = (props) => {
-    const GetInitialData = () => {       
-        ipc.invoke('GetInitialData', null).then((result) => {
-            let columns = {...result[0]};
-            const items = [...result[1]];
-
-            columns = calculateColumns(columns, items);
-            setColumns(columns);
-        });
-    }
-    
-    const calculateColumns = (columns = [], _items = []) => {
-        if (columns.length === 0) return;
-
-        if (_items.length > 0) {
-            Object.entries(columns).forEach(([key]) => {
-                    columns[key].items = Array.from(_items.filter(item => item.category === key))
-                });
-        }
-
-        return columns;
-    };
-
     const [columns, setColumns] = useState([]);
 
     const columnsRef = useRef(null);
     const columnsAddRef = useRef(null);
+
+    const GetInitialData = () => {       
+        ipc.invoke('GetInitialData', null).then((result) => {
+            let tempColumns = result[0];
+            const tempItems = result[1];
+
+            tempColumns = calculateColumns(tempColumns, tempItems);
+
+            setColumns(tempColumns);
+        });
+    }
+    
+    const calculateColumns = (_columns = [], _items = []) => {
+        if (_columns.length === 0) return _columns;
+
+        if (_items.length > 0) {
+            Object.entries(_columns).forEach(([key]) => {
+                _columns[key].items = Array.from(_items.filter(item => item.category === key))
+                });
+        }
+
+        return _columns;
+    };
 
     const CallResizeUpdate = (appHeight, appWidth) => {
         ipc.send('ResizeMainWindow', [appWidth, appHeight]);
@@ -147,9 +201,9 @@ const Main = (props) => {
         <div className="App" >
             <DragDropContext onDragEnd={result => onDragEnd(result, columns, setColumns)}>
                 <div className="columns" ref={columnsRef}>
-                    {columns ? Object.entries(columns).map(([columnId, column], index) => {
+                    {columns ? columns.map((column, index) => {
                         return (
-                            <Column columnId={columnId} column={column} key={index} addItem={() => AddItem(columnId, columns, setColumns)} updateColumn={(updatedColumn) => UpdateColumn(columnId, updatedColumn, columns, setColumns)} />
+                            <Column columnId={column.id} column={column} key={index} addItem={() => AddItem(column.id, columns, setColumns)} updateColumn={(newProps = []) => UpdateColumn(newProps, column.id, columns, setColumns)} />
                         );
                     }):null}
                 </div>

@@ -209,7 +209,7 @@ getScreenHeight = () => {
 ipc.handle('GetInitialData', (event, args) => {
     const itemsFromBackend = [];
     
-    const columnsFromBackend = {};
+    const columnsFromBackend = [];
 
     return [columnsFromBackend, itemsFromBackend];
 });
