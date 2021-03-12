@@ -1,6 +1,6 @@
 {
   "name": "kanote",
-  "version": "0.1.143",
+  "version": "0.1.188",
   "private": true,
   "description": "Kaban Board Quick personal app",
   "author": "Johnny Prescott",
@@ -42,9 +42,93 @@
   },
   "eslintConfig": {
     "extends": [
+      "eslint:recommended",
+      "plugin:react/recommended",
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "rules": {
+      "semi": "error",
+      "quotes": [
+        "error",
+        "single"
+      ],
+      "camelcase": [
+        "error",
+        {
+          "properties": "always"
+        }
+      ],
+      "id-match": [
+        "error",
+        "(^[A-Za-z][a-z]*([A-Z][a-z]+)*([0-9]{0,2}|[A-Z])$|JSON)",
+        {
+          "properties": true,
+          "ignoreDestructuring": false,
+          "onlyDeclarations": true
+        }
+      ],
+      "array-bracket-newline": "error",
+      "array-bracket-spacing": "error",
+      "array-callback-return": "off",
+      "block-spacing": "error",
+      "brace-style": "error",
+      "comma-dangle": "error",
+      "computed-property-spacing": "error",
+      "func-call-spacing": "error",
+      "func-name-matching": "error",
+      "indent": "error",
+      "jsx-quotes": "error",
+      "key-spacing": "error",
+      "object-curly-spacing": [
+        "error",
+        "always"
+      ],
+      "object-curly-newline": "error",
+      "prefer-object-spread": "error",
+      "keyword-spacing": "error",
+      "no-trailing-spaces": "error",
+      "prefer-const": "error",
+      "no-const-assign": "error",
+      "no-duplicate-imports": "error",
+      "prefer-arrow-callback": "error",
+      "react/jsx-pascal-case": "error",
+      "react-hooks/exhaustive-deps": "off",
+      "react/function-component-definition": [
+        2,
+        {
+          "namedComponents": "arrow-function"
+        }
+      ],
+      "react/style-prop-object": "error",
+      "react/prop-types": 0
+    },
+    "settings": {
+      "react": {
+        "createClass": "createReactClass",
+        "pragma": "React",
+        "fragment": "Fragment",
+        "version": "detect",
+        "flowVersion": "0.53"
+      },
+      "propWrapperFunctions": [
+        "forbidExtraProps",
+        {
+          "property": "freeze",
+          "object": "Object"
+        },
+        {
+          "property": "myFavoriteWrapper"
+        }
+      ],
+      "linkComponents": [
+        "Hyperlink",
+        {
+          "name": "Link",
+          "linkAttribute": "to"
+        }
+      ]
+    }
   },
   "browserslist": {
     "production": [
@@ -57,5 +141,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "eslint-plugin-react": "^7.22.0"
   }
 }

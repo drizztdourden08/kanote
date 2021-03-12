@@ -9,7 +9,7 @@ const documentFolder = app.getPath('documents');
 const appName = app.getName();
 const mainPath = documentFolder + '\\' + appName;
 
-const CreateDataDirectory = () => {    
+const CreateDataDirectory = () => {
     if (!existsSync(mainPath)) {
         mkdir(mainPath, { recursive: true }, (err) => {
             if (err) throw err;
@@ -21,24 +21,24 @@ const LoadCurrentUserBoard = (boardName = '') => {
     if (boardName === '') { }
 
     const itemsFromBackend = [
-        { id: uuidv4(), content: "", priority: "High", title: "Correct Err:35", tags: ["Code", "Table"] },
-        { id: uuidv4(), content: "", priority: "Medium", title: "Test", tags: ["Plan", "Testing"] },
-        { id: uuidv4(), content: "", priority: "Low", title: "Add items", tags: ["Content", "Team 3"] },
-        { id: uuidv4(), content: "", priority: "High", title: "fix Drag Bug", tags: ["UI"] },
-        { id: uuidv4(), content: "", priority: "High", title: "Improve performance", tags: ["Code", "Performance"] }
+        { id: uuidv4(), content: '', priority: 'High', title: 'Correct Err:35', tags: ['Code', 'Table'] },
+        { id: uuidv4(), content: '', priority: 'Medium', title: 'Test', tags: ['Plan', 'Testing'] },
+        { id: uuidv4(), content: '', priority: 'Low', title: 'Add items', tags: ['Content', 'Team 3'] },
+        { id: uuidv4(), content: '', priority: 'High', title: 'fix Drag Bug', tags: ['UI'] },
+        { id: uuidv4(), content: '', priority: 'High', title: 'Improve performance', tags: ['Code', 'Performance'] }
     ];
 
     const columnsFromBackend = {
         [uuidv4()]: {
-            title: "To do",
+            title: 'To do',
             items: itemsFromBackend
         },
         [uuidv4()]: {
-            title: "In Progress",
+            title: 'In Progress',
             items: []
         },
         [uuidv4()]: {
-            title: "Done",
+            title: 'Done',
             items: []
         }
     };
@@ -53,4 +53,4 @@ const LoadCurrentUserBoard = (boardName = '') => {
 
 
 
-module.exports = { CreateDataDirectory, LoadCurrentUserBoard } 
+module.exports = { CreateDataDirectory, LoadCurrentUserBoard };

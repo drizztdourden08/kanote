@@ -10,14 +10,19 @@ html, body, #root{
 * {pointer-events: all;}
 .draggable {-webkit-app-region: drag;}
 
+.handle-container{
+    width: 100%;
+
+    padding: 5px;
+}
+
 .handle {
     display: flex;
     align-items: flex-start;
     justify-content: center;
 
     margin: auto;
-    padding: 5px;
-
+    
     width: 100% - 5px;
     height: 35px;
     

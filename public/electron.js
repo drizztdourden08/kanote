@@ -1,239 +1,221 @@
 const { CreateDataDirectory, LoadCurrentUserBoard } = require('./scripts/DataManagement.js');
 
-const electron = require("electron");
-const { app, Menu, Tray } = require("electron");
+const electron = require('electron');
+const { app, Menu, Tray } = require('electron');
 
 const standardWindow = electron.BrowserWindow;
-const {BrowserWindow} = require("electron-acrylic-window");
-const path = require("path"); 
-const isDev = require("electron-is-dev"); 
+const { BrowserWindow } = require('electron-acrylic-window');
+const path = require('path');
+const isDev = require('electron-is-dev');
 
 let mainWindow;
 let handle;
 
-ipc = electron.ipcMain;
+const ipc = electron.ipcMain;
 
 CreateDataDirectory();
 LoadCurrentUserBoard();
 
 function createMain() {
-    vOptions = {
+    const vOptions = {
         theme: 'appearance-based',
         effect: 'acrylic',
         useCustomWindowRefreshMethod: true,
         maximumRefreshRate: 60,
         disableOnBlur: false
-     }
+    };
 
-    mainWin = new standardWindow({ 
-        y:36,
-        x:0,
-        width: 930, 
+    let mainWin = new standardWindow({
+        y: 36,
+        x: 0,
+        width: 930,
         height: 600,
         frame: false,
         transparent: true,
         alwaysOnTop: true,
         resizable: false,
+        fullscreenable: false,
         skipTaskbar: true,
-        webPreferences: { 
-            webSecurity: false, 
+        webPreferences: {
+            webSecurity: false,
             nodeIntegration: true,
             enableRemoteModule: true
         },
         show: false
-    }); 
+    });
 
     mainWin.webContents.openDevTools();
 
-    mainWin.loadURL(isDev ? "http://localhost:3000" : `file://${path.join(__dirname, "../build/index.html")}`); 
-    mainWin.on("closed", () => (mainWin = null));
+    mainWin.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
+    mainWin.on('closed', () => (mainWin = null));
 
     return mainWin;
-};
+}
 
 function createHandle() {
-    handleWin = new standardWindow({ 
-        y:-35,
-        x:0,
-        width: 100, 
+    let handleWin = new standardWindow({
+        y: -35,
+        x: 0,
+        width: 100,
         height: 35,
         frame: false,
         transparent: true,
         alwaysOnTop: true,
         resizable: true,
+        fullscreenable: false,
         skipTaskbar: true,
-        webPreferences: { 
-            webSecurity: false, 
+        webPreferences: {
+            webSecurity: false,
             nodeIntegration: true,
             enableRemoteModule: true
         },
         show: false
-    }); 
+    });
 
     handleWin.webContents.openDevTools();
 
-    handleWin.loadURL(isDev ? "http://localhost:3000/handle" : `file://${path.join(__dirname, "../build/index.html/handle")}`); 
-    handleWin.on("closed", () => (handleWin = null));
+    handleWin.loadURL(isDev ? 'http://localhost:3000/handle' : `file://${path.join(__dirname, '../build/index.html/handle')}`);
+    handleWin.on('closed', () => (handleWin = null));
 
     return handleWin;
-};
+}
 
-app.on("ready", () => {
+app.on('ready', () => {
     mainWindow = createMain();
     handle = createHandle();
 
-    mainWindow.once('ready-to-show', () => {        
+    mainWindow.once('ready-to-show', () => {
         mainWindow.show();
         handle.show();
-    })
+    });
 });
 
-let tray = null
+let tray = null;
 app.whenReady().then(() => {
     tray = new Tray('public/logo32@2x.png');
-    const contextMenu = Menu.buildFromTemplate([
-        { label: 'Exit'}
-      ]);
-    tray.setToolTip('Kanote')
-    tray.setContextMenu(contextMenu)
+    const contextMenu = Menu.buildFromTemplate([{ label: 'Exit' }]);
+    tray.setToolTip('Kanote');
+    tray.setContextMenu(contextMenu);
 });
 
-app.on("window-all-closed", () => { if (process.platform !== "darwin") { app.quit(); } });     
-app.on("activate", () => { if (mainWindow === null) { createWindow(); }}); 
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
+});
+app.on('activate', () => {
+    if (mainWindow === null) {
+        createMain();
+    }
+});
 
 let lastAppWidth;
 let lastAppHeight;
 
-ResizeCenterMain = (appWidth, appHeight) => {
-    let w, h;    
+const ResizeCenterMain = (appWidth, appHeight) => {
+    let w, h;
     appWidth==='last' ? w = lastAppWidth: w = parseInt(appWidth);
     appHeight==='last' ? h = lastAppHeight: h = parseInt(appHeight);
 
     lastAppWidth = w;
     lastAppHeight = h;
 
-    screenWidth = getScreenWidth();
-    let [appX, appY] = mainWindow.getPosition()
+    const screenWidth = getScreenWidth();
+    const appY = mainWindow.getPosition()[1];
 
     const bottomBuffer = 120;
-    
-    const TargetHeight = h + bottomBuffer;
 
-    const TargetWidth = w;
-    const centeredX = (screenWidth / 2) - (TargetWidth / 2);
+    const targetHeight = h + bottomBuffer;
+
+    const targetWidth = w;
+    const centeredX = (screenWidth / 2) - (targetWidth / 2);
 
     mainWindow.resizable = true;
-    mainWindow.setSize(TargetWidth, TargetHeight);
-    mainWindow.setPosition(centeredX, appY);
+    mainWindow.setSize(targetWidth, targetHeight);
+    console.log(centeredX +'-'+appY+'-'+targetWidth+'-'+targetHeight);
+    mainWindow.setPosition(Math.round(centeredX), appY);
     mainWindow.resizable = false;
 
-    let handleWidth = TargetWidth + 10;
-    let handleHeight = 45; 
+    const handleWidth = targetWidth + 10;
+    const handleHeight = 45;
 
     const handleCenteredX = (screenWidth / 2) - (handleWidth / 2);
 
     handle.resizable = true;
-    handle.setPosition(handleCenteredX, -5);
+    handle.setPosition(Math.round(handleCenteredX), -5);
     handle.setSize(handleWidth, handleHeight);
     handle.resizable = false;
 };
 
-ipc.on('ResizeMainWindow', (event, [appWidth, appHeight] = args) => {
+ipc.on('ResizeMainWindow', (event, args, [appWidth, appHeight] = args) => {
+    console.log(appWidth + 'x' + appHeight);
     ResizeCenterMain(appWidth, appHeight);
 });
 
 const ToggleScroll = () => {
-    screenWidth = getScreenWidth();
-    const [appWidth, appHeight] = mainWindow.getSize();
-    let [appX, appY] = mainWindow.getPosition()
+    const appHeight = mainWindow.getSize()[1];
+    const appX = mainWindow.getPosition()[0];
+    let appY = mainWindow.getPosition()[1];
 
     let appToggled;
-    if(appY < 0) {
+    if (appY < 0) {
         appToggled = false;
-    }
-    else{
+    } else {
         appToggled = true;
     }
 
     let intervalCount = 0;
-    let intervalMax;
     let modifier = 20;
 
     if (appToggled) {
         mainWindow.alwaysOnTop = true;
         modifier *= -1;
         appY = 0; //Ensure starting position when moving in case anything happened that moved the normal position.
-    }
-    else {
+    } else {
         mainWindow.alwaysOnTop = true;
         appY = -appHeight;
     }
 
-    intervalMax = Math.round((appHeight + 35) / Math.abs(modifier));
+    const intervalMax = Math.round((appHeight + 35) / Math.abs(modifier));
     const animationMsTotal = 200;
-    const msInterval = animationMsTotal / intervalMax
-    const iID = setInterval(() => {
+    const msInterval = animationMsTotal / intervalMax;
+    const intervalId = setInterval(() => {
         if (intervalCount <= intervalMax) {
-            let y = appY + (intervalCount * modifier);            
+            const y = appY + (intervalCount * modifier);
             mainWindow.setPosition(appX, y);
+        } else {
+            const y = appY + (intervalMax * modifier);
+            mainWindow.setPosition(appX, y);
+            clearInterval(intervalId);
         }
-        else{
-            let y = appY + (intervalMax * modifier);
-            mainWindow.setPosition(appX, y);          
-            clearInterval(iID);
-        };
         intervalCount++;
     }, msInterval);
     return appToggled;
-}
+};
 
 ipc.handle('ToggleScroll', (event, args) => {
     const toggleState =  ToggleScroll();
     return toggleState;
 });
 
-getScreenWidth = () => {
+const getScreenWidth = () => {
     var screen = electron.screen;
-    var mainScreen = screen.getPrimaryDisplay()
+    var mainScreen = screen.getPrimaryDisplay();
     const dimensions = mainScreen.size;
     return dimensions.width;
-}
+};
 
-getScreenHeight = () => {
+const getScreenHeight = () => {
     var screen = electron.screen;
-    var mainScreen = screen.getPrimaryDisplay()
+    var mainScreen = screen.getPrimaryDisplay();
     const dimensions = mainScreen.size;
     return dimensions.height;
-}
+};
 
 ipc.handle('GetInitialData', (event, args) => {
     const itemsFromBackend = [];
-    
+
     const columnsFromBackend = [];
 
     return [columnsFromBackend, itemsFromBackend];
 });
-
-// const itemsFromBackend = [
-//     { id: '4', category: '1', content: "", priority: "High", title: "Correct Err:35", tags: ["Code", "Table"] },
-//     { id: '5', category: '1', content: "", priority: "Medium", title: "Test", tags: ["Plan", "Testing"] },
-//     { id: '6', category: '1', content: "", priority: "Low", title: "Add items", tags: ["Content", "Team 3"] },
-//     { id: '7', category: '2', content: "", priority: "High", title: "fix Drag Bug", tags: ["UI"] },
-//     { id: '9', category: '2', content: "", priority: "High", title: "fix Drag Bug", tags: ["UI"] },
-//     { id: '8', category: '3', content: "", priority: "High", title: "Improve performance", tags: ["Code", "Performance"] }
-// ];
-
-// const columnsFromBackend = {
-//     ['1']: {
-//         title: "To do",
-//         items: []
-//     },
-//     ['2']: {
-//         title: "In Progress",
-//         items: []
-//     },
-//     ['3']: {
-//         title: "Done",
-//         items: []
-//     }
-// };

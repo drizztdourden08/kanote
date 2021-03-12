@@ -14,17 +14,29 @@ body {
     background: transparent;
     padding: 0;
 }
-#root{height: 100%;}
+
 html, body, #root, .App, .columns, .column{
     pointer-events: none; 
 }
+#root{display:flex; justify-content: center;}
 
 * {pointer-events: all;}
 .draggable {-webkit-app-region: drag;}
 
+button {
+    background: none;
+    border: solid 1px #cccccc;;
+    color: #cccccc;
+}
+
 .App {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    justify-content: center;
+    
+    color: #cccccc;
+
+    
     padding-top: 20px;
 }
 
@@ -206,6 +218,8 @@ html, body, #root, .App, .columns, .column{
 
     font-size: 1.5em;
     cursor: pointer;
+
+    border: none;
 }
 
 .accept-button:hover{
@@ -242,4 +256,8 @@ input[type="text"]:focus{
 
     font-size: 1.05em;
     color:#F05D60;
+}
+
+button{
+    outline: none;
 }
