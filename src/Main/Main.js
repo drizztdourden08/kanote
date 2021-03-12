@@ -148,7 +148,7 @@ const Main = (props) => {
         } else console.log('undefined Swimlane: ' + swimlaneId);
     };
 
-    const updateColumn = (swimlaneId, columnId, newProps) => {
+    const updateColumn = (swimlaneId, columnId, newProps, targetSwimlane, targetColumn) => {
         const tempBoard = { ...board };
         console.log(swimlaneId +'-'+ columnId);
         console.log(newProps);
@@ -191,6 +191,10 @@ const Main = (props) => {
                 setBoard(tempBoard);
             } else console.log('undefined column: ' + columnId);
         } else console.log('undefined Swimlane: ' + swimlaneId);
+    };
+
+    const updateCard = (swimlaneId, columnId, newProps) => {
+
     };
 
     const onDragEndCards = (result, columns, setColumns) => {
