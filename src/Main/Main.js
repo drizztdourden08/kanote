@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { DragDropContext } from 'react-beautiful-dnd';
 
 import { mouseMoveDetect } from '../scripts/ElectronClickThrough';
 
@@ -111,7 +112,6 @@ const Main = (props) => {
 
     const addColumn = (swimlaneId) => {
         const tempBoard = { ...board };
-        console.log(swimlaneId + '==>' + JSON.stringify(tempBoard));
 
         const sIndex = tempBoard.swimlanes.findIndex((s) => s.id === swimlaneId);
         if (sIndex > -1){
@@ -148,10 +148,9 @@ const Main = (props) => {
         } else console.log('undefined Swimlane: ' + swimlaneId);
     };
 
-    const updateColumn = (swimlaneId, columnId, newProps, targetSwimlane, targetColumn) => {
+    const updateColumn = (swimlaneId, columnId, newProps) => {
         const tempBoard = { ...board };
-        console.log(swimlaneId +'-'+ columnId);
-        console.log(newProps);
+
         const sIndex = tempBoard.swimlanes.findIndex((s) => s.id === swimlaneId);
         if (sIndex > -1){
             const swimlane = tempBoard.swimlanes.splice(sIndex, 1)[0];
@@ -159,7 +158,6 @@ const Main = (props) => {
             let cIndex = swimlane.columns.findIndex((c) => c.id === columnId);
             if (cIndex > -1){
                 const column = swimlane.columns.splice(cIndex, 1)[0];
-                console.log(column.toDelete);
 
                 newProps.map((prop) => {
                     column[prop.property] = prop.newValue;
@@ -197,50 +195,139 @@ const Main = (props) => {
 
     };
 
-    const onDragEndCards = (result, columns, setColumns) => {
+    const moveColumn = (sourceSwimlaneId, targetSwimlaneId, sourceColumnId = null, targetColumnId = null, sourceCardId = null, sourceIndex = null, targetIndex = null) => {
+
+    };
+
+    const moveCard = (sourceSwimlaneId, targetSwimlaneId, sourceColumnId = null, targetColumnId = null, sourceIndex = null, targetIndex = null) => {
+        const tempBoard = { ...board };
+        console.log('moving card');
+        let sourceSwimlane = null;
+        let sourceColumn = null;
+        let sourceCard = null;
+        let targetSwimlane = null;
+        let targetColumn = null;
+
+        console.log(tempBoard);
+
+        //GET SOURCES
+        const ssIndex = tempBoard.swimlanes.findIndex((s) => s.id === sourceSwimlaneId);
+        if (ssIndex > -1){
+            sourceSwimlane = tempBoard.swimlanes.splice(ssIndex, 1)[0];
+            if (sourceColumnId !== null){
+                const csIndex = sourceSwimlane.columns.findIndex((c) => c.id === sourceColumnId);
+                if (csIndex > -1){
+                    sourceColumn = sourceSwimlane.columns.splice(csIndex, 1)[0];
+                    if (sourceIndex > -1){
+                        sourceCard = sourceColumn.cards.splice(sourceIndex, 1)[0];
+
+                        //GET TARGETS
+                        if (sourceColumnId !== targetColumnId){
+
+                            if (sourceSwimlaneId !== targetSwimlaneId){
+                                const stIndex = tempBoard.swimlanes.findIndex((s) => s.id === targetSwimlaneId);
+                                if (stIndex > -1){
+                                    targetSwimlane = tempBoard.swimlanes.splice(stIndex, 1)[0];
+
+                                    const ctIndex = targetSwimlane.columns.findIndex((c) => c.id === targetColumnId);
+                                    if (ctIndex > -1){
+                                        //reconstruct source
+                                        sourceSwimlane.columns.splice(csIndex, 0, sourceColumn);
+                                        tempBoard.swimlanes.splice(ssIndex, 0, sourceSwimlane);
+
+                                        //reconstruct target
+                                        targetColumn = targetSwimlane.columns.splice(ctIndex, 1)[0];
+
+                                        targetColumn.cards.splice(targetIndex, 0, sourceCard);
+                                        targetSwimlane.columns.splice(ctIndex, 0, targetColumn);
+                                        tempBoard.swimlanes.splice(stIndex, 0, targetSwimlane);
+                                    }
+                                }
+                            } else {
+                                sourceSwimlane.columns.splice(csIndex, 0, sourceColumn);
+
+                                console.log('10');
+                                const ctIndex = sourceSwimlane.columns.findIndex((c) => c.id === targetColumnId);
+                                if (ctIndex > -1){
+
+                                    targetColumn = sourceSwimlane.columns.splice(ctIndex, 1)[0];
+
+                                    //reconstruct target
+                                    targetColumn.cards.splice(targetIndex, 0, sourceCard);
+
+                                    sourceSwimlane.columns.splice(ctIndex, 0, targetColumn);
+
+                                    tempBoard.swimlanes.splice(ssIndex, 0, sourceSwimlane);
+
+                                }
+                            }
+                        } else {
+                            //reconstruct source
+                            console.log('10');
+                            sourceColumn.cards.splice(targetIndex, 0, sourceCard);
+                            sourceSwimlane.columns.splice(csIndex, 0, sourceColumn);
+                            tempBoard.swimlanes.splice(ssIndex, 0, sourceSwimlane);
+                        }
+                    }
+                }
+            }
+        }
+
+        setBoard(tempBoard);
+    };
+
+    const getParentId = (sourceType, id) => {
+        const tempboard = { ...board };
+
+        let parentId = null;
+
+        switch (sourceType) {
+            case 'CARD':{
+                tempboard.swimlanes.forEach((sl) => {
+                    sl.columns.forEach((c) => {
+                        c.cards.forEach((ca) => {
+                            if (ca.id === id) {
+                                parentId = c.id;
+                            }
+                        });
+                    });
+                });
+                break;
+            }
+            case 'COLUMN':{
+                tempboard.swimlanes.forEach((sl) => {
+                    sl.columns.forEach((c) => {
+                        if (c.id === id) {
+                            parentId = sl.id;
+                        }
+                    });
+                });
+                break;
+            }
+            default:
+                break;
+        }
+
+        return parentId;
+    };
+
+    const onDragEnd = (result) => {
         if (!result.destination) {
             return;
         }
+
         const { source, destination } = result;
+        console.log(result);
+        switch (result.type) {
+            case 'CARD':{
+                const sourceSwimlaneId = getParentId('COLUMN', source.droppableId);
+                const targetSwimlaneId = getParentId('COLUMN', destination.droppableId);
+                moveCard(sourceSwimlaneId, targetSwimlaneId, source.droppableId, destination.droppableId, source.index, destination.index);
+                break;
+            }
 
-        if (source.droppableId !== destination.droppableId) {
-            let tempColumns = [...columns];
-
-            const sourceIndex = tempColumns.findIndex((c) => c.id === source.droppableId);
-            let sourceColumn = tempColumns.splice(sourceIndex, 1)[0];
-
-            const destIndex = tempColumns.findIndex((c) => c.id === destination.droppableId);
-            let destColumn = tempColumns.splice(destIndex, 1)[0];
-
-            const sourceItems = [...sourceColumn.items];
-            const destItems = [...destColumn.items];
-            const [removed] = sourceItems.splice(source.index, 1);
-            destItems.splice(destination.index, 0, removed);
-
-            sourceColumn = { ...sourceColumn, items: sourceItems };
-            destColumn = { ...destColumn, items: destItems };
-
-            tempColumns = [...tempColumns, sourceColumn, destColumn];
-            tempColumns.sort((a, b) => a.position - b.position);
-
-            setColumns(tempColumns);
-
-        } else {
-            let tempColumns = [...columns];
-
-            const cIndex = tempColumns.findIndex((c) => c.id === source.droppableId);
-            let column = tempColumns.splice(cIndex, 1)[0];
-
-            const copiedItems = [...column.items];
-            const [removed] = copiedItems.splice(source.index, 1);
-            copiedItems.splice(destination.index, 0, removed);
-
-            column = { ...column, items: copiedItems };
-
-            tempColumns = [...tempColumns, column];
-            tempColumns.sort((a, b) => a.position - b.position);
-
-            setColumns(tempColumns);
+            default:
+                break;
         }
     };
 
@@ -256,6 +343,7 @@ const Main = (props) => {
         const appHeight = appRef.current.offsetHeight;
         const appWidth = appRef.current.offsetWidth;
         callResizeUpdate(appWidth, appHeight);
+        console.log('rendered');
     }, [appRef, board]);
 
     const functions = {
@@ -267,13 +355,15 @@ const Main = (props) => {
 
     return (
         <div className="App" ref={appRef}>
-            {
-                board.swimlanes.map(
-                    (sl, index) => (
-                        <Swimlane functions={functions} swimlane={sl} key={index}></Swimlane>
+            <DragDropContext onDragEnd={(result) => onDragEnd(result)}>
+                {
+                    board.swimlanes.map(
+                        (sl, index) => (
+                            <Swimlane functions={functions} swimlane={sl} key={index}></Swimlane>
+                        )
                     )
-                )
-            }
+                }
+            </DragDropContext>
         </div>
     );
 };

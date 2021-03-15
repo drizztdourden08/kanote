@@ -1,6 +1,6 @@
 {
   "name": "kanote",
-  "version": "0.1.188",
+  "version": "0.1.197",
   "private": true,
   "description": "Kaban Board Quick personal app",
   "author": "Johnny Prescott",
@@ -77,7 +77,13 @@
       "computed-property-spacing": "error",
       "func-call-spacing": "error",
       "func-name-matching": "error",
-      "indent": "error",
+      "indent": [
+        "error",
+        4,
+        {
+          "SwitchCase": 1
+        }
+      ],
       "jsx-quotes": "error",
       "key-spacing": "error",
       "object-curly-spacing": [

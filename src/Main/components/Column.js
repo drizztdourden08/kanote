@@ -47,7 +47,7 @@ const Column = (props) => {
                 <AiOutlinePlus />
             </button>
             <div className="column_cards">
-                <Droppable droppableId={props.column.id}>
+                <Droppable droppableId={props.column.id} type="CARD">
                     {(provided, snapshot) => (
                         <div
                             {...provided.droppableProps}
@@ -63,6 +63,5 @@ const Column = (props) => {
         </div>
     );
 };
-
 
 export default Column;
