@@ -1,0 +1,57 @@
+.card {
+    display: flex;
+    flex-direction: column;
+
+    height: 100px;
+    
+    margin: 10px 0;
+    padding: 5px 10px;
+
+    background: rgba(0, 0, 0, 0.7);
+    color: #eee;
+    border-left: 4px solid #F05D60;
+
+    cursor: grab;
+}
+
+.card_priority {
+    align-self: flex-start;
+    padding: 2px 10px;
+    font-family: 'Poppins';
+    font-size: 0.8em;
+    background: #229922;
+    border-radius: 3px;
+    color: #ccc;
+}
+
+.card_title {
+    display: flex;
+    font-weight: 200;
+    font-family: 'kufam';
+    justify-content: space-between;
+    margin: 10px 0;
+}
+
+.card_tags {
+    display: flex;
+    flex-direction: row;
+}
+
+.tag {
+    padding: 0px 10px;
+    font-family: 'Poppins';
+    font-size: 0.7em;
+    background: #bbb;
+    color: #555;
+    border-radius: 10px;
+    margin-right: 3px;
+}
+
+.tag::before {
+    content: '#';
+}
+
+.add-icon_card{
+    margin-top: 10px;
+    align-self: center;
+}

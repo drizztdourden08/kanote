@@ -21,6 +21,7 @@ class _Board {
 class _Swimlane {
     constructor(){
         this.id = uuidv4();
+        this.title = '' + Math.random() * 1000  + '';
         this.columns = [];
     }
 }
@@ -225,16 +226,16 @@ const Main = (props) => {
                         if (sourceColumnId !== targetColumnId){
 
                             if (sourceSwimlaneId !== targetSwimlaneId){
+                                //reconstruct source
+                                sourceSwimlane.columns.splice(csIndex, 0, sourceColumn);
+                                tempBoard.swimlanes.splice(ssIndex, 0, sourceSwimlane);
+
                                 const stIndex = tempBoard.swimlanes.findIndex((s) => s.id === targetSwimlaneId);
                                 if (stIndex > -1){
                                     targetSwimlane = tempBoard.swimlanes.splice(stIndex, 1)[0];
 
                                     const ctIndex = targetSwimlane.columns.findIndex((c) => c.id === targetColumnId);
                                     if (ctIndex > -1){
-                                        //reconstruct source
-                                        sourceSwimlane.columns.splice(csIndex, 0, sourceColumn);
-                                        tempBoard.swimlanes.splice(ssIndex, 0, sourceSwimlane);
-
                                         //reconstruct target
                                         targetColumn = targetSwimlane.columns.splice(ctIndex, 1)[0];
 

@@ -1,0 +1,85 @@
+.columns {
+    display: flex;
+    flex-direction: row;
+}
+
+.columns_add{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+
+    background: #00000022;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+
+    width: 300px;
+
+    margin: 0 10px;
+    margin-top: 5px;
+}
+
+.column-visible {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.column_title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+
+
+    padding: 5px 10px;
+    
+    background: rgba(0, 0, 0, 0.7);
+    color: #fefefe;
+    border-top: solid 3px #F05D60;
+
+    font-family: 'kufam';
+    font-size: 1.25em;
+}
+
+.column_title div{
+    width: 100%;
+}
+
+.column_title div div:first-child{
+    display: flex;
+    flex-direction: row;
+    
+    width: 100%;
+    margin: 3px 0;
+}
+
+.column_title div div:first-child span{
+    display: flex;
+    align-self: center;
+    flex-grow: 1;
+}
+
+.column_title div div:first-child div{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    flex-basis: 3em;
+    flex-shrink: 0;
+}
+
+.column_title div div:nth-child(2){
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;   
+    width: 100%;
+    margin: 3px 0;
+}
+
+.column_cards {
+    display: flex;
+    flex-direction: column;
+}
