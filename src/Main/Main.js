@@ -2,11 +2,14 @@ import React, { useEffect, useState, useRef } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
 
 import { mouseMoveDetect } from '../scripts/ElectronClickThrough';
+import { dateAdd } from '../scripts/DateTime';
 
 import './Main.css';
 
 import Swimlane from './components/Swimlane';
 import './components/css/Swimlane.css';
+import { MdNetworkWifi } from 'react-icons/md';
+import { Switch } from 'react-router';
 
 const ipc = window.require('electron').ipcRenderer;
 
@@ -21,7 +24,7 @@ class _Board {
 class _Swimlane {
     constructor(){
         this.id = uuidv4();
-        this.title = '' + Math.random() * 1000  + '';
+        this.title = 'Swinlane ' + Math.floor(Math.random() * Math.floor(100))  + '';
         this.columns = [];
     }
 }
@@ -30,7 +33,7 @@ class _Column {
     constructor(swimlaneId) {
         this.id = uuidv4();
         this.swimlaneId = swimlaneId;
-        this.title = '' + Math.random() * 1000  + '';
+        this.title = 'Column ' + Math.floor(Math.random() * Math.floor(100))  + '';
         this.cards = [];
         this.editing = false;
         this.moveColumnBy = 0;
@@ -45,26 +48,80 @@ class _Card {
     constructor(columnId) {
         this.id = uuidv4();
         this.columnId = columnId;
-        this.title = '' + Math.random() * 1000  + '';
-        this.priority = '';
-        this.tags = [];
-        this.content = [];
-        this.timing = { created: null, dueDate: null, timeLeft: null, breached: false };
+        this.title = 'Card ' + Math.floor(Math.random() * Math.floor(100))  + '';
+        this.priority = new _Priority();
+        this.image = [
+            'https://www.talkwalker.com/images/2020/blog-headers/image-analysis.png',
+            'https://seeklogo.com/images/P/pepsi-vertical-logo-72846897FF-seeklogo.com.png',
+            'https://www.projecttopics.org/wp-content/uploads/2017/09/abstract-140898_1280.jpg',
+            'http://artist.com/art-recognition-and-education/wp-content/themes/artist-blog/media-files/2016/05/abstract-6.jpg',
+            'https://i.icanvas.com/list-hero/abstract-landscapes-1.jpg',
+            'https://www.fyimusicnews.ca/sites/default/files/media-beat-large.jpg',
+            'http://2015.holocaustremembrance.com/sites/default/files/field/image/social_media_strategy111.jpg',
+            'https://cdn.arstechnica.net/wp-content/uploads/2016/02/5718897981_10faa45ac3_b-640x624.jpg',
+            'https://teeltechcanada.com/2015/wp-content/uploads/2017/08/cyber-security-banner-red.jpg',
+            'https://thumbs.dreamstime.com/b/abstract-red-grey-tech-geometric-banner-design-vector-web-header-corporate-background-101610481.jpg',
+            null, null, null, null
+        ][Math.floor(Math.random() * Math.floor(14))];
+        this.tags = ['task', 'beamed'];
+        this.content = [new cTaskList()].splice(Math.floor(Math.random() * Math.floor(1)), Math.round(Math.random()));
+        this.timing = {
+            created: Date.now(),
+            dueDate: dateAdd(this.created, 'minute', 5),
+            timeLeft: this.dueDate - this.created,
+            breached: this.timeLeft > 0 ? false:true
+        };
         this.notification = false;
-        this.assignee = null;
-        this.accentColor = null;
-        this.comments = null;
+        this.assignees = [new _Assignee(), new _Assignee(), new _Assignee(), new _Assignee(), new _Assignee(), new _Assignee(), new _Assignee(), new _Assignee()];
+        this.accentColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+        this.comments = [];
+        this.editing = false;
+        this.moveColumnBy = 0;
+        this.moveSwimlaneBy = 0;
+        this.toDelete = false;
+        this.cancelChanges = false;
+        this.originalCard = {};
     }
-
 }
 
-// class cTaskList {
-//     constructor() {
+class _Priority {
+    constructor() {
+        this.id = uuidv4();
+        this.title = ['High', 'Medium', 'Low'][Math.floor(Math.random() * Math.floor(3))];
+        this.color = '#' + Math.floor(Math.random()*16777215).toString(16);
+        this.level = Math.floor(Math.random() * Math.floor(10));
+    }
+}
 
-//     }
-// };
+class _Assignee {
+    constructor() {
+        this.id = uuidv4();
+        this.firstName = ['Johnny', 'Chris', 'Alain', 'Sam', 'Kim'][Math.floor(Math.random() * Math.floor(5))];
+        this.lastName = ['Prescott', 'Paris', 'Janeway', 'Tremblay', 'Turilli'][Math.floor(Math.random() * Math.floor(5))];
+        this.initial = this.firstName[0] + this.lastName[0];
+        this.color = '#' + Math.floor(Math.random()*16777215).toString(16);
+    }
+}
 
-// class cTask {
+class cTaskList {
+    constructor() {
+        this.id = uuidv4();
+        this.title = 'Tasklist ' + Math.floor(Math.random() * Math.floor(10));
+        this.tasks = [new cTask(), new cTask(), new cTask(), new cTask(), new cTask()].slice(0, Math.floor(Math.random() * Math.floor(4)));
+    }
+}
+
+class cTask {
+    constructor(parentTaskId) {
+        this.id = uuidv4();
+        this.parentTaskId = parentTaskId;
+        this.title = 'task ' + Math.floor(Math.random() * Math.floor(10));
+        this.checked = Math.random() < 0.5;
+        this.tasks = [];
+    }
+}
+
+// class cImage {
 //     constructor() {
 
 //     }
@@ -76,7 +133,7 @@ class _Card {
 //     }
 // };
 
-// class cImage {
+// class cMarkdownText {
 //     constructor() {
 
 //     }
@@ -95,18 +152,14 @@ window.onscroll = function () {
     window.scrollTo(0, 0);
 };
 
-//Draging Functions
-
-
 const Main = (props) => {
     const [board, setBoard] = useState(new _Board());
     const appRef = useRef(null);
 
-    const addSwimlane = () => {
+    const addSwimlane = (sIndex) => {
         const newSwimlane = new _Swimlane();
-
         const tempBoard = { ...board };
-        tempBoard.swimlanes = [...tempBoard.swimlanes, newSwimlane];
+        tempBoard.swimlanes.splice(sIndex + 1, 0, newSwimlane);
 
         setBoard(tempBoard);
     };
@@ -202,14 +255,12 @@ const Main = (props) => {
 
     const moveCard = (sourceSwimlaneId, targetSwimlaneId, sourceColumnId = null, targetColumnId = null, sourceIndex = null, targetIndex = null) => {
         const tempBoard = { ...board };
-        console.log('moving card');
+
         let sourceSwimlane = null;
         let sourceColumn = null;
         let sourceCard = null;
         let targetSwimlane = null;
         let targetColumn = null;
-
-        console.log(tempBoard);
 
         //GET SOURCES
         const ssIndex = tempBoard.swimlanes.findIndex((s) => s.id === sourceSwimlaneId);
@@ -247,7 +298,6 @@ const Main = (props) => {
                             } else {
                                 sourceSwimlane.columns.splice(csIndex, 0, sourceColumn);
 
-                                console.log('10');
                                 const ctIndex = sourceSwimlane.columns.findIndex((c) => c.id === targetColumnId);
                                 if (ctIndex > -1){
 
@@ -255,16 +305,13 @@ const Main = (props) => {
 
                                     //reconstruct target
                                     targetColumn.cards.splice(targetIndex, 0, sourceCard);
-
                                     sourceSwimlane.columns.splice(ctIndex, 0, targetColumn);
-
                                     tempBoard.swimlanes.splice(ssIndex, 0, sourceSwimlane);
 
                                 }
                             }
                         } else {
                             //reconstruct source
-                            console.log('10');
                             sourceColumn.cards.splice(targetIndex, 0, sourceCard);
                             sourceSwimlane.columns.splice(csIndex, 0, sourceColumn);
                             tempBoard.swimlanes.splice(ssIndex, 0, sourceSwimlane);
@@ -318,7 +365,6 @@ const Main = (props) => {
         }
 
         const { source, destination } = result;
-        console.log(result);
         switch (result.type) {
             case 'CARD':{
                 const sourceSwimlaneId = getParentId('COLUMN', source.droppableId);
@@ -332,26 +378,54 @@ const Main = (props) => {
         }
     };
 
+    const returnContentElement = (contentElement, cIndex) => {
+        let element;
+        switch (contentElement.constructor.name) {
+            case 'cTaskList':{
+                const list = [];
+                contentElement.tasks.map((task, index) => {
+                    list.push(
+                        <div className="task" key={index}>
+                            <input type="checkbox" id={task.title} name={task.title} value={task.title} checked={task.checked}/>
+                            <label htmlFor={task.title}>{task.title}</label>
+                        </div>
+                    );
+                });
+
+                element = (
+                    <div className="tasklist" key={cIndex}>
+                        <h2 className="title">{contentElement.title}</h2>
+                        <div className="tasks-container">{list}</div>
+                    </div>
+                );
+            }
+                break;
+            default:
+                break;
+        }
+        return element;
+    };
+
     const callResizeUpdate = (appWidth, appHeight) => {
         ipc.send('ResizeMainWindow', [appWidth, appHeight]);
     };
 
     useEffect(() => { //Initial Render load Data
-        addSwimlane();
+        if (board.swimlanes.length === 0) addSwimlane();
     }, []);
 
     useEffect(() => {
         const appHeight = appRef.current.offsetHeight;
         const appWidth = appRef.current.offsetWidth;
         callResizeUpdate(appWidth, appHeight);
-        console.log('rendered');
     }, [appRef, board]);
 
     const functions = {
-        'addSwimlane': () => addSwimlane(),
+        'addSwimlane': (sindex) => addSwimlane(sindex),
         'addColumn': (swimlaneId) => addColumn(swimlaneId),
         'addCard': (swimlaneId, columnId) => addCard(swimlaneId, columnId),
-        'updateColumn': (swimlaneId, columnId, newprops) => updateColumn(swimlaneId, columnId, newprops)
+        'updateColumn': (swimlaneId, columnId, newprops) => updateColumn(swimlaneId, columnId, newprops),
+        'returnContentElement': (contentElement, cIndex) => returnContentElement(contentElement, cIndex)
     };
 
     return (
@@ -360,7 +434,7 @@ const Main = (props) => {
                 {
                     board.swimlanes.map(
                         (sl, index) => (
-                            <Swimlane functions={functions} swimlane={sl} key={index}></Swimlane>
+                            <Swimlane functions={functions} swimlane={sl} key={index} index={index}></Swimlane>
                         )
                     )
                 }

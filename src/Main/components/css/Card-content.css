@@ -1,0 +1,92 @@
+.tasklist {
+    padding: 5px 10px;
+}
+
+.tasklist .title {
+    padding: 0;
+    margin: 0;
+
+    font-family: 'Roboto';
+    font-weight: 600;
+    font-size: 1em;
+    color:#ddd;
+}
+
+.tasklist .tasks-container {
+    padding-left: 10px;
+
+
+    color:#ddd;
+}
+
+.tasklist .tasks-container .task {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.tasklist .tasks-container .task input[type="checkbox"] {
+    position: relative;
+    width: 1.5em;
+    height: 1.5em;
+    color: #000;
+    border: 1px solid #777;
+    border-radius: 4px;
+    appearance: none;
+    outline: 0;
+    cursor: pointer;
+    /*transition: background 0.2s 0.2s;*/
+}
+
+.tasklist .tasks-container .task input[type="checkbox"]::before {
+    position: absolute;
+    content: '';
+    display: block;
+    top: 2px;
+    left: 7px;
+    width: 8px;
+    height: 14px;
+    border-style: solid;
+    border-color: #FFF;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    opacity: 0;
+}
+
+.tasklist .tasks-container .task input[type="checkbox"]:checked {
+    color: #FFF;
+    border-color: #F05D60;
+    background: #F05D60;
+}
+
+.tasklist .tasks-container .task input[type="checkbox"]::before {
+    opacity: 1;
+}
+
+.tasklist .tasks-container .task input[type="checkbox"]~label::before {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.tasklist .tasks-container .task label {
+    position: relative;
+    cursor: pointer;
+    
+    font-family: 'Roboto';
+    font-weight:100;
+    font-size: 1em;
+
+    padding: 0 0.25em 0;
+    user-select: none;
+}
+
+.tasklist .tasks-container .task label::before {
+    position: absolute;
+    content: attr(data-content);
+    color: #777;
+    clip-path: polygon(0 0, 0 0, 0% 100%, 0 100%);
+    text-decoration: line-through;
+    text-decoration-thickness: 3px;
+    text-decoration-color: #000;
+    transition: clip-path 0.2s 0.2s;
+}

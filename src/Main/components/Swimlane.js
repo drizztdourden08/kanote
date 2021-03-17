@@ -10,7 +10,7 @@ const Swimlane = (props) => {
         <div className="swimlane">
             <div className="swimlane_title">
                 <span>{props.swimlane.title}</span>
-                <button className="add-icon add-icon_swimlane" onClick={() => props.functions.addSwimlane()} >
+                <button className="add-icon add-icon_swimlane" onClick={() => props.functions.addSwimlane(props.index)} >
                     <AiOutlinePlus />
                 </button>
             </div>
