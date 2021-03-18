@@ -7,8 +7,6 @@ import './css/Card-content.css';
 import { BiDotsVerticalRounded, BiCommentDetail } from 'react-icons/bi';
 
 const Card = (props) => {
-    console.log(props.card);
-
     return (
         <Draggable key={props.card.id} draggableId={props.card.id} index={props.index} >
             {(provided) => (
@@ -16,7 +14,6 @@ const Card = (props) => {
                     className="card"
 
                     {...provided.draggableProps}
-                    {...provided.dragHandleProps}
                     ref={provided.innerRef}
                 >
                     {
@@ -31,7 +28,7 @@ const Card = (props) => {
                                             </div>
                                             :undefined
                                     }
-                                    <div className="card-main">
+                                    <div {...provided.dragHandleProps} className="card-main">
                                         <div className="card-main_wrapper" style={props.card.image !== null ? { background: '#00000099' }:undefined }>
                                             {
                                                 props.card.priority !== null ?
@@ -52,7 +49,15 @@ const Card = (props) => {
 
                                 {props.card.content.length > 0 ?
                                     <div className="card_content">
-                                        {props.card.content.map((element, index) => props.functions.returnContentElement(element, index))}
+                                        {props.card.content.map((element, index) => {
+                                            return (
+                                                <div className="content-element" key={index}>
+                                                    {props.functions.returnContentElement(element)}
+                                                    <hr />
+                                                </div>
+                                            );
+                                        })
+                                        }
                                     </div>
                                     :undefined
                                 }

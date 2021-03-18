@@ -1,15 +1,19 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
 
+import ReactMarkdown from 'react-markdown';
+import gfm from 'remark-gfm';
+import CodeBlock from './components/CodeBlock';
+
 import { mouseMoveDetect } from '../scripts/ElectronClickThrough';
 import { dateAdd } from '../scripts/DateTime';
+
+import { loremIpsum, name, surname, fullname, username } from 'react-lorem-ipsum';
 
 import './Main.css';
 
 import Swimlane from './components/Swimlane';
 import './components/css/Swimlane.css';
-import { MdNetworkWifi } from 'react-icons/md';
-import { Switch } from 'react-router';
 
 const ipc = window.require('electron').ipcRenderer;
 
@@ -24,7 +28,7 @@ class _Board {
 class _Swimlane {
     constructor(){
         this.id = uuidv4();
-        this.title = 'Swinlane ' + Math.floor(Math.random() * Math.floor(100))  + '';
+        this.title = 'Swimlane ' + Math.floor(Math.random() * Math.floor(100))  + '';
         this.columns = [];
     }
 }
@@ -61,10 +65,10 @@ class _Card {
             'https://cdn.arstechnica.net/wp-content/uploads/2016/02/5718897981_10faa45ac3_b-640x624.jpg',
             'https://teeltechcanada.com/2015/wp-content/uploads/2017/08/cyber-security-banner-red.jpg',
             'https://thumbs.dreamstime.com/b/abstract-red-grey-tech-geometric-banner-design-vector-web-header-corporate-background-101610481.jpg',
-            null, null, null, null
-        ][Math.floor(Math.random() * Math.floor(14))];
+            null, null, null, null, null, null, null, null
+        ][Math.floor(Math.random() * Math.floor(18))];
         this.tags = ['task', 'beamed'];
-        this.content = [new cTaskList()].splice(Math.floor(Math.random() * Math.floor(1)), Math.round(Math.random()));
+        this.content = [new _cTaskList(), new _cText(), new _cMarkdownText(), new _cImage()].splice(Math.floor(Math.random() * Math.floor(3)), Math.round(Math.random()));
         this.timing = {
             created: Date.now(),
             dueDate: dateAdd(this.created, 'minute', 5),
@@ -72,7 +76,7 @@ class _Card {
             breached: this.timeLeft > 0 ? false:true
         };
         this.notification = false;
-        this.assignees = [new _Assignee(), new _Assignee(), new _Assignee(), new _Assignee(), new _Assignee(), new _Assignee(), new _Assignee(), new _Assignee()];
+        this.assignees = [new _Assignee(), new _Assignee()];
         this.accentColor = '#' + Math.floor(Math.random()*16777215).toString(16);
         this.comments = [];
         this.editing = false;
@@ -96,48 +100,95 @@ class _Priority {
 class _Assignee {
     constructor() {
         this.id = uuidv4();
-        this.firstName = ['Johnny', 'Chris', 'Alain', 'Sam', 'Kim'][Math.floor(Math.random() * Math.floor(5))];
-        this.lastName = ['Prescott', 'Paris', 'Janeway', 'Tremblay', 'Turilli'][Math.floor(Math.random() * Math.floor(5))];
+        this.firstName = name();
+        this.lastName = surname();
         this.initial = this.firstName[0] + this.lastName[0];
         this.color = '#' + Math.floor(Math.random()*16777215).toString(16);
     }
 }
 
-class cTaskList {
+class _cTaskList {
     constructor() {
         this.id = uuidv4();
         this.title = 'Tasklist ' + Math.floor(Math.random() * Math.floor(10));
-        this.tasks = [new cTask(), new cTask(), new cTask(), new cTask(), new cTask()].slice(0, Math.floor(Math.random() * Math.floor(4)));
+        this.tasks = [new _cTask(), new _cTask(), new _cTask(), new _cTask(), new _cTask()].slice(0, Math.floor(Math.random() * Math.floor(4)));
     }
 }
 
-class cTask {
-    constructor(parentTaskId) {
+class _cTask {
+    constructor(parentTaskId = null) {
         this.id = uuidv4();
         this.parentTaskId = parentTaskId;
         this.title = 'task ' + Math.floor(Math.random() * Math.floor(10));
         this.checked = Math.random() < 0.5;
-        this.tasks = [];
+        this.tasks = this.parentTaskId === null ? [new _cTask(this.id), new _cTask(this.id)]: [];
     }
 }
 
-// class cImage {
-//     constructor() {
+class _cText {
+    constructor() {
+        this.id = uuidv4();
+        this.text = loremIpsum({ p: 1, avgWordsPerSentence: 8, avgSentencesPerParagraph: 2 });
+    }
+}
 
-//     }
-// };
+class _cMarkdownText {
+    constructor() {
+        this.id = uuidv4();
+        this.text = `
+A paragraph with *emphasis* and **strong importance**.
 
-// class cText {
-//     constructor() {
+> A block quote with ~strikethrough~ and a URL: https://reactjs.org.
 
-//     }
-// };
+## Bullet list
+* Lists
+    * List 2
+* [x] todo
+* [ ] todo
+* [x] done
+    * Something
+    * Something else
 
-// class cMarkdownText {
-//     constructor() {
+[google][www.google.com]
 
-//     }
-// };
+# A table:
+
+| a | b |
+| - | - |
+| Something | Else |
+| Again | Nothing |
+| To | Be |
+
+    class _cText {
+        constructor() {
+            this.id = uuidv4();
+            this.text = loremIpsum({ p: 1, avgWordsPerSentence: 8, avgSentencesPerParagraph: 2 });
+        }
+    }
+        `;
+    }
+}
+
+class _cImage {
+    constructor() {
+        this.id = uuidv4();
+        this.alt = 'altimage ' + Math.floor(Math.random() * Math.floor(10));
+        this.url = [
+            'https://clipartart.com/images/small-flowers-clip-art-23.jpg',
+            'data:image/png;base64,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',
+            'https://www.pngitem.com/pimgs/m/519-5196083_transparent-8-bit-clipart-small-pixel-art-carrot.png',
+            'https://www.kindpng.com/picc/m/187-1874183_dresser-clipart-pixel-art-small-easy-pixel-art.png',
+            'https://www.pngfind.com/pngs/m/227-2272433_pichu-small-pixel-art-grid-hd-png-download.png',
+            'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/802ef158-f37f-4520-abcd-6abdf048eb45/d5qamec-998cf8e7-8457-4bad-be09-201c655082ab.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvODAyZWYxNTgtZjM3Zi00NTIwLWFiY2QtNmFiZGYwNDhlYjQ1XC9kNXFhbWVjLTk5OGNmOGU3LTg0NTctNGJhZC1iZTA5LTIwMWM2NTUwODJhYi5qcGcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.FpPB2r5Pzg7rqbp_iFEcnbHmBmf2FZY487Yj4JSfJ10',
+            'https://media.npr.org/assets/img/2011/01/18/istock_000008186878small-59d7be65b2b8e157cb4f17e95131b9658f738848.jpg',
+            'https://www.eggcelerate.com/egg/wp-content/uploads/2016/03/photodune-2196491-big-and-small-goldfish-l-scaled.jpg',
+            'https://ksassets.timeincuk.net/wp/uploads/sites/56/2019/01/Small-living-room.jpg',
+            'https://post.healthline.com/wp-content/uploads/2019/02/bunch_of_two_large_and_one_small_bananas-1200x628-facebook.jpg',
+            'https://www.edgeip.com/images/FCK/Image/202002/00-SFG-SmallScholarshipsBigRewardsSFSCSIC.jpg'
+        ][Math.floor(Math.random() * Math.floor(11))];
+    }
+}
+
 
 // class cRichText {
 //     constructor() {
@@ -378,27 +429,50 @@ const Main = (props) => {
         }
     };
 
-    const returnContentElement = (contentElement, cIndex) => {
+    const returnContentElement = (contentElement, cIndex = null) => {
         let element;
         switch (contentElement.constructor.name) {
-            case 'cTaskList':{
-                const list = [];
-                contentElement.tasks.map((task, index) => {
-                    list.push(
-                        <div className="task" key={index}>
-                            <input type="checkbox" id={task.title} name={task.title} value={task.title} checked={task.checked}/>
-                            <label htmlFor={task.title}>{task.title}</label>
-                        </div>
-                    );
-                });
-
+            case '_cTaskList':
                 element = (
-                    <div className="tasklist" key={cIndex}>
-                        <h2 className="title">{contentElement.title}</h2>
-                        <div className="tasks-container">{list}</div>
+                    <div className="cTasklist">
+                        <h2 className="cTasklist-title">{contentElement.title}</h2>
+                        <div className="tasks-container">{
+                            contentElement.tasks.map((cTask, tIndex) => (
+                                returnContentElement(cTask, tIndex)
+                            ))
+                        }
+                        </div>
                     </div>
                 );
-            }
+                break;
+            case '_cTask':
+                element = (
+                    <div className="cTask" key={cIndex}>
+                        <div className="form-checkbox">
+                            <input type="checkbox" id={contentElement.title} name={contentElement.title} value={contentElement.title} checked={contentElement.checked}/>
+                            <label htmlFor={contentElement.title}>{contentElement.title}</label>
+                        </div>
+                        {contentElement.tasks.length > 0 ?
+                            <div className="task-subtasks">
+                                {
+                                    contentElement.tasks.map((cTask, tIndex) => (
+                                        returnContentElement(cTask, tIndex)
+                                    ))
+                                }
+                            </div>
+                            :undefined
+                        }
+                    </div>
+                );
+                break;
+            case '_cText':
+                element = (<p className="cText">{contentElement.text}</p>);
+                break;
+            case '_cMarkdownText':
+                element = (<div className="cMarkdownText"><ReactMarkdown plugins={[gfm]} renderers={{ code: CodeBlock }}>{contentElement.text}</ReactMarkdown></div>);
+                break;
+            case '_cImage':
+                element = (<img className="cImage" alt={contentElement.alt} src={contentElement.url} />);
                 break;
             default:
                 break;

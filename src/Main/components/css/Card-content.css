@@ -1,92 +1,219 @@
-.tasklist {
+.content-element hr {
+    width: 80%;
+    height: 1px;
+    margin: 0 auto;
+    border: none;
+    background: linear-gradient(to left, transparent, #F05D60 10%, #F05D60 90%, transparent);
+}
+
+.cTasklist {
     padding: 5px 10px;
 }
 
-.tasklist .title {
+.cTasklist-title {
     padding: 0;
     margin: 0;
-
+    text-align: center;
     font-family: 'Roboto';
-    font-weight: 600;
-    font-size: 1em;
-    color:#ddd;
+    font-weight: 400;
+    font-size: 1.5em;
+    color: #ddd;
 }
 
-.tasklist .tasks-container {
+.cTask {
     padding-left: 10px;
-
-
-    color:#ddd;
 }
 
-.tasklist .tasks-container .task {
+.form-checkbox {
     display: flex;
-    flex-direction: row;
     justify-content: flex-start;
     align-items: center;
 }
 
-.tasklist .tasks-container .task input[type="checkbox"] {
-    position: relative;
-    width: 1.5em;
-    height: 1.5em;
-    color: #000;
-    border: 1px solid #777;
-    border-radius: 4px;
+input[type="checkbox"] {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
     appearance: none;
-    outline: 0;
-    cursor: pointer;
-    /*transition: background 0.2s 0.2s;*/
+    height: 20px;
+    width: 20px;
+    border: 1px solid #F05D60;
+    border-radius: 3px;
+    outline: none;
 }
 
-.tasklist .tasks-container .task input[type="checkbox"]::before {
-    position: absolute;
-    content: '';
+input[type="checkbox"]::after {
     display: block;
-    top: 2px;
-    left: 7px;
-    width: 8px;
-    height: 14px;
-    border-style: solid;
-    border-color: #FFF;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-    opacity: 0;
+    content: '\2713';
+    color: transparent;
 }
 
-.tasklist .tasks-container .task input[type="checkbox"]:checked {
-    color: #FFF;
-    border-color: #F05D60;
-    background: #F05D60;
+input[type="checkbox"]:checked {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #F05D60;
+    outline: none;
 }
 
-.tasklist .tasks-container .task input[type="checkbox"]::before {
-    opacity: 1;
-}
-
-.tasklist .tasks-container .task input[type="checkbox"]~label::before {
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-}
-
-.tasklist .tasks-container .task label {
-    position: relative;
-    cursor: pointer;
-    
-    font-family: 'Roboto';
-    font-weight:100;
+input[type="checkbox"]:checked::after {
+    display: block;
+    content: '\2713';
+    color: #ddd;
+    font-weight: bold;
     font-size: 1em;
-
-    padding: 0 0.25em 0;
-    user-select: none;
 }
 
-.tasklist .tasks-container .task label::before {
+input[type="checkbox"]+label {
+    font-family: 'Roboto';
+    font-weight: 100;
+    font-size: 1em;
+    color: #ddd;
+}
+
+.cText {
+    padding: 5px 10px;
+    font-family: 'Roboto';
+    font-size: 1em;
+    color: #ddd;
+}
+
+.cMarkdownText {
+    padding: 5px 10px;
+    font-family: 'Roboto';
+    font-weight: 100;
+}
+
+.cMarkdownText ul {
+    margin-right: 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+.cMarkdownText ul>li {
+    margin: 5px 0;
+    margin-left: 15px;
+}
+
+.cMarkdownText ul li:before {
+    display: inline-block;
+    content: '';
+    width: 2px;
+    height: 2px;
+    border: 2px solid #F05D60;
+    border-radius: 100%;
+    padding: 0.1em;
+    line-height: 1.0;
+    margin-right: 0.5em;
+}
+
+.cMarkdownText a {
+    color: #F05D60;
+    font-weight: 500;
+}
+
+.cMarkdownText h1,
+.cMarkdownText h2,
+.cMarkdownText h3,
+.cMarkdownText h4,
+.cMarkdownText h5,
+.cMarkdownText h6 {
+    color: #F05D60;
+    text-transform: uppercase;
+}
+
+.cMarkdownText h1{
+    font-weight: 500;
+    font-size: 2em;
+}
+
+.cMarkdownText h2{
+    font-weight: 400;
+    font-size: 1.5em;
+}
+
+.cMarkdownText h3{
+    font-weight: 300;
+    font-size: 1.25em;
+}
+
+.cMarkdownText h4{
+    font-weight: 250;
+    font-size: 1.15em;
+}
+
+.cMarkdownText h5{
+    font-weight: 200;
+    font-size: 1.1em;
+}
+
+.cMarkdownText h6{
+    font-weight: 100;
+    font-size: 1.05em;
+}
+
+.cMarkdownText blockquote{
+    margin: 0;
+    padding: 0;
+    padding: 4px 10px;
+    border-left: 4px solid #F05D60;
+
+    background: #0003;
+}
+
+.cMarkdownText blockquote p{
+    margin: 0;
+    padding: 0;
+}
+
+table {
+    position: relative;
+    border-collapse: collapse;
+    overflow: hidden;
+}
+table thead{
+    background: linear-gradient(45deg, #F05D60, #773032);
+}
+
+table tbody tr:nth-child(even){
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+table tbody tr:nth-child(odd){
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+table th, .cMarkdownText table td {
+    padding: 10px;
+    color: #fff;
+}
+
+table th {
+    text-align: left;
+}
+
+table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+table tbody td {
+    position: relative;
+}
+
+table tbody td:hover::before {
+    content: "";
     position: absolute;
-    content: attr(data-content);
-    color: #777;
-    clip-path: polygon(0 0, 0 0, 0% 100%, 0 100%);
-    text-decoration: line-through;
-    text-decoration-thickness: 3px;
-    text-decoration-color: #000;
-    transition: clip-path 0.2s 0.2s;
+    left: 0;
+    right: 0;
+    top: -9999px;
+    bottom: -9999px;
+    background-color: rgba(255, 255, 255, 0.2);
+    z-index: -1;
+}
+
+.cImage {
+    padding: 5px 10px;
+    width: calc(100% - 20px);
+    max-height: 150px;
+    object-fit: cover;
 }
