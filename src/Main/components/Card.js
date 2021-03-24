@@ -93,7 +93,15 @@ const Card = (props) => {
                                 </div>
                                 <div className="card-field">
                                     <BiImageAlt />
-                                    <input type="text" value={props.card.image} onChange={event => props.functions.updateCard(props.functions.getParentId('COLUMN', props.card.columnId), props.card.columnId, props.card.id, [{ 'property': 'title', 'newValue': event.target.value }])} />
+                                    <input type="text" value={props.card.image} onChange={event => props.functions.updateCard(props.functions.getParentId('COLUMN', props.card.columnId), props.card.columnId, props.card.id, [{ 'property': 'image', 'newValue': event.target.value }])} />
+                                </div>
+                                <div className="card-field">
+                                    <BiImageAlt />
+                                    <input type="text" name="priority" value={props.card.priority} onChange={event => props.functions.updateCard(props.functions.getParentId('COLUMN', props.card.columnId), props.card.columnId, props.card.id, [{ 'property': 'priority', 'newValue': event.target.value }])} />
+                                    <datalist id="priority">
+                                        <option value="Boston" />
+                                        <option value="Cambridge" />
+                                    </datalist>
                                 </div>
                             </div>
 
