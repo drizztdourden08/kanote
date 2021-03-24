@@ -1,6 +1,6 @@
 {
   "name": "kanote",
-  "version": "0.1.238",
+  "version": "0.1.242",
   "private": true,
   "description": "Kaban Board Quick personal app",
   "author": "Johnny Prescott",
@@ -13,6 +13,7 @@
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.7.1",
+    "ba64": "^3.0.9",
     "concurrently": "^5.3.0",
     "cross-env": "^7.0.3",
     "electron": "^11.2.3",
@@ -20,6 +21,7 @@
     "electron-builder": "^22.9.1",
     "electron-is-dev": "^1.2.0",
     "fs": "^0.0.1-security",
+    "image-to-base64": "^2.1.1",
     "react": "^17.0.1",
     "react-beautiful-dnd": "^13.0.0",
     "react-dom": "^17.0.1",
@@ -67,7 +69,7 @@
         "error",
         "(^[A-Za-z][a-z]*([A-Z][a-z]+)*([0-9]{0,2}|[A-Z])$|JSON)",
         {
-          "properties": true,
+          "properties": false,
           "ignoreDestructuring": false,
           "onlyDeclarations": true
         }

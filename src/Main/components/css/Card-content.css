@@ -217,3 +217,15 @@ table tbody td:hover::before {
     max-height: 150px;
     object-fit: cover;
 }
+
+.card-field{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 3px 10px;
+}
+
+.card-field svg{
+    font-size: 2em;
+}

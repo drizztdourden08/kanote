@@ -4,7 +4,8 @@ import { Draggable } from 'react-beautiful-dnd';
 import './css/Card.css';
 import './css/Card-content.css';
 
-import { BiDotsVerticalRounded, BiCommentDetail } from 'react-icons/bi';
+import { BiDotsVerticalRounded, BiCommentDetail, BiImageAlt } from 'react-icons/bi';
+import { MdTitle } from 'react-icons/md';
 
 const Card = (props) => {
     return (
@@ -28,7 +29,7 @@ const Card = (props) => {
                                             </div>
                                             :undefined
                                     }
-                                    <div {...provided.dragHandleProps} className="card-main">
+                                    <div className="card-main">
                                         <div className="card-main_wrapper" style={props.card.image !== null ? { background: '#00000099' }:undefined }>
                                             {
                                                 props.card.priority !== null ?
@@ -37,11 +38,11 @@ const Card = (props) => {
                                                     </div>
                                                     :undefined
                                             }
-                                            <div className="card_title">
+                                            <div {...provided.dragHandleProps} className="card_title">
                                                 <span>{props.card.title}</span>
                                             </div>
-                                            <div className="card-editing">
-                                                <BiDotsVerticalRounded />
+                                            <div className="card-editing" >
+                                                <button className="standard-button" onClick={() => props.functions.updateCard(props.functions.getParentId('COLUMN', props.card.columnId), props.card.columnId, props.card.id, [{ 'property': 'editing', 'newValue': !props.card.editing }])} ><BiDotsVerticalRounded /></button>
                                             </div>
                                         </div>
                                     </div>
@@ -52,7 +53,7 @@ const Card = (props) => {
                                         {props.card.content.map((element, index) => {
                                             return (
                                                 <div className="content-element" key={index}>
-                                                    {props.functions.returnContentElement(element)}
+                                                    {props.functions.returnContentElement(element, index)}
                                                     <hr />
                                                 </div>
                                             );
@@ -61,6 +62,7 @@ const Card = (props) => {
                                     </div>
                                     :undefined
                                 }
+
                                 <div className="card_footer">
                                     <div className="card_footer-left">
                                         {props.card.tags.length > 0 ?
@@ -84,7 +86,15 @@ const Card = (props) => {
                                 </div>
                             </div>
                             :
-                            <div>
+                            <div className="card-wrapper">
+                                <div className="card-field">
+                                    <MdTitle />
+                                    <input type="text" value={props.card.title} onChange={event => props.functions.updateCard(props.functions.getParentId('COLUMN', props.card.columnId), props.card.columnId, props.card.id, [{ 'property': 'title', 'newValue': event.target.value }])} />
+                                </div>
+                                <div className="card-field">
+                                    <BiImageAlt />
+                                    <input type="text" value={props.card.image} onChange={event => props.functions.updateCard(props.functions.getParentId('COLUMN', props.card.columnId), props.card.columnId, props.card.id, [{ 'property': 'title', 'newValue': event.target.value }])} />
+                                </div>
                             </div>
 
                     }
