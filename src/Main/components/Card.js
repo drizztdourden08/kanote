@@ -50,7 +50,7 @@ const Card = (props) => {
 
                                 {props.card.content.length > 0 ?
                                     <div className="card_content">
-                                        {props.card.content.map((element, index) => {
+                                        {props.card.content.array.map((element, index) => {
                                             return (
                                                 <div className="content-element" key={index}>
                                                     {props.functions.returnContentElement(element, index)}
@@ -67,14 +67,14 @@ const Card = (props) => {
                                     <div className="card_footer-left">
                                         {props.card.tags.length > 0 ?
                                             <div className="card_tags">
-                                                {props.card.tags.map((tag, index) =>
+                                                {props.card.tags.array.map((tag, index) =>
                                                     <div key={index} className="tag">{tag}</div>)}
                                             </div>
                                             :undefined
                                         }
                                         {props.card.assignees.length > 0 ?
                                             <div className="card_footer_assignees">
-                                                {props.card.assignees.map((assignee, index) =>
+                                                {props.card.assignees.array.map((assignee, index) =>
                                                     <div className="assignee-wrapper" key={index}>
                                                         <div className="assignee" style={{ background: assignee.color }}>{assignee.initial}</div>
                                                     </div>)}

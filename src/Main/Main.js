@@ -14,28 +14,173 @@ import './Main.css';
 
 import Swimlane from './components/Swimlane';
 import './components/css/Swimlane.css';
-import RnImgToBase64 from 'react-native-img-to-base64';
+import Column from './components/Column';
 
-const { v4: uuidv4, isUuid  } = require('uuid');
+import { v4 as uuidv4, validate as uuidValidate  } from 'uuid';
+
 const imageToBase64 = require('image-to-base64');
-const ba64 = require("ba64");
+const ba64 = require('ba64');
 
 const ipc = window.require('electron').ipcRenderer;
 
+class Color {
+    constructor(hexColor){
+        this._hex = hexColor;
+        this.red = parseInt(hexColor[0] + hexColor[1], 16);
+        this.green = parseInt(hexColor[2] + hexColor[3], 16);
+        this.blue = parseInt(hexColor[4] + hexColor[5], 16);
+    }
+    static FromRGB(red, green, blue){
+        if ((red >= 0 && red <= 255) === false) return;
+        if ((green >= 0 && green <= 255) === false) return;
+        if ((blue >= 0 && blue <= 255) === false) return;
+
+        return new Color('#' + red.ToString(16) + green.ToString(16) + blue.ToString(16));
+    }
+
+    set hex(value){
+        const rgx = new RegExp('[0-9]{6}');
+        if (rgx.test(value) === false){
+            return;
+        }
+        this._hex = value;
+    }
+
+    get hex(){
+        return '#' + this._hex;
+    }
+
+    get rgb(){
+        return { red: this.red, green: this.green, blue: this.blue };
+    }
+}
+class ArrayOf {
+    constructor(objTypes){
+        this.value = [];
+        this.objTypes = objTypes;
+    }
+
+    add(val){
+        if (this.objTypes.indexOf(val.constructor.name) === -1) return;
+        this.value.push(val);
+    }
+
+    insert(val, index){
+        if (this.objTypes.indexOf(val.constructor.name) === -1) return;
+        if (index === -1) return;
+        this.value.splice(index, 0, val);
+    }
+
+    remove(val){
+        if (this.objTypes.indexOf(val.constructor.name) === -1) return;
+
+        const index = this.value.findIndex((Id) => Id === val.id);
+        this.value.splice(index, 1);
+    }
+
+    removeAt(index){
+        if (index === -1) return;
+        this.value.splice(index, 1);
+    }
+
+    extract(id){
+        if (uuidValidate(id) === false) return;
+
+        const index = this.value.findIndex((v) => v.id === id);
+        if (index > -1) return [this.value.splice(index, 1)[0], index];
+    }
+
+    get array(){
+        return this.value;
+    }
+}
 
 class _Board {
     constructor(){
-        this.swimlanes = [];
-        this.priorities = [];
-        this.tags = [];
+        this._title = 'Board ' + Math.floor(Math.random() * Math.floor(100))  + '';
+        this._swimlanes = new ArrayOf(['_Swimlane']);
+        this._priorities = new ArrayOf(['_Priority']);
+        this._tags = new ArrayOf(['_Tag']);
+    }
+
+    set title(value){
+        const rgx = new RegExp('[A-Za-z0-9]{3,30}');
+        if (rgx.test(value) === false){
+            return;
+        }
+
+        this._title = value;
+    }
+    get title(){
+        return this._title;
+    }
+
+    set swimlanes(value){
+        if (Array.isArray(value)){
+            value.map((el) => {
+                if (el.constructor.name !== '_Swimlane') return;
+            });
+            this._swimlanes = value;
+        }
+    }
+    get swimlanes(){
+        return this._swimlanes;
+    }
+
+    set priorities(value){
+        if (Array.isArray(value)){
+            value.map((el) => {
+                if (el.constructor.name !== '_Priority') return;
+            });
+            this._priorities = value;
+        }
+    }
+    get priorities(){
+        return this._priorities;
+    }
+
+    set tags(value){
+        if (Array.isArray(value)){
+            value.map((el) => {
+                if (el.constructor.name !== '_Tag') return;
+            });
+            this._tags = value;
+        }
+    }
+    get tags(){
+        return this._tags;
     }
 }
 
 class _Swimlane {
     constructor(){
         this.id = uuidv4();
-        this.title = 'Swimlane ' + Math.floor(Math.random() * Math.floor(100))  + '';
-        this.columns = [];
+        this._title = 'Swimlane ' + Math.floor(Math.random() * Math.floor(100))  + '';
+        this._columns = new ArrayOf(['_Column']);
+    }
+
+    set title(value){
+        const rgx = new RegExp('[A-Za-z0-9]{3,30}');
+        if (rgx.test(value) === false){
+            return;
+        }
+
+        this._title = value;
+    }
+    get title(){
+        return this._title;
+    }
+
+    set columns(value){
+        if (Array.isArray(value)){
+            value.map((el) => {
+                if (el.constructor.name !== '_Column') return;
+            });
+            this._columns = value;
+        }
+    }
+    get columns(){
+        return this._columns;
     }
 }
 
@@ -43,54 +188,191 @@ class _Column {
     constructor(swimlaneId) {
         this.id = uuidv4();
         this.swimlaneId = swimlaneId;
-        this.title = 'Column ' + Math.floor(Math.random() * Math.floor(100))  + '';
-        this.cards = [];
+        this._title = 'Column ' + Math.floor(Math.random() * Math.floor(100))  + '';
+        this._cards = new ArrayOf(['_Card']);
         this.editing = false;
-        this.moveColumnBy = 0;
-        this.moveSwimlaneBy = 0;
         this.toDelete = false;
         this.cancelChanges = false;
         this.originalColumn = {};
+    }
+
+    set title(value){
+        const rgx = new RegExp('[A-Za-z0-9]{3,30}');
+        if (rgx.test(value) === false){
+            return;
+        }
+
+        this._title = value;
+    }
+    get title(){
+        return this._title;
+    }
+
+    set cards(value){
+        if (Array.isArray(value)){
+            value.map((el) => {
+                if (el.constructor.name !== '_Card') return;
+            });
+            this._cards = value;
+        }
+    }
+    get cards(){
+        return this._cards;
     }
 }
 
 class _Card {
     constructor(columnId) {
         this.id = uuidv4();
-        this.columnId = columnId;
-        this.title = 'Card ' + Math.floor(Math.random() * Math.floor(100))  + '';
-        this.priority = new _Priority();
-        this.image = [
-            'https://www.talkwalker.com/images/2020/blog-headers/image-analysis.png',
-            'https://seeklogo.com/images/P/pepsi-vertical-logo-72846897FF-seeklogo.com.png',
-            'https://www.projecttopics.org/wp-content/uploads/2017/09/abstract-140898_1280.jpg',
-            'http://artist.com/art-recognition-and-education/wp-content/themes/artist-blog/media-files/2016/05/abstract-6.jpg',
-            'https://i.icanvas.com/list-hero/abstract-landscapes-1.jpg',
-            'https://www.fyimusicnews.ca/sites/default/files/media-beat-large.jpg',
-            'http://2015.holocaustremembrance.com/sites/default/files/field/image/social_media_strategy111.jpg',
-            'https://cdn.arstechnica.net/wp-content/uploads/2016/02/5718897981_10faa45ac3_b-640x624.jpg',
-            'https://teeltechcanada.com/2015/wp-content/uploads/2017/08/cyber-security-banner-red.jpg',
-            'https://thumbs.dreamstime.com/b/abstract-red-grey-tech-geometric-banner-design-vector-web-header-corporate-background-101610481.jpg',
-            null, null, null, null, null, null, null, null
-        ][Math.floor(Math.random() * Math.floor(18))];
-        this.tags = ['task', 'beamed'];
-        this.content = [new _cTaskList(), new _cText(), new _cMarkdownText(), new _cImage()].splice(Math.floor(Math.random() * Math.floor(3)), Math.round(Math.random()));
-        this.timing = {
-            created: Date.now(),
-            dueDate: dateAdd(this.created, 'minute', 5),
-            timeLeft: this.dueDate - this.created,
-            breached: this.timeLeft > 0 ? false:true
+        this._columnId = this.columnId(columnId);
+        this._title = 'Card ' + Math.floor(Math.random() * Math.floor(100))  + '';
+        this._priority = new _Priority();
+        this._imageSource = '';
+        this.image = {
+            fromUrlToBase64(url){
+                imageToBase64(url).then(base64 => {
+                    this._imageSource = base64;
+                    this.alt = url.split('\\').pop().split('/').pop();
+                });
+            },
+            fromlocalPathToBase64(path){
+                imageToBase64(path).then(base64 => {
+                    this._imageSource = base64;
+                    this.alt = path.split('\\').pop().split('/').pop();
+                });
+            },
+            fromUrlToLocal(base64){
+                return;
+            },
+            fromBase64ToLocal(base64, pathToSave){
+                ba64.writeImage(pathToSave, base64, () => {
+                    return;
+                });
+
+                const ext = ba64.getExt(base64);
+                this._imageSource = pathToSave + ext;
+            },
+            fromUrl(url){
+                const expression = '(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})';
+                const rgx = new RegExp(expression);
+                if (rgx.test(url)){
+                    this._imageSource = url;
+                }
+            }
         };
-        this.notification = false;
-        this.assignees = [new _Assignee(), new _Assignee()];
-        this.accentColor = '#' + Math.floor(Math.random()*16777215).toString(16);
-        this.comments = [];
+        this._tags = new ArrayOf(['_Tags']);
+        this._content = new ArrayOf(['_cTaskList', '_cText', '_cMarkdownText', '_cImage']);
+        this._created = Date.now();
+        this._dueDate =
+        this.datetime = {
+            timeLeft(){
+                return this.dueDate - this.created;
+            },
+            breached(){
+                return this.timeLeft > 0 ? false:true;
+            }
+        };
+        this._notification = false;
+        this._assignees = new ArrayOf(['_Assignee']);
+        this._accentColor = new Color();
         this.editing = false;
-        this.moveColumnBy = 0;
-        this.moveSwimlaneBy = 0;
         this.toDelete = false;
         this.cancelChanges = false;
         this.originalCard = {};
+    }
+
+    set columnId(value){
+        if (uuidValidate(value) === false){
+            return;
+        }
+
+        this._columnId = value;
+    }
+    get parentTaskId(){
+        return this._columnId;
+    }
+
+    set title(value){
+        const rgx = new RegExp('[A-Za-z0-9]{3,30}');
+        if (rgx.test(value) === false){
+            return;
+        }
+
+        this._title = value;
+    }
+    get title(){
+        return this._title;
+    }
+
+    set priority(value){
+        if (value.constructor.name !== '_Priority'){
+            return;
+        }
+
+        this._priority = value;
+    }
+    get priority(){
+        return this._priority;
+    }
+
+    set imageSource(value){
+        this._imageSource = value;
+    }
+    get imageSource(){
+        return this._imageSource;
+    }
+
+    get tags(){
+        return this._tags;
+    }
+
+    get content(){
+        return this._content;
+    }
+
+    get created(){
+        return this._created;
+    }
+
+    set dueDate(value){
+        const d = new Date(value);
+        if (isNaN(d.getTime())){
+            return;
+        }
+
+        if (d <= this._created){
+            return;
+        }
+
+        this._dueDate = value;
+    }
+    get dueDate(){
+        return this._dueDate;
+    }
+
+    set notification(value){
+        if (typeof(value) === 'boolean'){
+            return;
+        }
+        this._notification = value;
+    }
+    get notification(){
+        return this._notification;
+    }
+
+    get assignees(){
+        return this._assignees;
+    }
+
+    set accentColor(value){
+        if (value.constructor.name !== 'Color'){
+            return;
+        }
+
+        this._accentColor = value;
+    }
+    get accentColor(){
+        return this._accentColor;
     }
 }
 
@@ -98,7 +380,7 @@ class _Priority {
     constructor() {
         this.id = uuidv4();
         this._title = ['High', 'Medium', 'Low'][Math.floor(Math.random() * Math.floor(3))];
-        this._color = this.color(Math.floor(Math.random()*16777215).toString(16));
+        this._color = new Color(this.color(Math.floor(Math.random()*16777215).toString(16)));
         this._level = this.level(Math.floor(Math.random() * Math.floor(10)));
     }
 
@@ -115,21 +397,14 @@ class _Priority {
     }
 
     set color(value){
-        const rgx = new RegExp('[0-9]{6}');
-        if (rgx.test(value) === false){
+        if (value.constructor.name !== 'Color'){
             return;
         }
+
         this._color = value;
     }
-    get colorHex(){
-        return '#' + this._color;
-    }
-    get colorRgb(){
-        const r = parseInt(this._color[0] + this._color[1], 16);
-        const g = parseInt(this._color[2] + this._color[3], 16);
-        const b = parseInt(this._color[4] + this._color[5], 16);
-        const rgbArray = [r,g,b];
-        return rgbArray;
+    get color(){
+        return this._color;
     }
 
     set level(value){
@@ -149,7 +424,7 @@ class _Assignee {
         this.id = uuidv4();
         this._firstName = name();
         this._lastName = surname();
-        this._color = '#' + Math.floor(Math.random()*16777215).toString(16);
+        this._color = new Color(this.color(Math.floor(Math.random()*16777215).toString(16)));
     }
 
     set firstName(value){
@@ -185,21 +460,14 @@ class _Assignee {
     }
 
     set color(value){
-        const rgx = new RegExp('[0-9]{6}');
-        if (rgx.test(value) === false){
+        if (value.constructor.name !== 'Color'){
             return;
         }
+
         this._color = value;
     }
-    get colorHex(){
-        return '#' + this._color;
-    }
-    get colorRgb(){
-        const r = parseInt(this._color[0] + this._color[1], 16);
-        const g = parseInt(this._color[2] + this._color[3], 16);
-        const b = parseInt(this._color[4] + this._color[5], 16);
-        const rgbArray = [r,g,b];
-        return rgbArray;
+    get color(){
+        return this._color;
     }
 }
 
@@ -207,21 +475,7 @@ class _cTaskList {
     constructor() {
         this.id = uuidv4();
         this._title = 'Tasklist ' + Math.floor(Math.random() * Math.floor(10));
-        this._tasks = [new _cTask(), new _cTask(), new _cTask(), new _cTask(), new _cTask()].slice(0, Math.floor(Math.random() * Math.floor(4)));
-        this.tasks = {
-            insert (value = undefined, index = this._tasks.length)  {
-                if (value === undefined){
-                    value = new _cTask();
-                }
-
-                if (value.constructor.name === '_cTask'){
-                    this._task.splice(index, 0, value);
-                }
-            },
-            remove (index) {
-                this._tasks.splice(index, 1);
-            }
-        };
+        this._tasks = new ArrayOf(['_cTask']);
     }
 
     set title(value){
@@ -236,14 +490,12 @@ class _cTaskList {
         return this._title;
     }
 
-    set tasks(tArray){
-        if (Array.isArray(tArray)){
-            let containTasks = true;
-            tArray.map((task, index) => {
-                if (tArray.constructor.name !== '_cTask') containTasks = false;
+    set tasks(value){
+        if (Array.isArray(value)){
+            value.map((el) => {
+                if (el.constructor.name !== '_cTask') return;
             });
-
-            if (containTasks) this._tasks = tArray;
+            this._tasks = value;
         }
     }
     get tasks(){
@@ -257,25 +509,11 @@ class _cTask {
         this._parentTaskId = parentTaskId;
         this._title = 'task ' + Math.floor(Math.random() * Math.floor(10));
         this._checked = Math.random() < 0.5;
-        this._tasks = this.parentTaskId === null ? [new _cTask(this.id), new _cTask(this.id)]: [];
-        this.tasks = {
-            insert (value = undefined, index = this._tasks.length)  {
-                if (value === undefined){
-                    value = new _cTask();
-                }
-
-                if (value.constructor.name === '_cTask'){
-                    this._task.splice(index, 0, value);
-                }
-            },
-            remove (index) {
-                this._tasks.splice(index, 1);
-            }
-        };
+        this._tasks = new ArrayOf(['_cTask']);
     }
 
     set parentTaskId(value){
-        if (isUuid(value) === false){
+        if (uuidValidate(value) === false){
             return;
         }
 
@@ -308,14 +546,12 @@ class _cTask {
         return this._checked;
     }
 
-    set tasks(tArray){
-        if (Array.isArray(tArray)){
-            let containTasks = true;
-            tArray.map((task, index) => {
-                if (tArray.constructor.name !== '_cTask') containTasks = false;
+    set tasks(value){
+        if (Array.isArray(value)){
+            value.map((el) => {
+                if (el.constructor.name !== '_cTask') return;
             });
-
-            if (containTasks) this._tasks = tArray;
+            this._tasks = value;
         }
     }
     get tasks(){
@@ -481,31 +717,27 @@ const Main = (props) => {
 
     const addSwimlane = (sIndex) => {
         const newSwimlane = new _Swimlane();
-        const tempBoard = { ...board };
-        tempBoard.swimlanes.splice(sIndex + 1, 0, newSwimlane);
+        const tempBoard = new _Board();
+        Object.assign(tempBoard, board);
+        tempBoard.swimlanes.add(newSwimlane);
 
         setBoard(tempBoard);
     };
 
     const addColumn = (swimlaneId) => {
-        const tempBoard = { ...board };
+        const tempBoard = new _Board();
+        Object.assign(tempBoard, board);
 
-        const sIndex = tempBoard.swimlanes.findIndex((s) => s.id === swimlaneId);
-        if (sIndex > -1){
-            const swimlane = tempBoard.swimlanes.splice(sIndex, 1)[0];
+        const [swimlane, sIndex] = tempBoard.swimlanes.extract(swimlaneId);
+        swimlane.columns.add(new _Column(swimlaneId));
+        tempBoard.swimlanes.insert(swimlane, sIndex);
 
-            const column = new _Column(swimlaneId);
-
-            swimlane.columns = [...swimlane.columns, column];
-
-            tempBoard.swimlanes.splice(sIndex, 0, swimlane);
-
-            setBoard(tempBoard);
-        } else console.log('undefined Swimlane: ' + swimlaneId);
+        setBoard(tempBoard);
     };
 
     const addCard = (swimlaneId, columnId) => {
-        const tempBoard = { ...board };
+        const tempBoard = new _Board();
+        Object.assign(tempBoard, board);
 
         const sIndex = tempBoard.swimlanes.findIndex((s) => s.id === swimlaneId);
         if (sIndex > -1){
@@ -526,7 +758,8 @@ const Main = (props) => {
     };
 
     const updateColumn = (swimlaneId, columnId, newProps) => {
-        const tempBoard = { ...board };
+        const tempBoard = new _Board();
+        Object.assign(tempBoard, board);
 
         const sIndex = tempBoard.swimlanes.findIndex((s) => s.id === swimlaneId);
         if (sIndex > -1){
@@ -569,7 +802,9 @@ const Main = (props) => {
     };
 
     const updateCard = (swimlaneId, columnId, cardId, newProps) => {
-        const tempBoard = { ...board };
+        const tempBoard = new _Board();
+        Object.assign(tempBoard, board);
+
         console.log('sl: ', swimlaneId, ' c: ', columnId, 'ca: ', cardId, 'np: ', newProps);
         const sIndex = tempBoard.swimlanes.findIndex((s) => s.id === swimlaneId);
         if (sIndex > -1){
@@ -602,7 +837,8 @@ const Main = (props) => {
     };
 
     const moveCard = (sourceSwimlaneId, targetSwimlaneId, sourceColumnId = null, targetColumnId = null, sourceIndex = null, targetIndex = null) => {
-        const tempBoard = { ...board };
+        const tempBoard = new _Board();
+        Object.assign(tempBoard, board);
 
         let sourceSwimlane = null;
         let sourceColumn = null;
@@ -673,13 +909,14 @@ const Main = (props) => {
     };
 
     const getParentId = (sourceType, id) => {
-        const tempboard = { ...board };
+        const tempBoard = new _Board();
+        Object.assign(tempBoard, board);
 
         let parentId = null;
 
         switch (sourceType) {
             case 'CARD':{
-                tempboard.swimlanes.forEach((sl) => {
+                tempBoard.swimlanes.forEach((sl) => {
                     sl.columns.forEach((c) => {
                         c.cards.forEach((ca) => {
                             if (ca.id === id) {
@@ -691,7 +928,7 @@ const Main = (props) => {
                 break;
             }
             case 'COLUMN':{
-                tempboard.swimlanes.forEach((sl) => {
+                tempBoard.swimlanes.forEach((sl) => {
                     sl.columns.forEach((c) => {
                         if (c.id === id) {
                             parentId = sl.id;
@@ -782,7 +1019,9 @@ const Main = (props) => {
     };
 
     useEffect(() => { //Initial Render load Data
-        if (board.swimlanes.length === 0) addSwimlane();
+        if (board.swimlanes.array.length === 0) {
+            addSwimlane();
+        }
     }, []);
 
     useEffect(() => {
@@ -801,11 +1040,12 @@ const Main = (props) => {
         'getParentId': (sourceType, id) => getParentId(sourceType, id)
     };
 
+
     return (
         <div className="App" ref={appRef}>
             <DragDropContext onDragEnd={(result) => onDragEnd(result)}>
                 {
-                    board.swimlanes.map(
+                    board.swimlanes.array.map(
                         (sl, index) => (
                             <Swimlane functions={functions} swimlane={sl} key={index} index={index}></Swimlane>
                         )

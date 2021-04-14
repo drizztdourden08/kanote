@@ -15,7 +15,7 @@ const Swimlane = (props) => {
                 </button>
             </div>
             <div className="columns">
-                {props.swimlane.columns ? props.swimlane.columns.map((c, index) => (
+                {props.swimlane.columns ? props.swimlane.columns.array.map((c, index) => (
                     <Column column={c} key={index} functions={props.functions} />
                 )):null}
             </div>
