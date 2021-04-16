@@ -82,7 +82,7 @@ const Card = (props) => {
                                             :undefined
                                         }
                                     </div>
-                                    <div className="card_footer_notes-counter"><BiCommentDetail /><span>{props.card.comments.length}</span></div>
+                                    <div className="card_footer_notes-counter"><BiCommentDetail /><span>{props.card.comments.array.length}</span></div>
                                 </div>
                             </div>
                             :

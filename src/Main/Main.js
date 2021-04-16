@@ -26,9 +26,10 @@ const ipc = window.require('electron').ipcRenderer;
 class Color {
     constructor(hexColor){
         this._hex = hexColor;
-        this.red = parseInt(hexColor[0] + hexColor[1], 16);
-        this.green = parseInt(hexColor[2] + hexColor[3], 16);
-        this.blue = parseInt(hexColor[4] + hexColor[5], 16);
+        console.log(hexColor);
+        this.red = hexColor ? parseInt(hexColor[0] + hexColor[1], 16): null;
+        this.green = hexColor ? parseInt(hexColor[2] + hexColor[3], 16): null;
+        this.blue = hexColor ? parseInt(hexColor[4] + hexColor[5], 16): null;
     }
     static FromRGB(red, green, blue){
         if ((red >= 0 && red <= 255) === false) return;
@@ -88,6 +89,10 @@ class ArrayOf {
 
         const index = this.value.findIndex((v) => v.id === id);
         if (index > -1) return [this.value.splice(index, 1)[0], index];
+    }
+
+    extractAt(index){
+        if (index > -1) return this.value.splice(index, 1)[0];
     }
 
     get array(){
@@ -224,7 +229,7 @@ class _Column {
 class _Card {
     constructor(columnId) {
         this.id = uuidv4();
-        this._columnId = this.columnId(columnId);
+        this._columnId = columnId;
         this._title = 'Card ' + Math.floor(Math.random() * Math.floor(100))  + '';
         this._priority = new _Priority();
         this._imageSource = '';
@@ -264,6 +269,7 @@ class _Card {
         this._content = new ArrayOf(['_cTaskList', '_cText', '_cMarkdownText', '_cImage']);
         this._created = Date.now();
         this._dueDate =
+        this._comments = new ArrayOf(['_Comment']);
         this.datetime = {
             timeLeft(){
                 return this.dueDate - this.created;
@@ -364,6 +370,10 @@ class _Card {
         return this._assignees;
     }
 
+    get comments(){
+        return this._comments;
+    }
+
     set accentColor(value){
         if (value.constructor.name !== 'Color'){
             return;
@@ -380,8 +390,8 @@ class _Priority {
     constructor() {
         this.id = uuidv4();
         this._title = ['High', 'Medium', 'Low'][Math.floor(Math.random() * Math.floor(3))];
-        this._color = new Color(this.color(Math.floor(Math.random()*16777215).toString(16)));
-        this._level = this.level(Math.floor(Math.random() * Math.floor(10)));
+        this._color = new Color(Math.floor(Math.random()*16777215).toString(16));
+        this._level = Math.floor(Math.random() * Math.floor(10));
     }
 
     set title(value){
@@ -468,6 +478,32 @@ class _Assignee {
     }
     get color(){
         return this._color;
+    }
+}
+
+class _Comment{
+    constructor() {
+        this.id = uuidv4();
+        this._text = '';
+        this._timestamp = Date.now();
+        this._author = {};
+    }
+
+    set text(value){
+        this._text = value;
+    }
+    get text(){
+        return this._text;
+    }
+
+    set author(value){
+        if (value.constructor.name !== '_Assignee'){
+            return;
+        }
+        this._author = value;
+    }
+    get author(){
+        return this._author;
     }
 }
 
@@ -715,7 +751,7 @@ const Main = (props) => {
     const [board, setBoard] = useState(new _Board());
     const appRef = useRef(null);
 
-    const addSwimlane = (sIndex) => {
+    const addSwimlane = () => {
         const newSwimlane = new _Swimlane();
         const tempBoard = new _Board();
         Object.assign(tempBoard, board);
@@ -739,66 +775,53 @@ const Main = (props) => {
         const tempBoard = new _Board();
         Object.assign(tempBoard, board);
 
-        const sIndex = tempBoard.swimlanes.findIndex((s) => s.id === swimlaneId);
-        if (sIndex > -1){
-            const swimlane = tempBoard.swimlanes.splice(sIndex, 1)[0];
+        const [swimlane, sIndex] = tempBoard.swimlanes.extract(swimlaneId);
+        const [column, cIndex] = swimlane.columns.extract(columnId);
 
-            const cIndex = swimlane.columns.findIndex((c) => c.id === columnId);
-            if (cIndex > -1){
-                const column = swimlane.columns.splice(cIndex, 1)[0];
+        column.cards.add(new _Card(columnId));
 
-                column.cards = [...column.cards, new _Card(columnId)];
+        swimlane.columns.insert(column, cIndex);
+        tempBoard.swimlanes.insert(swimlane, sIndex);
 
-                swimlane.columns.splice(cIndex, 0, column);
-                tempBoard.swimlanes.splice(sIndex, 0, swimlane);
-
-                setBoard(tempBoard);
-            } else console.log('undefined column: ' + columnId);
-        } else console.log('undefined Swimlane: ' + swimlaneId);
+        setBoard(tempBoard);
     };
 
     const updateColumn = (swimlaneId, columnId, newProps) => {
         const tempBoard = new _Board();
         Object.assign(tempBoard, board);
 
-        const sIndex = tempBoard.swimlanes.findIndex((s) => s.id === swimlaneId);
-        if (sIndex > -1){
-            const swimlane = tempBoard.swimlanes.splice(sIndex, 1)[0];
+        const [swimlane, sIndex] = tempBoard.swimlanes.extract(swimlaneId);
+        const [column, cIndex] = swimlane.columns.extract(columnId);
 
-            let cIndex = swimlane.columns.findIndex((c) => c.id === columnId);
-            if (cIndex > -1){
-                const column = swimlane.columns.splice(cIndex, 1)[0];
+        newProps.map((prop) => {
+            column[prop.property] = prop.newValue;
+            if (prop.property === 'editing' && prop.newValue === true) column.originalColumn = { ...column };
+        });
 
-                newProps.map((prop) => {
-                    column[prop.property] = prop.newValue;
-                    if (prop.property === 'editing' && prop.newValue === true) column.originalColumn = { ...column };
-                });
+        if (!column.toDelete){
+            if (column.cancelChanges){
+                column.title = column.originalColumn.title;
+                column.originalColumn = {};
+                column.cancelChanges = false;
+            }
 
-                if (!column.toDelete){
-                    if (column.cancelChanges){
-                        column.title = column.originalColumn.title;
-                        column.originalColumn = {};
-                        column.cancelChanges = false;
-                    }
+            let moveMod = 0;
+            if (column.moveColumnBy !== 0 && (((cIndex + column.moveColumnBy) >= 0) && ((cIndex + column.moveColumnBy) <= swimlane.columns.length))){
+                //If moveColumnBy is required
+                moveMod = column.moveColumnBy;
+                column.moveColumnBy = 0;
+            }
 
-                    if (column.moveColumnBy !== 0 && (((cIndex + column.moveColumnBy) >= 0) && ((cIndex + column.moveColumnBy) <= swimlane.columns.length))){
-                        //If moveColumnBy is required
-                        cIndex += column.moveColumnBy;
-                        column.moveColumnBy = 0;
-                    }
+            // eslint-disable-next-line no-constant-condition
+            if (true){
+                //If moveSwimlaneBy is required
+            }
 
-                    // eslint-disable-next-line no-constant-condition
-                    if (true){
-                        //If moveSwimlaneBy is required
-                    }
+            swimlane.columns.insert(column, cIndex + moveMod);
+        }
+        tempBoard.swimlanes.insert(swimlane, sIndex);
 
-                    swimlane.columns.splice(cIndex, 0, column);
-                }
-                tempBoard.swimlanes.splice(sIndex, 0, swimlane);
-
-                setBoard(tempBoard);
-            } else console.log('undefined column: ' + columnId);
-        } else console.log('undefined Swimlane: ' + swimlaneId);
+        setBoard(tempBoard);
     };
 
     const updateCard = (swimlaneId, columnId, cardId, newProps) => {
@@ -840,68 +863,42 @@ const Main = (props) => {
         const tempBoard = new _Board();
         Object.assign(tempBoard, board);
 
-        let sourceSwimlane = null;
-        let sourceColumn = null;
-        let sourceCard = null;
-        let targetSwimlane = null;
-        let targetColumn = null;
 
         //GET SOURCES
-        const ssIndex = tempBoard.swimlanes.findIndex((s) => s.id === sourceSwimlaneId);
-        if (ssIndex > -1){
-            sourceSwimlane = tempBoard.swimlanes.splice(ssIndex, 1)[0];
-            if (sourceColumnId !== null){
-                const csIndex = sourceSwimlane.columns.findIndex((c) => c.id === sourceColumnId);
-                if (csIndex > -1){
-                    sourceColumn = sourceSwimlane.columns.splice(csIndex, 1)[0];
-                    if (sourceIndex > -1){
-                        sourceCard = sourceColumn.cards.splice(sourceIndex, 1)[0];
+        const [sourceSwimlane, ssIndex] = tempBoard.swimlanes.extract(sourceSwimlaneId);
+        if (sourceColumnId !== null){
+            const [sourceColumn, csIndex] = sourceSwimlane.columns.extract(sourceColumnId);
+            if (sourceIndex > -1){
+                const sourceCard = sourceColumn.cards.extractAt(sourceIndex);
 
-                        //GET TARGETS
-                        if (sourceColumnId !== targetColumnId){
+                //GET TARGETS
+                if (sourceColumnId !== targetColumnId){
+                    if (sourceSwimlaneId !== targetSwimlaneId){
+                        sourceSwimlane.columns.insert(sourceColumn, csIndex);
+                        tempBoard.swimlanes.insert(sourceSwimlane, ssIndex);
 
-                            if (sourceSwimlaneId !== targetSwimlaneId){
-                                //reconstruct source
-                                sourceSwimlane.columns.splice(csIndex, 0, sourceColumn);
-                                tempBoard.swimlanes.splice(ssIndex, 0, sourceSwimlane);
+                        const [targetSwimlane, stIndex] = tempBoard.swimlanes.extract(targetSwimlaneId);
+                        const [targetColumn, ctIndex] = targetSwimlane.columns.extract(targetColumnId);
 
-                                const stIndex = tempBoard.swimlanes.findIndex((s) => s.id === targetSwimlaneId);
-                                if (stIndex > -1){
-                                    targetSwimlane = tempBoard.swimlanes.splice(stIndex, 1)[0];
+                        targetColumn.cards.insert(sourceCard, targetIndex);
 
-                                    const ctIndex = targetSwimlane.columns.findIndex((c) => c.id === targetColumnId);
-                                    if (ctIndex > -1){
-                                        //reconstruct target
-                                        targetColumn = targetSwimlane.columns.splice(ctIndex, 1)[0];
 
-                                        targetColumn.cards.splice(targetIndex, 0, sourceCard);
-                                        targetSwimlane.columns.splice(ctIndex, 0, targetColumn);
-                                        tempBoard.swimlanes.splice(stIndex, 0, targetSwimlane);
-                                    }
-                                }
-                            } else {
-                                sourceSwimlane.columns.splice(csIndex, 0, sourceColumn);
+                        targetSwimlane.columns.insert(targetColumn, ctIndex);
+                        tempBoard.swimlanes.insert(targetSwimlane, stIndex);
+                    } else {
+                        sourceSwimlane.columns.insert(sourceColumn, csIndex);
 
-                                const ctIndex = sourceSwimlane.columns.findIndex((c) => c.id === targetColumnId);
-                                if (ctIndex > -1){
-
-                                    targetColumn = sourceSwimlane.columns.splice(ctIndex, 1)[0];
-
-                                    //reconstruct target
-                                    targetColumn.cards.splice(targetIndex, 0, sourceCard);
-                                    sourceSwimlane.columns.splice(ctIndex, 0, targetColumn);
-                                    tempBoard.swimlanes.splice(ssIndex, 0, sourceSwimlane);
-
-                                }
-                            }
-                        } else {
-                            //reconstruct source
-                            sourceColumn.cards.splice(targetIndex, 0, sourceCard);
-                            sourceSwimlane.columns.splice(csIndex, 0, sourceColumn);
-                            tempBoard.swimlanes.splice(ssIndex, 0, sourceSwimlane);
-                        }
+                        const [targetColumn, ctIndex] = sourceSwimlane.columns.extract(targetColumnId);
+                        targetColumn.cards.insert(sourceCard, targetIndex);
+                        sourceSwimlane.columns.insert(targetColumn, ctIndex);
+                        tempBoard.swimlanes.insert(sourceSwimlane, ssIndex);
                     }
+                } else {
+                    sourceColumn.cards.insert(sourceCard, targetIndex);
+                    sourceSwimlane.columns.insert(sourceColumn, csIndex);
+                    tempBoard.swimlanes.insert(sourceSwimlane, ssIndex);
                 }
+
             }
         }
 
@@ -916,9 +913,9 @@ const Main = (props) => {
 
         switch (sourceType) {
             case 'CARD':{
-                tempBoard.swimlanes.forEach((sl) => {
-                    sl.columns.forEach((c) => {
-                        c.cards.forEach((ca) => {
+                tempBoard.swimlanes.array.forEach((sl) => {
+                    sl.columns.array.forEach((c) => {
+                        c.cards.array.forEach((ca) => {
                             if (ca.id === id) {
                                 parentId = c.id;
                             }
@@ -928,8 +925,8 @@ const Main = (props) => {
                 break;
             }
             case 'COLUMN':{
-                tempBoard.swimlanes.forEach((sl) => {
-                    sl.columns.forEach((c) => {
+                tempBoard.swimlanes.array.forEach((sl) => {
+                    sl.columns.array.forEach((c) => {
                         if (c.id === id) {
                             parentId = sl.id;
                         }
