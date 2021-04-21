@@ -43,7 +43,7 @@ const Column = (props) => {
                         </div>
                 }
             </div>
-            <button className="add-icon add-icon_card" onClick={() => props.functions.addCard(props.column.swimlaneId, props.column.id)}>
+            <button className="add-icon add-icon_card" onClick={() => props.functions.addCard(props.column.id)}>
                 <AiOutlinePlus />
             </button>
             <div className="column_cards">

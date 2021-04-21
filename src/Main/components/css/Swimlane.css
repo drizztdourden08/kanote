@@ -1,8 +1,8 @@
 .swimlane {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: stretch;
-    justify-content: space-between;
+    justify-content: stretch;
 
     box-sizing: border-box;
     border: none;
@@ -13,21 +13,16 @@
 
 .swimlane_title {
     display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-
-    width: 50px;
+    flex-direction: row;
+    justify-content: stretch ;
+    align-items: center;
 }
 
 .swimlane_title span {
     box-sizing: border-box;
-    padding: 40px 20px 50px 10px;
     
     flex-grow: 1;
-    writing-mode: vertical-lr;
     text-align: center;
-    transform: rotate(180deg);
 
     font-weight: 200;
     font-family: 'kufam';
@@ -35,16 +30,4 @@
 
     background: linear-gradient(90deg, #F05D60, #A33F41);
     color: #fff;
-}
-
-.add-icon_swimlane {
-    margin-top: -1px;
-    height: 25px;
-    box-sizing: border-box;
-    
-    border: none;
-    border-radius: 0 0 50px 50px;
-    border-top: none;
-
-    background: linear-gradient(-90deg, #F05D60, #A33F41);
 }

@@ -15,8 +15,11 @@ import './Main.css';
 import Swimlane from './components/Swimlane';
 import './components/css/Swimlane.css';
 import Column from './components/Column';
+import './components/css/Column.css';
 
-import { v4 as uuidv4, validate as uuidValidate  } from 'uuid';
+import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
+
+import { AiOutlineInsertRowRight, AiOutlineInsertRowAbove } from 'react-icons/ai';
 
 const imageToBase64 = require('image-to-base64');
 const ba64 = require('ba64');
@@ -24,14 +27,14 @@ const ba64 = require('ba64');
 const ipc = window.require('electron').ipcRenderer;
 
 class Color {
-    constructor(hexColor){
+    constructor(hexColor) {
         this._hex = hexColor;
         console.log(hexColor);
-        this.red = hexColor ? parseInt(hexColor[0] + hexColor[1], 16): null;
-        this.green = hexColor ? parseInt(hexColor[2] + hexColor[3], 16): null;
-        this.blue = hexColor ? parseInt(hexColor[4] + hexColor[5], 16): null;
+        this.red = hexColor ? parseInt(hexColor[0] + hexColor[1], 16) : null;
+        this.green = hexColor ? parseInt(hexColor[2] + hexColor[3], 16) : null;
+        this.blue = hexColor ? parseInt(hexColor[4] + hexColor[5], 16) : null;
     }
-    static FromRGB(red, green, blue){
+    static FromRGB(red, green, blue) {
         if ((red >= 0 && red <= 255) === false) return;
         if ((green >= 0 && green <= 255) === false) return;
         if ((blue >= 0 && blue <= 255) === false) return;
@@ -39,217 +42,239 @@ class Color {
         return new Color('#' + red.ToString(16) + green.ToString(16) + blue.ToString(16));
     }
 
-    set hex(value){
+    set hex(value) {
         const rgx = new RegExp('[0-9]{6}');
-        if (rgx.test(value) === false){
+        if (rgx.test(value) === false) {
             return;
         }
         this._hex = value;
     }
 
-    get hex(){
+    get hex() {
         return '#' + this._hex;
     }
 
-    get rgb(){
+    get rgb() {
         return { red: this.red, green: this.green, blue: this.blue };
     }
 }
 class ArrayOf {
-    constructor(objTypes){
+    constructor(objTypes) {
         this.value = [];
         this.objTypes = objTypes;
     }
 
-    add(val){
+    add(val) {
         if (this.objTypes.indexOf(val.constructor.name) === -1) return;
         this.value.push(val);
     }
 
-    insert(val, index){
+    insert(val, index) {
         if (this.objTypes.indexOf(val.constructor.name) === -1) return;
         if (index === -1) return;
         this.value.splice(index, 0, val);
     }
 
-    remove(val){
+    remove(val) {
         if (this.objTypes.indexOf(val.constructor.name) === -1) return;
 
         const index = this.value.findIndex((Id) => Id === val.id);
         this.value.splice(index, 1);
     }
 
-    removeAt(index){
+    removeAt(index) {
         if (index === -1) return;
         this.value.splice(index, 1);
     }
 
-    extract(id){
+    extract(id) {
         if (uuidValidate(id) === false) return;
 
         const index = this.value.findIndex((v) => v.id === id);
         if (index > -1) return [this.value.splice(index, 1)[0], index];
     }
 
-    extractAt(index){
+    extractAt(index) {
         if (index > -1) return this.value.splice(index, 1)[0];
     }
 
-    get array(){
+    get array() {
         return this.value;
     }
 }
 
 class _Board {
-    constructor(){
-        this._title = 'Board ' + Math.floor(Math.random() * Math.floor(100))  + '';
-        this._swimlanes = new ArrayOf(['_Swimlane']);
+    constructor() {
+        this.id = uuidv4();
+        this._title = 'Board ' + Math.floor(Math.random() * Math.floor(100)) + '';
+        this._childrens = new ArrayOf(['_Swimlane', '_Column', '_VerticalGroup']);
         this._priorities = new ArrayOf(['_Priority']);
         this._tags = new ArrayOf(['_Tag']);
     }
 
-    set title(value){
+    set title(value) {
         const rgx = new RegExp('[A-Za-z0-9]{3,30}');
-        if (rgx.test(value) === false){
+        if (rgx.test(value) === false) {
             return;
         }
 
         this._title = value;
     }
-    get title(){
+    get title() {
         return this._title;
     }
 
-    set swimlanes(value){
-        if (Array.isArray(value)){
+    set childrens(value) {
+        if (Array.isArray(value)) {
             value.map((el) => {
-                if (el.constructor.name !== '_Swimlane') return;
+                if (['_Column', '_VerticalGroup'].indexOf(el.constructor.name) === -1) return;
             });
-            this._swimlanes = value;
+            this._childrens = value;
         }
     }
-    get swimlanes(){
-        return this._swimlanes;
+    get childrens() {
+        return this._childrens;
     }
 
-    set priorities(value){
-        if (Array.isArray(value)){
+    set priorities(value) {
+        if (Array.isArray(value)) {
             value.map((el) => {
                 if (el.constructor.name !== '_Priority') return;
             });
             this._priorities = value;
         }
     }
-    get priorities(){
+    get priorities() {
         return this._priorities;
     }
 
-    set tags(value){
-        if (Array.isArray(value)){
+    set tags(value) {
+        if (Array.isArray(value)) {
             value.map((el) => {
                 if (el.constructor.name !== '_Tag') return;
             });
             this._tags = value;
         }
     }
-    get tags(){
+    get tags() {
         return this._tags;
     }
 }
 
-class _Swimlane {
-    constructor(){
+class _VerticalGroup {
+    constructor() {
         this.id = uuidv4();
-        this._title = 'Swimlane ' + Math.floor(Math.random() * Math.floor(100))  + '';
-        this._columns = new ArrayOf(['_Column']);
+        this._title = 'VerticalGroup ' + Math.floor(Math.random() * Math.floor(100)) + '';
+        this._childrens = new ArrayOf(['_Swimlane']);
+        this.lockedSwimlane = false;
     }
 
-    set title(value){
+    set childrens(value) {
+        if (Array.isArray(value)) {
+            value.map((el) => {
+                if (el.constructor.name !== '_Swimlane') return;
+            });
+            this._childrens = value;
+        }
+    }
+    get childrens() {
+        return this._childrens;
+    }
+}
+
+class _Swimlane {
+    constructor() {
+        this.id = uuidv4();
+        this._title = 'Swimlane ' + Math.floor(Math.random() * Math.floor(100)) + '';
+        this._childrens = new ArrayOf(['_Column', '_VerticalGroup']);
+    }
+
+    set title(value) {
         const rgx = new RegExp('[A-Za-z0-9]{3,30}');
-        if (rgx.test(value) === false){
+        if (rgx.test(value) === false) {
             return;
         }
 
         this._title = value;
     }
-    get title(){
+    get title() {
         return this._title;
     }
 
-    set columns(value){
-        if (Array.isArray(value)){
+    set childrens(value) {
+        if (Array.isArray(value)) {
             value.map((el) => {
                 if (el.constructor.name !== '_Column') return;
             });
-            this._columns = value;
+            this._childrens = value;
         }
     }
-    get columns(){
-        return this._columns;
+    get childrens() {
+        return this._childrens;
     }
 }
 
 class _Column {
-    constructor(swimlaneId) {
+    constructor(parentId) {
         this.id = uuidv4();
-        this.swimlaneId = swimlaneId;
-        this._title = 'Column ' + Math.floor(Math.random() * Math.floor(100))  + '';
-        this._cards = new ArrayOf(['_Card']);
+        this.parentId = parentId;
+        this._title = 'Column ' + Math.floor(Math.random() * Math.floor(100)) + '';
+        this._childrens = new ArrayOf(['_Card']);
         this.editing = false;
         this.toDelete = false;
         this.cancelChanges = false;
         this.originalColumn = {};
     }
 
-    set title(value){
+    set title(value) {
         const rgx = new RegExp('[A-Za-z0-9]{3,30}');
-        if (rgx.test(value) === false){
+        if (rgx.test(value) === false) {
             return;
         }
 
         this._title = value;
     }
-    get title(){
+    get title() {
         return this._title;
     }
 
-    set cards(value){
-        if (Array.isArray(value)){
+    set childrens(value) {
+        if (Array.isArray(value)) {
             value.map((el) => {
                 if (el.constructor.name !== '_Card') return;
             });
-            this._cards = value;
+            this._childrens = value;
         }
     }
-    get cards(){
-        return this._cards;
+    get childrens() {
+        return this._childrens;
     }
 }
 
 class _Card {
-    constructor(columnId) {
+    constructor(parentId) {
         this.id = uuidv4();
-        this._columnId = columnId;
-        this._title = 'Card ' + Math.floor(Math.random() * Math.floor(100))  + '';
+        this._parentId = parentId;
+        this._title = 'Card ' + Math.floor(Math.random() * Math.floor(100)) + '';
         this._priority = new _Priority();
         this._imageSource = '';
         this.image = {
-            fromUrlToBase64(url){
+            fromUrlToBase64(url) {
                 imageToBase64(url).then(base64 => {
                     this._imageSource = base64;
                     this.alt = url.split('\\').pop().split('/').pop();
                 });
             },
-            fromlocalPathToBase64(path){
+            fromlocalPathToBase64(path) {
                 imageToBase64(path).then(base64 => {
                     this._imageSource = base64;
                     this.alt = path.split('\\').pop().split('/').pop();
                 });
             },
-            fromUrlToLocal(base64){
+            fromUrlToLocal(base64) {
                 return;
             },
-            fromBase64ToLocal(base64, pathToSave){
+            fromBase64ToLocal(base64, pathToSave) {
                 ba64.writeImage(pathToSave, base64, () => {
                     return;
                 });
@@ -257,10 +282,10 @@ class _Card {
                 const ext = ba64.getExt(base64);
                 this._imageSource = pathToSave + ext;
             },
-            fromUrl(url){
+            fromUrl(url) {
                 const expression = '(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})';
                 const rgx = new RegExp(expression);
-                if (rgx.test(url)){
+                if (rgx.test(url)) {
                     this._imageSource = url;
                 }
             }
@@ -269,13 +294,13 @@ class _Card {
         this._content = new ArrayOf(['_cTaskList', '_cText', '_cMarkdownText', '_cImage']);
         this._created = Date.now();
         this._dueDate =
-        this._comments = new ArrayOf(['_Comment']);
+            this._comments = new ArrayOf(['_Comment']);
         this.datetime = {
-            timeLeft(){
+            timeLeft() {
                 return this.dueDate - this.created;
             },
-            breached(){
-                return this.timeLeft > 0 ? false:true;
+            breached() {
+                return this.timeLeft > 0 ? false : true;
             }
         };
         this._notification = false;
@@ -287,101 +312,101 @@ class _Card {
         this.originalCard = {};
     }
 
-    set columnId(value){
-        if (uuidValidate(value) === false){
+    set parentId(value) {
+        if (uuidValidate(value) === false) {
             return;
         }
 
-        this._columnId = value;
+        this._parentId = value;
     }
-    get parentTaskId(){
-        return this._columnId;
+    get parentId() {
+        return this._parentId;
     }
 
-    set title(value){
+    set title(value) {
         const rgx = new RegExp('[A-Za-z0-9]{3,30}');
-        if (rgx.test(value) === false){
+        if (rgx.test(value) === false) {
             return;
         }
 
         this._title = value;
     }
-    get title(){
+    get title() {
         return this._title;
     }
 
-    set priority(value){
-        if (value.constructor.name !== '_Priority'){
+    set priority(value) {
+        if (value.constructor.name !== '_Priority') {
             return;
         }
 
         this._priority = value;
     }
-    get priority(){
+    get priority() {
         return this._priority;
     }
 
-    set imageSource(value){
+    set imageSource(value) {
         this._imageSource = value;
     }
-    get imageSource(){
+    get imageSource() {
         return this._imageSource;
     }
 
-    get tags(){
+    get tags() {
         return this._tags;
     }
 
-    get content(){
+    get content() {
         return this._content;
     }
 
-    get created(){
+    get created() {
         return this._created;
     }
 
-    set dueDate(value){
+    set dueDate(value) {
         const d = new Date(value);
-        if (isNaN(d.getTime())){
+        if (isNaN(d.getTime())) {
             return;
         }
 
-        if (d <= this._created){
+        if (d <= this._created) {
             return;
         }
 
         this._dueDate = value;
     }
-    get dueDate(){
+    get dueDate() {
         return this._dueDate;
     }
 
-    set notification(value){
-        if (typeof(value) === 'boolean'){
+    set notification(value) {
+        if (typeof (value) === 'boolean') {
             return;
         }
         this._notification = value;
     }
-    get notification(){
+    get notification() {
         return this._notification;
     }
 
-    get assignees(){
+    get assignees() {
         return this._assignees;
     }
 
-    get comments(){
+    get comments() {
         return this._comments;
     }
 
-    set accentColor(value){
-        if (value.constructor.name !== 'Color'){
+    set accentColor(value) {
+        if (value.constructor.name !== 'Color') {
             return;
         }
 
         this._accentColor = value;
     }
-    get accentColor(){
+    get accentColor() {
         return this._accentColor;
     }
 }
@@ -390,41 +415,41 @@ class _Priority {
     constructor() {
         this.id = uuidv4();
         this._title = ['High', 'Medium', 'Low'][Math.floor(Math.random() * Math.floor(3))];
-        this._color = new Color(Math.floor(Math.random()*16777215).toString(16));
+        this._color = new Color(Math.floor(Math.random() * 16777215).toString(16));
         this._level = Math.floor(Math.random() * Math.floor(10));
     }
 
-    set title(value){
+    set title(value) {
         const rgx = new RegExp('[A-Za-z0-9]{3,10}');
-        if (rgx.test(value) === false){
+        if (rgx.test(value) === false) {
             return;
         }
 
         this._title = value;
     }
-    get title(){
+    get title() {
         return this._title;
     }
 
-    set color(value){
-        if (value.constructor.name !== 'Color'){
+    set color(value) {
+        if (value.constructor.name !== 'Color') {
             return;
         }
 
         this._color = value;
     }
-    get color(){
+    get color() {
         return this._color;
     }
 
-    set level(value){
+    set level(value) {
         const rgx = new RegExp('[0-9]+');
-        if (rgx.test(value) === false){
+        if (rgx.test(value) === false) {
             return;
         }
         this._level = value;
     }
-    get level(){
+    get level() {
         return '#' + this._level;
     }
 }
@@ -434,54 +459,54 @@ class _Assignee {
         this.id = uuidv4();
         this._firstName = name();
         this._lastName = surname();
-        this._color = new Color(this.color(Math.floor(Math.random()*16777215).toString(16)));
+        this._color = new Color(this.color(Math.floor(Math.random() * 16777215).toString(16)));
     }
 
-    set firstName(value){
+    set firstName(value) {
         const rgx = new RegExp('[A-zÀ-ÖØ-öø-įĴ-őŔ-žǍ-ǰǴ-ǵǸ-țȞ-ȟȤ-ȳɃɆ-ɏḀ-ẞƀ-ƓƗ-ƚƝ-ơƤ-ƥƫ-ưƲ-ƶẠ-ỿ \\-\'\\.]{3,10}');
-        if (rgx.test(value) === false){
+        if (rgx.test(value) === false) {
             return;
         }
 
         this._firstName = value.trim().toLowerCase().replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase())));
     }
-    get firstName(){
+    get firstName() {
         return this._firstName;
     }
 
-    set lastName(value){
+    set lastName(value) {
         const rgx = new RegExp('[A-zÀ-ÖØ-öø-įĴ-őŔ-žǍ-ǰǴ-ǵǸ-țȞ-ȟȤ-ȳɃɆ-ɏḀ-ẞƀ-ƓƗ-ƚƝ-ơƤ-ƥƫ-ưƲ-ƶẠ-ỿ \\-\'\\.]{3,10}');
-        if (rgx.test(value) === false){
+        if (rgx.test(value) === false) {
             return;
         }
 
         this._lastName = value.trim().toLowerCase().replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase())));
     }
-    get lastName(){
+    get lastName() {
         return this._lastName;
     }
 
-    get initial(){
+    get initial() {
         return this._firstName[0] + this._lastName[0];
     }
 
-    get fullname(){
+    get fullname() {
         return this._firstName + '' + this._lastName;
     }
 
-    set color(value){
-        if (value.constructor.name !== 'Color'){
+    set color(value) {
+        if (value.constructor.name !== 'Color') {
             return;
         }
 
         this._color = value;
     }
-    get color(){
+    get color() {
         return this._color;
     }
 }
 
-class _Comment{
+class _Comment {
     constructor() {
         this.id = uuidv4();
         this._text = '';
@@ -489,20 +514,20 @@ class _Comment{
         this._author = {};
     }
 
-    set text(value){
+    set text(value) {
         this._text = value;
     }
-    get text(){
+    get text() {
         return this._text;
     }
 
-    set author(value){
-        if (value.constructor.name !== '_Assignee'){
+    set author(value) {
+        if (value.constructor.name !== '_Assignee') {
             return;
         }
         this._author = value;
     }
-    get author(){
+    get author() {
         return this._author;
     }
 }
@@ -514,27 +539,27 @@ class _cTaskList {
         this._tasks = new ArrayOf(['_cTask']);
     }
 
-    set title(value){
+    set title(value) {
         const rgx = new RegExp('[A-Za-z0-9]{3,10}');
-        if (rgx.test(value) === false){
+        if (rgx.test(value) === false) {
             return;
         }
 
         this._title = value;
     }
-    get title(){
+    get title() {
         return this._title;
     }
 
-    set tasks(value){
-        if (Array.isArray(value)){
+    set tasks(value) {
+        if (Array.isArray(value)) {
             value.map((el) => {
                 if (el.constructor.name !== '_cTask') return;
             });
             this._tasks = value;
         }
     }
-    get tasks(){
+    get tasks() {
         return this._tasks;
     }
 }
@@ -548,49 +573,49 @@ class _cTask {
         this._tasks = new ArrayOf(['_cTask']);
     }
 
-    set parentTaskId(value){
-        if (uuidValidate(value) === false){
+    set parentTaskId(value) {
+        if (uuidValidate(value) === false) {
             return;
         }
 
         this._parentTaskId = value;
     }
-    get parentTaskId(){
+    get parentTaskId() {
         return this._parentTaskId;
     }
 
-    set title(value){
+    set title(value) {
         const rgx = new RegExp('[A-Za-z0-9]{3,10}');
-        if (rgx.test(value) === false){
+        if (rgx.test(value) === false) {
             return;
         }
 
         this._title = value;
     }
-    get title(){
+    get title() {
         return this._title;
     }
 
-    set checked(value){
-        if (typeof(value) !== 'boolean'){
+    set checked(value) {
+        if (typeof (value) !== 'boolean') {
             return;
         }
 
         this._checked = value;
     }
-    get checked(){
+    get checked() {
         return this._checked;
     }
 
-    set tasks(value){
-        if (Array.isArray(value)){
+    set tasks(value) {
+        if (Array.isArray(value)) {
             value.map((el) => {
                 if (el.constructor.name !== '_cTask') return;
             });
             this._tasks = value;
         }
     }
-    get tasks(){
+    get tasks() {
         return this._tasks;
     }
 }
@@ -604,7 +629,7 @@ class _cText {
     set text(value) {
         this._text = String(value);
     }
-    get text(){
+    get text() {
         return this._text;
     }
 }
@@ -648,7 +673,7 @@ A paragraph with *emphasis* and **strong importance**.
     set text(value) {
         this._text = String(value);
     }
-    get text(){
+    get text() {
         return this._text;
     }
 }
@@ -673,22 +698,22 @@ class _cImage {
             ][Math.floor(Math.random() * Math.floor(11))]
         );
         this.image = {
-            fromUrlToBase64(url){
+            fromUrlToBase64(url) {
                 imageToBase64(url).then(base64 => {
                     this._imageSource = base64;
                     this.alt = url.split('\\').pop().split('/').pop();
                 });
             },
-            fromlocalPathToBase64(path){
+            fromlocalPathToBase64(path) {
                 imageToBase64(path).then(base64 => {
                     this._imageSource = base64;
                     this.alt = path.split('\\').pop().split('/').pop();
                 });
             },
-            fromUrlToLocal(base64){
+            fromUrlToLocal(base64) {
                 return;
             },
-            fromBase64ToLocal(base64, pathToSave){
+            fromBase64ToLocal(base64, pathToSave) {
                 ba64.writeImage(pathToSave, base64, () => {
                     return;
                 });
@@ -696,39 +721,39 @@ class _cImage {
                 const ext = ba64.getExt(base64);
                 this._imageSource = pathToSave + ext;
             },
-            fromUrl(url){
+            fromUrl(url) {
                 const expression = '(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})';
                 const rgx = new RegExp(expression);
-                if (rgx.test(url)){
+                if (rgx.test(url)) {
                     this._imageSource = url;
                 }
             }
         };
     }
 
-    set alt(value){
+    set alt(value) {
         const rgx = new RegExp('[A-Za-z0-9]{3,20}');
-        if (rgx.test(value)){
+        if (rgx.test(value)) {
             this._alt = value;
         } else {
             this._alt = value.substring(0, 19);
         }
     }
-    get alt(){
+    get alt() {
         return this._alt;
     }
 
     set image(value) {
         this._imageSource = value;
     }
-    get image(){
+    get image() {
         return this._imageSource;
     }
 
-    set imageSource(value){
+    set imageSource(value) {
         this._imageSource = value;
     }
-    get imageSource(){
+    get imageSource() {
         return this._imageSource;
     }
 }
@@ -751,37 +776,91 @@ const Main = (props) => {
     const [board, setBoard] = useState(new _Board());
     const appRef = useRef(null);
 
-    const addSwimlane = () => {
+    const addSwimlane = (parentId = null) => {
+        const tempBoard = new _Board();
+        Object.assign(tempBoard, board);
+
         const newSwimlane = new _Swimlane();
-        const tempBoard = new _Board();
-        Object.assign(tempBoard, board);
-        tempBoard.swimlanes.add(newSwimlane);
+        const newVerticalgroup = new _VerticalGroup();
+        newVerticalgroup.childrens.add(newSwimlane);
+
+        const elInfo = getElementInfo(parentId);
+        const objects = [];
+        if (elInfo){
+            switch (elInfo.parentType) {
+                case null:
+                    tempBoard.childrens.add(newVerticalgroup);
+                    break;
+                case '_Swimlane':
+                    for (let i = 0; i < elInfo.idsHierarchy.length; i++) {
+                        if (i === 0) objects.push(tempBoard.childrens.extract(elInfo.idsHierarchy[i]));
+                        else objects.push(objects[i - 1].childrens.extract(elInfo.idsHierarchy[i]));
+                    }
+
+                    objects[objects.length - 1][0].childrens.add(newVerticalgroup);
+
+                    for (let i = objects.length - 1; i === 0; i--) {
+                        if (i === objects.length - 1) tempBoard.childrens.insert(objects[objects.length - 1][0], objects[objects.length - 1][1],);
+                        else objects[i].childrens.insert(objects[i - 1][0], objects[i - 1][1]);
+                    }
+                    break;
+                case '_Verticalgroup':
+                    for (let i = 0; i < elInfo.idsHierarchy.length; i++) {
+                        if (i === 0) objects.push(tempBoard.childrens.extract(elInfo.idsHierarchy[i]));
+                        else objects.push(objects[i - 1].childrens.extract(elInfo.idsHierarchy[i]));
+                    }
+
+                    objects[objects.length - 1][0].childrens.add(newSwimlane);
+
+                    for (let i = objects.length - 1; i === 0; i--) {
+                        if (i === objects.length - 1) tempBoard.childrens.insert(objects[objects.length - 1][0], objects[objects.length - 1][1],);
+                        else objects[i].childrens.insert(objects[i - 1][0], objects[i - 1][1]);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
 
         setBoard(tempBoard);
     };
 
-    const addColumn = (swimlaneId) => {
+    const addColumn = (swimlaneId = null) => {
         const tempBoard = new _Board();
         Object.assign(tempBoard, board);
 
-        const [swimlane, sIndex] = tempBoard.swimlanes.extract(swimlaneId);
-        swimlane.columns.add(new _Column(swimlaneId));
-        tempBoard.swimlanes.insert(swimlane, sIndex);
+        if (swimlaneId !== null){
+            const [swimlane, sIndex] = tempBoard.childrens.extract(swimlaneId);
+            swimlane.columns.add(new _Column(swimlaneId));
+            tempBoard.childrens.insert(swimlane, sIndex);
+        } else {
+            tempBoard.childrens.add(new _Column(swimlaneId));
+        }
 
         setBoard(tempBoard);
     };
 
-    const addCard = (swimlaneId, columnId) => {
+    const addCard = (columnId) => {
         const tempBoard = new _Board();
         Object.assign(tempBoard, board);
 
-        const [swimlane, sIndex] = tempBoard.swimlanes.extract(swimlaneId);
-        const [column, cIndex] = swimlane.columns.extract(columnId);
-
+        const swimlaneId = getParentId('COLUMN', columnId);
+        let swimlane, sIndex;
+        let column, cIndex;
+        if (swimlaneId !== null){
+            [swimlane, sIndex] = tempBoard.childrens.extract(swimlaneId);
+            [column, cIndex] = swimlane.columns.extract(columnId);
+        } else {
+            [column, cIndex] = tempBoard.childrens.extract(columnId);
+        }
         column.cards.add(new _Card(columnId));
 
-        swimlane.columns.insert(column, cIndex);
-        tempBoard.swimlanes.insert(swimlane, sIndex);
+        if (swimlaneId !== null){
+            swimlane.columns.insert(column, cIndex);
+            tempBoard.childrens.insert(swimlane, sIndex);
+        } else {
+            tempBoard.childrens.insert(column, cIndex);
+        }
 
         setBoard(tempBoard);
     };
@@ -790,7 +869,7 @@ const Main = (props) => {
         const tempBoard = new _Board();
         Object.assign(tempBoard, board);
 
-        const [swimlane, sIndex] = tempBoard.swimlanes.extract(swimlaneId);
+        const [swimlane, sIndex] = tempBoard.childrens.extract(swimlaneId);
         const [column, cIndex] = swimlane.columns.extract(columnId);
 
         newProps.map((prop) => {
@@ -798,28 +877,28 @@ const Main = (props) => {
             if (prop.property === 'editing' && prop.newValue === true) column.originalColumn = { ...column };
         });
 
-        if (!column.toDelete){
-            if (column.cancelChanges){
+        if (!column.toDelete) {
+            if (column.cancelChanges) {
                 column.title = column.originalColumn.title;
                 column.originalColumn = {};
                 column.cancelChanges = false;
             }
 
             let moveMod = 0;
-            if (column.moveColumnBy !== 0 && (((cIndex + column.moveColumnBy) >= 0) && ((cIndex + column.moveColumnBy) <= swimlane.columns.length))){
+            if (column.moveColumnBy !== 0 && (((cIndex + column.moveColumnBy) >= 0) && ((cIndex + column.moveColumnBy) <= swimlane.columns.length))) {
                 //If moveColumnBy is required
                 moveMod = column.moveColumnBy;
                 column.moveColumnBy = 0;
             }
 
             // eslint-disable-next-line no-constant-condition
-            if (true){
+            if (true) {
                 //If moveSwimlaneBy is required
             }
 
             swimlane.columns.insert(column, cIndex + moveMod);
         }
-        tempBoard.swimlanes.insert(swimlane, sIndex);
+        tempBoard.childrens.insert(swimlane, sIndex);
 
         setBoard(tempBoard);
     };
@@ -829,16 +908,16 @@ const Main = (props) => {
         Object.assign(tempBoard, board);
 
         console.log('sl: ', swimlaneId, ' c: ', columnId, 'ca: ', cardId, 'np: ', newProps);
-        const sIndex = tempBoard.swimlanes.findIndex((s) => s.id === swimlaneId);
-        if (sIndex > -1){
-            const swimlane = tempBoard.swimlanes.splice(sIndex, 1)[0];
+        const sIndex = tempBoard.childrens.findIndex((s) => s.id === swimlaneId);
+        if (sIndex > -1) {
+            const swimlane = tempBoard.childrens.splice(sIndex, 1)[0];
 
             const cIndex = swimlane.columns.findIndex((c) => c.id === columnId);
-            if (cIndex > -1){
+            if (cIndex > -1) {
                 const column = swimlane.columns.splice(cIndex, 1)[0];
 
                 const caIndex = column.cards.findIndex((ca) => ca.id === cardId);
-                if (caIndex > -1){
+                if (caIndex > -1) {
                     const card = column.cards.splice(caIndex, 1)[0];
 
                     newProps.map((prop) => {
@@ -848,7 +927,7 @@ const Main = (props) => {
 
                     column.cards.splice(caIndex, 0, card);
                     swimlane.columns.splice(cIndex, 0, column);
-                    tempBoard.swimlanes.splice(sIndex, 0, swimlane);
+                    tempBoard.childrens.splice(sIndex, 0, swimlane);
                     setBoard(tempBoard);
                 } else console.log('undefined card: ' + columnId);
             } else console.log('undefined column: ' + columnId);
@@ -856,7 +935,13 @@ const Main = (props) => {
     };
 
     const moveColumn = (sourceSwimlaneId, targetSwimlaneId, sourceColumnId = null, targetColumnId = null, sourceCardId = null, sourceIndex = null, targetIndex = null) => {
+        const tempBoard = new _Board();
+        Object.assign(tempBoard, board);
 
+        const [sourceSwimlane, ssIndex] = tempBoard.childrens.extract(sourceSwimlaneId);
+        if (sourceColumnId !== null) {
+            const [sourceColumn, csIndex] = sourceSwimlane.columns.extract(sourceColumnId);
+        }
     };
 
     const moveCard = (sourceSwimlaneId, targetSwimlaneId, sourceColumnId = null, targetColumnId = null, sourceIndex = null, targetIndex = null) => {
@@ -865,38 +950,38 @@ const Main = (props) => {
 
 
         //GET SOURCES
-        const [sourceSwimlane, ssIndex] = tempBoard.swimlanes.extract(sourceSwimlaneId);
-        if (sourceColumnId !== null){
+        const [sourceSwimlane, ssIndex] = tempBoard.childrens.extract(sourceSwimlaneId);
+        if (sourceColumnId !== null) {
             const [sourceColumn, csIndex] = sourceSwimlane.columns.extract(sourceColumnId);
-            if (sourceIndex > -1){
+            if (sourceIndex > -1) {
                 const sourceCard = sourceColumn.cards.extractAt(sourceIndex);
 
                 //GET TARGETS
-                if (sourceColumnId !== targetColumnId){
-                    if (sourceSwimlaneId !== targetSwimlaneId){
+                if (sourceColumnId !== targetColumnId) {
+                    if (sourceSwimlaneId !== targetSwimlaneId) {
                         sourceSwimlane.columns.insert(sourceColumn, csIndex);
-                        tempBoard.swimlanes.insert(sourceSwimlane, ssIndex);
+                        tempBoard.childrens.insert(sourceSwimlane, ssIndex);
 
-                        const [targetSwimlane, stIndex] = tempBoard.swimlanes.extract(targetSwimlaneId);
+                        const [targetSwimlane, stIndex] = tempBoard.childrens.extract(targetSwimlaneId);
                         const [targetColumn, ctIndex] = targetSwimlane.columns.extract(targetColumnId);
 
                         targetColumn.cards.insert(sourceCard, targetIndex);
 
 
                         targetSwimlane.columns.insert(targetColumn, ctIndex);
-                        tempBoard.swimlanes.insert(targetSwimlane, stIndex);
+                        tempBoard.childrens.insert(targetSwimlane, stIndex);
                     } else {
                         sourceSwimlane.columns.insert(sourceColumn, csIndex);
 
                         const [targetColumn, ctIndex] = sourceSwimlane.columns.extract(targetColumnId);
                         targetColumn.cards.insert(sourceCard, targetIndex);
                         sourceSwimlane.columns.insert(targetColumn, ctIndex);
-                        tempBoard.swimlanes.insert(sourceSwimlane, ssIndex);
+                        tempBoard.childrens.insert(sourceSwimlane, ssIndex);
                     }
                 } else {
                     sourceColumn.cards.insert(sourceCard, targetIndex);
                     sourceSwimlane.columns.insert(sourceColumn, csIndex);
-                    tempBoard.swimlanes.insert(sourceSwimlane, ssIndex);
+                    tempBoard.childrens.insert(sourceSwimlane, ssIndex);
                 }
 
             }
@@ -905,40 +990,29 @@ const Main = (props) => {
         setBoard(tempBoard);
     };
 
-    const getParentId = (sourceType, id) => {
-        const tempBoard = new _Board();
-        Object.assign(tempBoard, board);
-
-        let parentId = null;
-
-        switch (sourceType) {
-            case 'CARD':{
-                tempBoard.swimlanes.array.forEach((sl) => {
-                    sl.columns.array.forEach((c) => {
-                        c.cards.array.forEach((ca) => {
-                            if (ca.id === id) {
-                                parentId = c.id;
-                            }
-                        });
-                    });
-                });
-                break;
-            }
-            case 'COLUMN':{
-                tempBoard.swimlanes.array.forEach((sl) => {
-                    sl.columns.array.forEach((c) => {
-                        if (c.id === id) {
-                            parentId = sl.id;
-                        }
-                    });
-                });
-                break;
-            }
-            default:
-                break;
+    const getElementInfo = (id, object = null, parentType = null) => {
+        if (object === null) {
+            object = new _Board();
+            Object.assign(tempBoard, board);
         }
 
-        return parentId;
+        if (object.id) { 
+            if (object.id === id){
+                return {object: object, type: object.constructor.name, parentId: element.parentId, parentType: parentType, idsHierarchy: [id]}
+            } else {
+                if (object.childrens) {
+                    object.childrens.foreach((children) => {
+                        const result = getElementInfo(id, children, object.constructor.name);
+                        if (result) {
+                            result.idsHierarchy = [object.id, ...result.idsHierarchy];
+                            return result;
+                        }
+                        
+                    })
+                }                
+            }         
+        } else {return null;}
+        return null;
     };
 
     const onDragEnd = (result) => {
@@ -948,7 +1022,7 @@ const Main = (props) => {
 
         const { source, destination } = result;
         switch (result.type) {
-            case 'CARD':{
+            case 'CARD': {
                 const sourceSwimlaneId = getParentId('COLUMN', source.droppableId);
                 const targetSwimlaneId = getParentId('COLUMN', destination.droppableId);
                 moveCard(sourceSwimlaneId, targetSwimlaneId, source.droppableId, destination.droppableId, source.index, destination.index);
@@ -980,7 +1054,7 @@ const Main = (props) => {
                 element = (
                     <div className="cTask" key={cIndex}>
                         <div className="form-checkbox">
-                            <input type="checkbox" id={contentElement.title} name={contentElement.title} value={contentElement.title} checked={contentElement.checked}/>
+                            <input type="checkbox" id={contentElement.title} name={contentElement.title} value={contentElement.title} checked={contentElement.checked} />
                             <label htmlFor={contentElement.title}>{contentElement.title}</label>
                         </div>
                         {contentElement.tasks.length > 0 ?
@@ -991,7 +1065,7 @@ const Main = (props) => {
                                     ))
                                 }
                             </div>
-                            :undefined
+                            : undefined
                         }
                     </div>
                 );
@@ -1016,7 +1090,8 @@ const Main = (props) => {
     };
 
     useEffect(() => { //Initial Render load Data
-        if (board.swimlanes.array.length === 0) {
+        if (board.childrens.array.length === 0) {
+            addColumn();
             addSwimlane();
         }
     }, []);
@@ -1037,17 +1112,30 @@ const Main = (props) => {
         'getParentId': (sourceType, id) => getParentId(sourceType, id)
     };
 
+    const renderSwitch = (children, index) => {
+        switch (children.constructor.name) {
+            case '_Verticalgroup':
+                return <Swimlane functions={functions} swimlane={children} key={index} index={index} />;
+            case '_Column':
+                return <Column functions={functions} column={children} key={index} index={index} />;
+            default:
+                return undefined;
+        }
+    };
 
     return (
         <div className="App" ref={appRef}>
             <DragDropContext onDragEnd={(result) => onDragEnd(result)}>
-                {
-                    board.swimlanes.array.map(
-                        (sl, index) => (
-                            <Swimlane functions={functions} swimlane={sl} key={index} index={index}></Swimlane>
-                        )
-                    )
-                }
+                {board.childrens.array.map((children, index) => renderSwitch(children, index))}
+                <div>
+                    <button className="add-icon add-icon_column" onClick={() => functions.addColumn()} >
+                        <AiOutlineInsertRowRight />
+                    </button>
+
+                    <button className="add-icon add-icon_column" onClick={() => functions.addSwimlane()} >
+                        <AiOutlineInsertRowAbove />
+                    </button>
+                </div>
             </DragDropContext>
         </div>
     );
