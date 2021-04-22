@@ -1,0 +1,12 @@
+.verticalgroup {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: stretch;
+
+    box-sizing: border-box;
+    border: none;
+    border-top: 4px solid #F05D60;
+
+    margin-bottom: 10px;
+}

@@ -1,23 +1,6 @@
 {
     "version": "0.2.0",
     "configurations": [
-        // {
-        //     "name": "Electron: Main",
-        //     "type": "node",
-        //     "request": "launch",
-        //     "cwd": "${workspaceRoot}",
-        //     "preLaunchTask": "npm: start",
-        //     "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
-        //     "windows": {
-        //         "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
-        //     },
-        //     "program": "${workspaceRoot}/public/electron.js",
-        //     "protocol": "inspector"
-        //     "resolveSourceMapLocations": [
-        //         "${workspaceFolder}/**",
-        //         "!**/node_modules/**"
-        //     ]
-        // },
         {
             "name": "Electron: Main",
             "type": "node",
@@ -30,6 +13,22 @@
                 "run-script", "start"
             ],
             "port": 5858
-        }
+        },
+        {
+            "name": "Electron: Renderer",
+            "type": "chrome",
+            "request": "attach",
+            "port": 9222,
+            "webRoot": "${workspaceRoot}",
+            "windows": {
+                "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
+            }
+        }
+    ],
+    "compounds": [
+      {
+        "name": "Debug",
+        "configurations": ["Electron: Main", "Electron: Renderer"]
+      }
     ]
 }

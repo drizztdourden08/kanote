@@ -9,12 +9,12 @@ const VerticalGroup = (props) => {
     return (
         <div className="verticalgroup">
             <div className="swimlanes">
-                {props.verticalGroup.swimlanes ? props.verticalGroup.swimlanes.array.map((s, index) => (
+                {props.verticalgroup.childrens ? props.verticalgroup.childrens.array.map((s, index) => (
                     <Swimlane swimlane={s} key={index} functions={props.functions} />
                 )):null}
             </div>
-            <div className="swimlane_addbottom">
-                <button className="add-icon add-icon_column" onClick={() => props.functions.addSwimlane(props.)} >
+            <div className="buttons_container buttons_container-bottom">
+                <button className="add-icon add-icon_column" onClick={() => props.functions.addSwimlane(props.verticalgroup.id)} >
                     <AiOutlineInsertRowAbove />
                 </button>
             </div>

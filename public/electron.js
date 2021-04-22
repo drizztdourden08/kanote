@@ -72,7 +72,7 @@ function createHandle() {
         show: false
     });
 
-    handleWin.webContents.openDevTools();
+    //handleWin.webContents.openDevTools();
 
     handleWin.loadURL(isDev ? 'http://localhost:3000/handle' : `file://${path.join(__dirname, '../build/index.html/handle')}`);
     handleWin.on('closed', () => (handleWin = null));
@@ -128,7 +128,7 @@ const ResizeCenterMain = (appWidth, appHeight) => {
     const targetHeight = h + bottomBuffer;
 
     const targetWidth = w;
-    const centeredX = (screenWidth / 2) - (targetWidth / 2);
+    const centeredX = ((screenWidth / 4) * 3) - (targetWidth / 2);
 
     mainWindow.resizable = true;
     mainWindow.setSize(targetWidth, targetHeight);
@@ -139,7 +139,7 @@ const ResizeCenterMain = (appWidth, appHeight) => {
     const handleWidth = targetWidth + 10;
     const handleHeight = 45;
 
-    const handleCenteredX = (screenWidth / 2) - (handleWidth / 2);
+    const handleCenteredX = ((screenWidth / 4) * 3) - (handleWidth / 2);
 
     handle.resizable = true;
     handle.setPosition(Math.round(handleCenteredX), -5);

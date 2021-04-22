@@ -118,3 +118,31 @@ input[type="text"]:focus{
 button{
     outline: none;
 }
+
+.buttons_container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #00000044;
+}
+
+.buttons_container-bottom {
+    flex-direction: row;
+
+    margin-top: 5px;
+}
+
+.buttons_container-right {
+    flex-direction: column;
+
+    margin-left: 10px;
+}
+
+.buttons_container button {
+    padding: 2px;
+    border-radius: 2px;
+
+    margin: 5px;
+    font-size: 1.5em;
+}

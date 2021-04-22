@@ -1,7 +1,14 @@
+.swimlanes {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: stretch;
+}
+
 .swimlane {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
+    align-items: flex-end;
     justify-content: stretch;
 
     box-sizing: border-box;
@@ -11,11 +18,22 @@
     margin-bottom: 10px;
 }
 
+.swimlane-content {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: flex-end;
+
+    padding-top: 5px;
+}
+
 .swimlane_title {
     display: flex;
     flex-direction: row;
     justify-content: stretch ;
     align-items: center;
+
+    min-width: 300px;
 }
 
 .swimlane_title span {

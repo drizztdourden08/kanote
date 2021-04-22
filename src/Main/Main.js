@@ -12,6 +12,8 @@ import { loremIpsum, name, surname, fullname, username } from 'react-lorem-ipsum
 
 import './Main.css';
 
+import Verticalgroup from './components/Verticalgroup';
+import './components/css/Verticalgroup.css';
 import Swimlane from './components/Swimlane';
 import './components/css/Swimlane.css';
 import Column from './components/Column';
@@ -91,7 +93,13 @@ class ArrayOf {
         if (uuidValidate(id) === false) return;
 
         const index = this.value.findIndex((v) => v.id === id);
-        if (index > -1) return [this.value.splice(index, 1)[0], index];
+        if (index > -1) {
+            const o = this.value.splice(index, 1)[0];
+
+            return [o, index, o.constructor.name];
+        } else {
+            return;
+        }
     }
 
     extractAt(index) {
@@ -787,7 +795,7 @@ const Main = (props) => {
         const elInfo = getElementInfo(parentId);
         const objects = [];
         if (elInfo){
-            switch (elInfo.parentType) {
+            switch (elInfo.type) {
                 case null:
                     tempBoard.childrens.add(newVerticalgroup);
                     break;
@@ -800,26 +808,37 @@ const Main = (props) => {
                     objects[objects.length - 1][0].childrens.add(newVerticalgroup);
 
                     for (let i = objects.length - 1; i === 0; i--) {
-                        if (i === objects.length - 1) tempBoard.childrens.insert(objects[objects.length - 1][0], objects[objects.length - 1][1],);
+                        if (i === objects.length - 1) tempBoard.childrens.insert(objects[objects.length - 1][0], objects[objects.length - 1][1]);
                         else objects[i].childrens.insert(objects[i - 1][0], objects[i - 1][1]);
                     }
                     break;
-                case '_Verticalgroup':
+                case '_VerticalGroup':
                     for (let i = 0; i < elInfo.idsHierarchy.length; i++) {
-                        if (i === 0) objects.push(tempBoard.childrens.extract(elInfo.idsHierarchy[i]));
-                        else objects.push(objects[i - 1].childrens.extract(elInfo.idsHierarchy[i]));
+                        if (i === 0) { // 0 is always main _Board
+                            const obj = tempBoard.childrens.extract(elInfo.idsHierarchy[i + 1]);
+                            objects.push(obj);
+                        } else if (i === elInfo.idsHierarchy.length - 1) { //Last in hierarchy is always the current parent
+                            objects[i - 1][0].childrens.add(newSwimlane);
+                        } else {
+                            const c = objects[i - 1][0];
+                            const obj = c.childrens.extract(elInfo.idsHierarchy[i]);
+                            objects.push(obj);
+                        }
                     }
 
-                    objects[objects.length - 1][0].childrens.add(newSwimlane);
-
                     for (let i = objects.length - 1; i === 0; i--) {
-                        if (i === objects.length - 1) tempBoard.childrens.insert(objects[objects.length - 1][0], objects[objects.length - 1][1],);
-                        else objects[i].childrens.insert(objects[i - 1][0], objects[i - 1][1]);
+                        if (i === objects.length - 1) {
+                            tempBoard.childrens.insert(objects[objects.length - 1][0], objects[objects.length - 1][1]);
+                        } else {
+                            objects[i].childrens.insert(objects[i - 1][0], objects[i - 1][1]);
+                        }
                     }
                     break;
                 default:
                     break;
             }
+        } else {
+            tempBoard.childrens.add(newVerticalgroup);
         }
 
         setBoard(tempBoard);
@@ -844,7 +863,7 @@ const Main = (props) => {
         const tempBoard = new _Board();
         Object.assign(tempBoard, board);
 
-        const swimlaneId = getParentId('COLUMN', columnId);
+        const swimlaneId = getElementInfo('COLUMN', columnId);
         let swimlane, sIndex;
         let column, cIndex;
         if (swimlaneId !== null){
@@ -993,25 +1012,26 @@ const Main = (props) => {
     const getElementInfo = (id, object = null, parentType = null) => {
         if (object === null) {
             object = new _Board();
-            Object.assign(tempBoard, board);
+            Object.assign(object, board);
         }
 
-        if (object.id) { 
+        if (object) {
             if (object.id === id){
-                return {object: object, type: object.constructor.name, parentId: element.parentId, parentType: parentType, idsHierarchy: [id]}
+                return { object: object, type: object.constructor.name, parentId: object.parentId, parentType: parentType, idsHierarchy: [id] };
             } else {
                 if (object.childrens) {
-                    object.childrens.foreach((children) => {
-                        const result = getElementInfo(id, children, object.constructor.name);
+                    for (let i = 0; i < object.childrens.array.length; i++) {
+                        const result = getElementInfo(id, object.childrens.array[i], object.constructor.name);
                         if (result) {
                             result.idsHierarchy = [object.id, ...result.idsHierarchy];
                             return result;
                         }
-                        
-                    })
-                }                
-            }         
-        } else {return null;}
+                    }
+                }
+            }
+        } else {
+            return null;
+        }
         return null;
     };
 
@@ -1023,8 +1043,8 @@ const Main = (props) => {
         const { source, destination } = result;
         switch (result.type) {
             case 'CARD': {
-                const sourceSwimlaneId = getParentId('COLUMN', source.droppableId);
-                const targetSwimlaneId = getParentId('COLUMN', destination.droppableId);
+                const sourceSwimlaneId = getElementInfo('COLUMN', source.droppableId);
+                const targetSwimlaneId = getElementInfo('COLUMN', destination.droppableId);
                 moveCard(sourceSwimlaneId, targetSwimlaneId, source.droppableId, destination.droppableId, source.index, destination.index);
                 break;
             }
@@ -1091,8 +1111,7 @@ const Main = (props) => {
 
     useEffect(() => { //Initial Render load Data
         if (board.childrens.array.length === 0) {
-            addColumn();
-            addSwimlane();
+            console.log('done');
         }
     }, []);
 
@@ -1109,13 +1128,15 @@ const Main = (props) => {
         'updateColumn': (swimlaneId, columnId, newprops) => updateColumn(swimlaneId, columnId, newprops),
         'updateCard': (swimlaneId, columnId, cardId, newprops) => updateCard(swimlaneId, columnId, cardId, newprops),
         'returnContentElement': (contentElement, cIndex, func) => returnContentElement(contentElement, cIndex, func),
-        'getParentId': (sourceType, id) => getParentId(sourceType, id)
+        'getParentId': (sourceType, id) => getElementInfo(sourceType, id)
     };
 
     const renderSwitch = (children, index) => {
         switch (children.constructor.name) {
-            case '_Verticalgroup':
+            case '_Swimlane':
                 return <Swimlane functions={functions} swimlane={children} key={index} index={index} />;
+            case '_VerticalGroup':
+                return <Verticalgroup functions={functions} verticalgroup={children} key={index} index={index} />;
             case '_Column':
                 return <Column functions={functions} column={children} key={index} index={index} />;
             default:
@@ -1127,7 +1148,7 @@ const Main = (props) => {
         <div className="App" ref={appRef}>
             <DragDropContext onDragEnd={(result) => onDragEnd(result)}>
                 {board.childrens.array.map((children, index) => renderSwitch(children, index))}
-                <div>
+                <div className="buttons_container buttons_container-right">
                     <button className="add-icon add-icon_column" onClick={() => functions.addColumn()} >
                         <AiOutlineInsertRowRight />
                     </button>
