@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { DragDropContext } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
 import ReactMarkdown from 'react-markdown';
 import gfm from 'remark-gfm';
@@ -291,6 +291,8 @@ class _Card {
                 this._imageSource = pathToSave + ext;
             },
             fromUrl(url) {
+                //
+                const expressionTest = '^(?<scheme>[A-Za-z][A-Za-z0-9\+\.\-]+?\:)?(?:\/\/)?(?<Authority>(?<userinfo>[A-Za-z0-9\-\.\_\~\%\!\$\&\'\(\)\*\+\,\;\=]+\:?\@)?(?<host>\[?(?:(?:[0-9]{3}\.){3}[0-9]{3}|(?:[A-Fa-f0-9]*\:?){1,8}|[A-Za-z0-9\-\.\_\~\%\!\$\&\'\(\)\*\+\,\;\=]+)\]?)?\:?(?<port>[0-9]+)?)?\/?(?<path>(?<segment>\/?:?[A-Za-z0-9\-\.\_\~\%\!\$\&\'\(\)\*\+\,\;\=]*)+)?(?<query>\?[A-Za-z0-9\-\.\_\~\%\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]+)?(?<fragment>\#[A-Za-z0-9\-\.\_\~\%\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]+)?$';
                 const expression = '(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})';
                 const rgx = new RegExp(expression);
                 if (rgx.test(url)) {
@@ -782,106 +784,109 @@ window.onscroll = function () {
 
 const Main = (props) => {
     const [board, setBoard] = useState(new _Board());
+    const [dragType, setdragType] = useState({ parentType: '', type: '' });
     const appRef = useRef(null);
 
-    const addSwimlane = (parentId = null) => {
-        const tempBoard = new _Board();
-        Object.assign(tempBoard, board);
 
-        const newSwimlane = new _Swimlane();
-        const newVerticalgroup = new _VerticalGroup();
-        newVerticalgroup.childrens.add(newSwimlane);
-
-        const elInfo = getElementInfo(parentId);
+    const modifySubItem = (mainObj, targetInfo, functions) => {
         const objects = [];
-        if (elInfo){
-            switch (elInfo.type) {
-                case null:
-                    tempBoard.childrens.add(newVerticalgroup);
-                    break;
-                case '_Swimlane':
-                    for (let i = 0; i < elInfo.idsHierarchy.length; i++) {
-                        if (i === 0) objects.push(tempBoard.childrens.extract(elInfo.idsHierarchy[i]));
-                        else objects.push(objects[i - 1].childrens.extract(elInfo.idsHierarchy[i]));
-                    }
+        const results = [];
 
-                    objects[objects.length - 1][0].childrens.add(newVerticalgroup);
+        if (targetInfo && targetInfo.object.id !== mainObj.id) {
+            for (let i = 0; i < targetInfo.idsHierarchy.length; i++) {
+                if (i === 0) { // 0 is always main _Board
+                    const obj = mainObj.childrens.extract(targetInfo.idsHierarchy[i + 1]);
+                    objects.push(obj);
+                } else if (i === targetInfo.idsHierarchy.length - 1) { //Last in hierarchy is always the current parent
+                    //Apply all functions with their arguments here.
+                    functions.forEach((f) => {
+                        results.push(objects[i - 1][0].childrens[f.functionName](...f.arguments));
+                    });
+                } else {
+                    const c = objects[i - 1][0];
+                    const obj = c.childrens.extract(targetInfo.idsHierarchy[i + 1]);
+                    objects.push(obj);
+                }
+            }
 
-                    for (let i = objects.length - 1; i === 0; i--) {
-                        if (i === objects.length - 1) tempBoard.childrens.insert(objects[objects.length - 1][0], objects[objects.length - 1][1]);
-                        else objects[i].childrens.insert(objects[i - 1][0], objects[i - 1][1]);
-                    }
-                    break;
-                case '_VerticalGroup':
-                    for (let i = 0; i < elInfo.idsHierarchy.length; i++) {
-                        if (i === 0) { // 0 is always main _Board
-                            const obj = tempBoard.childrens.extract(elInfo.idsHierarchy[i + 1]);
-                            objects.push(obj);
-                        } else if (i === elInfo.idsHierarchy.length - 1) { //Last in hierarchy is always the current parent
-                            objects[i - 1][0].childrens.add(newSwimlane);
-                        } else {
-                            const c = objects[i - 1][0];
-                            const obj = c.childrens.extract(elInfo.idsHierarchy[i]);
-                            objects.push(obj);
-                        }
-                    }
-
-                    for (let i = objects.length - 1; i === 0; i--) {
-                        if (i === objects.length - 1) {
-                            tempBoard.childrens.insert(objects[objects.length - 1][0], objects[objects.length - 1][1]);
-                        } else {
-                            objects[i].childrens.insert(objects[i - 1][0], objects[i - 1][1]);
-                        }
-                    }
-                    break;
-                default:
-                    break;
+            for (let i = objects.length - 1; i >= 0; i--) {
+                if (i === 0) {
+                    mainObj.childrens.insert(objects[0][0], objects[0][1]);
+                } else {
+                    objects[i - 1][0].childrens.insert(objects[i][0], objects[i][1]);
+                }
             }
         } else {
-            tempBoard.childrens.add(newVerticalgroup);
+            functions.forEach((f) => {
+                results.push(mainObj.childrens[f.functionName](...f.arguments));
+            });
         }
-
-        setBoard(tempBoard);
+        return [mainObj, results];
     };
 
-    const addColumn = (swimlaneId = null) => {
+    const addItem = (itemType, parentId = null) => {
         const tempBoard = new _Board();
         Object.assign(tempBoard, board);
 
-        if (swimlaneId !== null){
-            const [swimlane, sIndex] = tempBoard.childrens.extract(swimlaneId);
-            swimlane.columns.add(new _Column(swimlaneId));
-            tempBoard.childrens.insert(swimlane, sIndex);
-        } else {
-            tempBoard.childrens.add(new _Column(swimlaneId));
+        const elInfo = getElementInfo(parentId);
+
+        const newVerticalgroup = new _VerticalGroup();
+        newVerticalgroup.childrens.add(new _Swimlane());
+
+        let objectToAdd;
+        switch (itemType) {
+            case '_Column':
+                objectToAdd = new _Column();
+                break;
+            case '_Swimlane':
+                if (elInfo) {
+                    switch (elInfo.type) {
+                        case null:
+                            objectToAdd = newVerticalgroup;
+                            //tempBoard.childrens.add(newVerticalgroup);
+                            break;
+                        case '_Swimlane':
+                            objectToAdd = newVerticalgroup;
+                            break;
+                        case '_VerticalGroup':
+                            objectToAdd = new _Swimlane();
+                            break;
+                        default:
+                            break;
+                    }
+                } else {
+                    objectToAdd = newVerticalgroup;
+                }
+                break;
+            case '_Card':
+                objectToAdd = new _Card();
+                break;
+            default:
+                break;
         }
 
-        setBoard(tempBoard);
+        const args = [objectToAdd];
+        const [FinalBoard, results] = modifySubItem(tempBoard, elInfo, [{ functionName: 'add', arguments: args }]);
+
+        setBoard(FinalBoard);
     };
 
-    const addCard = (columnId) => {
+    const moveItem = (sourceId, itemId, targetId, targetIndex) => {
         const tempBoard = new _Board();
         Object.assign(tempBoard, board);
 
-        const swimlaneId = getElementInfo('COLUMN', columnId);
-        let swimlane, sIndex;
-        let column, cIndex;
-        if (swimlaneId !== null){
-            [swimlane, sIndex] = tempBoard.childrens.extract(swimlaneId);
-            [column, cIndex] = swimlane.columns.extract(columnId);
-        } else {
-            [column, cIndex] = tempBoard.childrens.extract(columnId);
-        }
-        column.cards.add(new _Card(columnId));
+        const sourceInfo = getElementInfo(sourceId);
+        const [ModBoard, results] = modifySubItem(tempBoard, sourceInfo, [{ functionName: 'extract', arguments: [itemId] }]);
 
-        if (swimlaneId !== null){
-            swimlane.columns.insert(column, cIndex);
-            tempBoard.childrens.insert(swimlane, sIndex);
-        } else {
-            tempBoard.childrens.insert(column, cIndex);
-        }
+        const targetInfo = getElementInfo(targetId);
+        const [FinalBoard] = modifySubItem(ModBoard, targetInfo, [{ functionName: 'insert', arguments: [results[0][0], targetIndex] }]);
 
-        setBoard(tempBoard);
+        setBoard(FinalBoard);
+    };
+
+    const updateItem = (itemId, newProps) => {
+        const tempBoard = new _Board();
+        Object.assign(tempBoard, board);
     };
 
     const updateColumn = (swimlaneId, columnId, newProps) => {
@@ -953,62 +958,6 @@ const Main = (props) => {
         } else console.log('undefined Swimlane: ' + swimlaneId);
     };
 
-    const moveColumn = (sourceSwimlaneId, targetSwimlaneId, sourceColumnId = null, targetColumnId = null, sourceCardId = null, sourceIndex = null, targetIndex = null) => {
-        const tempBoard = new _Board();
-        Object.assign(tempBoard, board);
-
-        const [sourceSwimlane, ssIndex] = tempBoard.childrens.extract(sourceSwimlaneId);
-        if (sourceColumnId !== null) {
-            const [sourceColumn, csIndex] = sourceSwimlane.columns.extract(sourceColumnId);
-        }
-    };
-
-    const moveCard = (sourceSwimlaneId, targetSwimlaneId, sourceColumnId = null, targetColumnId = null, sourceIndex = null, targetIndex = null) => {
-        const tempBoard = new _Board();
-        Object.assign(tempBoard, board);
-
-
-        //GET SOURCES
-        const [sourceSwimlane, ssIndex] = tempBoard.childrens.extract(sourceSwimlaneId);
-        if (sourceColumnId !== null) {
-            const [sourceColumn, csIndex] = sourceSwimlane.columns.extract(sourceColumnId);
-            if (sourceIndex > -1) {
-                const sourceCard = sourceColumn.cards.extractAt(sourceIndex);
-
-                //GET TARGETS
-                if (sourceColumnId !== targetColumnId) {
-                    if (sourceSwimlaneId !== targetSwimlaneId) {
-                        sourceSwimlane.columns.insert(sourceColumn, csIndex);
-                        tempBoard.childrens.insert(sourceSwimlane, ssIndex);
-
-                        const [targetSwimlane, stIndex] = tempBoard.childrens.extract(targetSwimlaneId);
-                        const [targetColumn, ctIndex] = targetSwimlane.columns.extract(targetColumnId);
-
-                        targetColumn.cards.insert(sourceCard, targetIndex);
-
-
-                        targetSwimlane.columns.insert(targetColumn, ctIndex);
-                        tempBoard.childrens.insert(targetSwimlane, stIndex);
-                    } else {
-                        sourceSwimlane.columns.insert(sourceColumn, csIndex);
-
-                        const [targetColumn, ctIndex] = sourceSwimlane.columns.extract(targetColumnId);
-                        targetColumn.cards.insert(sourceCard, targetIndex);
-                        sourceSwimlane.columns.insert(targetColumn, ctIndex);
-                        tempBoard.childrens.insert(sourceSwimlane, ssIndex);
-                    }
-                } else {
-                    sourceColumn.cards.insert(sourceCard, targetIndex);
-                    sourceSwimlane.columns.insert(sourceColumn, csIndex);
-                    tempBoard.childrens.insert(sourceSwimlane, ssIndex);
-                }
-
-            }
-        }
-
-        setBoard(tempBoard);
-    };
-
     const getElementInfo = (id, object = null, parentType = null) => {
         if (object === null) {
             object = new _Board();
@@ -1016,7 +965,7 @@ const Main = (props) => {
         }
 
         if (object) {
-            if (object.id === id){
+            if (object.id === id) {
                 return { object: object, type: object.constructor.name, parentId: object.parentId, parentType: parentType, idsHierarchy: [id] };
             } else {
                 if (object.childrens) {
@@ -1035,24 +984,35 @@ const Main = (props) => {
         return null;
     };
 
+    const onBeforeCapture = (captured) => {
+        if (!captured){
+            return;
+        }
+
+        const elInfo = getElementInfo(captured.draggableId);
+
+        if (elInfo){
+            setdragType({ parentType: elInfo.parentType, type: elInfo.type });
+        }
+    };
+
     const onDragEnd = (result) => {
         if (!result.destination) {
             return;
         }
 
-        const { source, destination } = result;
         switch (result.type) {
-            case 'CARD': {
-                const sourceSwimlaneId = getElementInfo('COLUMN', source.droppableId);
-                const targetSwimlaneId = getElementInfo('COLUMN', destination.droppableId);
-                moveCard(sourceSwimlaneId, targetSwimlaneId, source.droppableId, destination.droppableId, source.index, destination.index);
+            case 'CARD':
+                moveItem(result.source.droppableId, result.draggableId, result.destination.droppableId, result.destination.index);
                 break;
-            }
-
+            case 'COLUMN':
+                moveItem(result.source.droppableId, result.draggableId, result.destination.droppableId, result.destination.index);
+                break;
             default:
                 break;
         }
     };
+
 
     const returnContentElement = (contentElement, cIndex = null, func = undefined) => {
         let element;
@@ -1121,39 +1081,49 @@ const Main = (props) => {
         callResizeUpdate(appWidth, appHeight);
     }, [appRef, board]);
 
-    const functions = {
-        'addSwimlane': (sindex) => addSwimlane(sindex),
-        'addColumn': (swimlaneId) => addColumn(swimlaneId),
-        'addCard': (swimlaneId, columnId) => addCard(swimlaneId, columnId),
-        'updateColumn': (swimlaneId, columnId, newprops) => updateColumn(swimlaneId, columnId, newprops),
-        'updateCard': (swimlaneId, columnId, cardId, newprops) => updateCard(swimlaneId, columnId, cardId, newprops),
-        'returnContentElement': (contentElement, cIndex, func) => returnContentElement(contentElement, cIndex, func),
-        'getParentId': (sourceType, id) => getElementInfo(sourceType, id)
-    };
-
-    const renderSwitch = (children, index) => {
+    const renderSwitch = (children, index, dragType) => {
         switch (children.constructor.name) {
             case '_Swimlane':
-                return <Swimlane functions={functions} swimlane={children} key={index} index={index} />;
+                return <Swimlane functions={functions} swimlane={children} key={index} index={index} dragType={dragType} />;
             case '_VerticalGroup':
-                return <Verticalgroup functions={functions} verticalgroup={children} key={index} index={index} />;
+                return <Verticalgroup functions={functions} verticalgroup={children} key={index} index={index} dragType={dragType} />;
             case '_Column':
-                return <Column functions={functions} column={children} key={index} index={index} />;
+                return <Column functions={functions} column={children} key={index} index={index} dragType={dragType} />;
             default:
                 return undefined;
         }
     };
 
+    const functions = {
+        'addItem': (itemType, parentId) => addItem(itemType, parentId),
+        'updateColumn': (swimlaneId, columnId, newprops) => updateColumn(swimlaneId, columnId, newprops),
+        'updateCard': (swimlaneId, columnId, cardId, newprops) => updateCard(swimlaneId, columnId, cardId, newprops),
+        'returnContentElement': (contentElement, cIndex, func) => returnContentElement(contentElement, cIndex, func),
+        'getParentId': (sourceType, id) => getElementInfo(sourceType, id),
+        'renderSwitch': (children, index, dragType) => renderSwitch(children, index, dragType)
+    };
+
     return (
         <div className="App" ref={appRef}>
-            <DragDropContext onDragEnd={(result) => onDragEnd(result)}>
-                {board.childrens.array.map((children, index) => renderSwitch(children, index))}
+            <DragDropContext onDragEnd={(result) => onDragEnd(result)} onBeforeCapture={(captured) => onBeforeCapture(captured)}>
+                <Droppable droppableId={board.id} direction="horizontal" isDropDisabled={!(['_Column', '_Verticalgroup'].includes(dragType.type) && dragType.parentType === '_Board')}>
+                    {(provided, snapshot) => (
+                        <div
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}
+                            className={snapshot.isDraggingOver ? 'board-childrens column-visible' : 'board-childrens'}
+                        >
+                            {board.childrens.array.map((children, index) => renderSwitch(children, index, dragType))}
+                            {provided.placeholder}
+                        </div>
+                    )}
+                </Droppable>
                 <div className="buttons_container buttons_container-right">
-                    <button className="add-icon add-icon_column" onClick={() => functions.addColumn()} >
+                    <button className="add-icon add-icon_column" onClick={() => functions.addItem('_Column')} >
                         <AiOutlineInsertRowRight />
                     </button>
 
-                    <button className="add-icon add-icon_column" onClick={() => functions.addSwimlane()} >
+                    <button className="add-icon add-icon_column" onClick={() => functions.addItem('_Swimlane')} >
                         <AiOutlineInsertRowAbove />
                     </button>
                 </div>

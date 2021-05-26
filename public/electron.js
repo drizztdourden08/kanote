@@ -39,7 +39,8 @@ function createMain() {
         webPreferences: {
             webSecurity: false,
             nodeIntegration: true,
-            enableRemoteModule: true
+            enableRemoteModule: true,
+            contextIsolation: false
         },
         show: false
     });
@@ -67,7 +68,8 @@ function createHandle() {
         webPreferences: {
             webSecurity: false,
             nodeIntegration: true,
-            enableRemoteModule: true
+            enableRemoteModule: true,
+            contextIsolation: false
         },
         show: false
     });
@@ -127,7 +129,7 @@ const ResizeCenterMain = (appWidth, appHeight) => {
 
     const targetHeight = h + bottomBuffer;
 
-    const targetWidth = w;
+    const targetWidth = Math.max(w, 300);
     const centeredX = ((screenWidth / 4) * 3) - (targetWidth / 2);
 
     mainWindow.resizable = true;
@@ -136,7 +138,7 @@ const ResizeCenterMain = (appWidth, appHeight) => {
     mainWindow.setPosition(Math.round(centeredX), appY);
     mainWindow.resizable = false;
 
-    const handleWidth = targetWidth + 10;
+    const handleWidth = Math.max(targetWidth + 10, 300);
     const handleHeight = 45;
 
     const handleCenteredX = ((screenWidth / 4) * 3) - (handleWidth / 2);

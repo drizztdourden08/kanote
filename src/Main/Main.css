@@ -40,9 +40,13 @@ button {
     padding-top: 20px;
 }
 
+.board-childrens {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
 
-
-.add-icon, .add-icon:focus {
+.add-icon, .add-icon:active {
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -111,7 +115,6 @@ input[type="text"]:focus{
 
     background: #00000055;
 
-    font-size: 1.05em;
     color:#F05D60;
 }
 

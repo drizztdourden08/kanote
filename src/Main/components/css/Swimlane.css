@@ -5,15 +5,21 @@
     justify-content: stretch;
 }
 
+.swimlane-childrens {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: stretch;
+}
+
 .swimlane {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: stretch;
     justify-content: stretch;
 
     box-sizing: border-box;
     border: none;
-    border-top: 4px solid #F05D60;
 
     margin-bottom: 10px;
 }
@@ -25,15 +31,14 @@
     justify-content: flex-end;
 
     padding-top: 5px;
+    min-width: 300px;
 }
 
 .swimlane_title {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: stretch ;
-    align-items: center;
-
-    min-width: 300px;
+    align-items: stretch;
 }
 
 .swimlane_title span {

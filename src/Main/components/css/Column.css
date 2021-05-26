@@ -1,8 +1,3 @@
-.columns {
-    display: flex;
-    flex-direction: row;
-}
-
 .columns_add{
     display: flex;
     flex-direction: column;
@@ -25,7 +20,7 @@
 }
 
 .column-visible {
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(255, 255, 255, 0.4);
 }
 
 .column_title {
@@ -33,8 +28,6 @@
     flex-direction: column;
     align-items: center;
     
-
-
     padding: 5px 10px;
     
     background: rgba(0, 0, 0, 0.7);
