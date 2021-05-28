@@ -226,6 +226,7 @@ class _Column {
     constructor(parentId) {
         this.id = uuidv4();
         this.parentId = parentId;
+        this._icon = 'https://upload.wikimedia.org/wikipedia/en/thumb/e/e0/WPVG_icon_2016.svg/1024px-WPVG_icon_2016.svg.png';
         this._title = 'Column ' + Math.floor(Math.random() * Math.floor(100)) + '';
         this._childrens = new ArrayOf(['_Card']);
         this.editing = false;
@@ -265,7 +266,7 @@ class _Card {
         this._parentId = parentId;
         this._title = 'Card ' + Math.floor(Math.random() * Math.floor(100)) + '';
         this._priority = new _Priority();
-        this._imageSource = '';
+        this._imageSource = 'https://images.unsplash.com/photo-1494253109108-2e30c049369b?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fHJhbmRvbS4uLnxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&w=1000&q=80';
         this.image = {
             fromUrlToBase64(url) {
                 imageToBase64(url).then(base64 => {

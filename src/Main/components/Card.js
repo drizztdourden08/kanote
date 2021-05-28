@@ -25,7 +25,7 @@ const Card = (props) => {
                                     {
                                         props.card.image !== null ?
                                             <div className="card-image">
-                                                <img alt="header-img" src={props.card.image} />
+                                                <img alt="header-img" src={props.card._imageSource} />
                                             </div>
                                             :undefined
                                     }

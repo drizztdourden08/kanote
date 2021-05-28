@@ -26,6 +26,7 @@ const Column = (props) => {
                                 ?
                                 <div>
                                     <div>
+                                        <img src={props.column._icon} alt="icon" />
                                         <span>{props.column.title}</span>
                                         <div>
                                             <button className="standard-button" onClick={() => props.functions.updateColumn(props.column.swimlaneId, props.column.id, [{ 'property': 'editing', 'newValue': !props.column.editing }])}><BiDotsVerticalRounded /></button>
@@ -50,9 +51,13 @@ const Column = (props) => {
                                 </div>
                         }
                     </div>
-                    <button className="add-icon add-icon_card" onClick={() => props.functions.addItem('_Card', props.column.id)}>
-                        <AiOutlinePlus />
-                    </button>
+                    <div className="expanding-button-container">
+                        <div className="expanding-add-button">
+                            <button onClick={() => props.functions.addItem('_Card', props.column.id)}>
+                                <AiOutlinePlus />
+                            </button>
+                        </div>
+                    </div>
                     <div className="column_cards">
                         <Droppable droppableId={props.column.id} type="CARD">
                             {(provided, snapshot) => (
