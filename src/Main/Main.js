@@ -13,11 +13,9 @@ import { loremIpsum, name, surname, fullname, username } from 'react-lorem-ipsum
 import './Main.css';
 
 import Verticalgroup from './components/Verticalgroup';
-import './components/css/Verticalgroup.css';
 import Swimlane from './components/Swimlane';
-import './components/css/Swimlane.css';
 import Column from './components/Column';
-import './components/css/Column.css';
+import ExpandingButtons from './components/ExpandingButtons';
 
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
 
@@ -223,9 +221,8 @@ class _Swimlane {
 }
 
 class _Column {
-    constructor(parentId) {
+    constructor() {
         this.id = uuidv4();
-        this.parentId = parentId;
         this._icon = 'https://upload.wikimedia.org/wikipedia/en/thumb/e/e0/WPVG_icon_2016.svg/1024px-WPVG_icon_2016.svg.png';
         this._title = 'Column ' + Math.floor(Math.random() * Math.floor(100)) + '';
         this._childrens = new ArrayOf(['_Card']);
@@ -261,12 +258,11 @@ class _Column {
 }
 
 class _Card {
-    constructor(parentId) {
+    constructor() {
         this.id = uuidv4();
-        this._parentId = parentId;
         this._title = 'Card ' + Math.floor(Math.random() * Math.floor(100)) + '';
         this._priority = new _Priority();
-        this._imageSource = 'https://images.unsplash.com/photo-1494253109108-2e30c049369b?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fHJhbmRvbS4uLnxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&w=1000&q=80';
+        this._imageSource = '';
         this.image = {
             fromUrlToBase64(url) {
                 imageToBase64(url).then(base64 => {
@@ -321,17 +317,6 @@ class _Card {
         this.toDelete = false;
         this.cancelChanges = false;
         this.originalCard = {};
-    }
-
-    set parentId(value) {
-        if (uuidValidate(value) === false) {
-            return;
-        }
-
-        this._parentId = value;
-    }
-    get parentId() {
-        return this._parentId;
     }
 
     set title(value) {
@@ -785,7 +770,7 @@ window.onscroll = function () {
 
 const Main = (props) => {
     const [board, setBoard] = useState(new _Board());
-    const [dragType, setdragType] = useState({ parentType: '', type: '' });
+    const [isDropDisabled, setIsDropDisabled] = useState({ board: false, verticalgroup: false, swimlane: false });
     const appRef = useRef(null);
 
 
@@ -825,7 +810,7 @@ const Main = (props) => {
         return [mainObj, results];
     };
 
-    const addItem = (itemType, parentId = null) => {
+    const addItem = (itemType, parentId = null, index) => {
         const tempBoard = new _Board();
         Object.assign(tempBoard, board);
 
@@ -842,9 +827,8 @@ const Main = (props) => {
             case '_Swimlane':
                 if (elInfo) {
                     switch (elInfo.type) {
-                        case null:
+                        case '_Board':
                             objectToAdd = newVerticalgroup;
-                            //tempBoard.childrens.add(newVerticalgroup);
                             break;
                         case '_Swimlane':
                             objectToAdd = newVerticalgroup;
@@ -866,8 +850,8 @@ const Main = (props) => {
                 break;
         }
 
-        const args = [objectToAdd];
-        const [FinalBoard, results] = modifySubItem(tempBoard, elInfo, [{ functionName: 'add', arguments: args }]);
+        const args = [objectToAdd, index];
+        const [FinalBoard, results] = modifySubItem(tempBoard, elInfo, [{ functionName: 'insert', arguments: args }]);
 
         setBoard(FinalBoard);
     };
@@ -959,7 +943,7 @@ const Main = (props) => {
         } else console.log('undefined Swimlane: ' + swimlaneId);
     };
 
-    const getElementInfo = (id, object = null, parentType = null) => {
+    const getElementInfo = (id, object = null, parentType = null, parentId = null) => {
         if (object === null) {
             object = new _Board();
             Object.assign(object, board);
@@ -967,11 +951,11 @@ const Main = (props) => {
 
         if (object) {
             if (object.id === id) {
-                return { object: object, type: object.constructor.name, parentId: object.parentId, parentType: parentType, idsHierarchy: [id] };
+                return { object: object, type: object.constructor.name, parentId: parentId, parentType: parentType, idsHierarchy: [id] };
             } else {
                 if (object.childrens) {
                     for (let i = 0; i < object.childrens.array.length; i++) {
-                        const result = getElementInfo(id, object.childrens.array[i], object.constructor.name);
+                        const result = getElementInfo(id, object.childrens.array[i], object.constructor.name, object.id);
                         if (result) {
                             result.idsHierarchy = [object.id, ...result.idsHierarchy];
                             return result;
@@ -985,16 +969,32 @@ const Main = (props) => {
         return null;
     };
 
-    const onBeforeCapture = (captured) => {
-        if (!captured){
+    const onDragStart = (dragInfo) => {
+        if (!dragInfo){
             return;
         }
 
-        const elInfo = getElementInfo(captured.draggableId);
+        let board = true;
+        let verticalgroup = true;
+        let swimlane = true;
 
-        if (elInfo){
-            setdragType({ parentType: elInfo.parentType, type: elInfo.type });
+        const elInfo = getElementInfo(dragInfo.draggableId);
+
+        switch (elInfo.parentType) {
+            case '_Board':
+                board = false;
+                break;
+            case '_VerticalGroup':
+                verticalgroup = false;
+                break;
+            case '_Swimlane':
+                swimlane = false;
+                break;
+            default:
+                break;
         }
+
+        setIsDropDisabled({ board: board, verticalgroup: verticalgroup, swimlane: swimlane });
     };
 
     const onDragEnd = (result) => {
@@ -1002,16 +1002,8 @@ const Main = (props) => {
             return;
         }
 
-        switch (result.type) {
-            case 'CARD':
-                moveItem(result.source.droppableId, result.draggableId, result.destination.droppableId, result.destination.index);
-                break;
-            case 'COLUMN':
-                moveItem(result.source.droppableId, result.draggableId, result.destination.droppableId, result.destination.index);
-                break;
-            default:
-                break;
-        }
+        moveItem(result.source.droppableId, result.draggableId, result.destination.droppableId, result.destination.index);
+        setIsDropDisabled({ board: true, verticalgroup: true, swimlane: true });
     };
 
 
@@ -1082,52 +1074,44 @@ const Main = (props) => {
         callResizeUpdate(appWidth, appHeight);
     }, [appRef, board]);
 
-    const renderSwitch = (children, index, dragType) => {
+    const renderSwitch = (children, index, isDropDisabled, parentId) => {
         switch (children.constructor.name) {
             case '_Swimlane':
-                return <Swimlane functions={functions} swimlane={children} key={index} index={index} dragType={dragType} />;
+                return <Swimlane functions={functions} swimlane={children} key={index} index={index} isDropDisabled={isDropDisabled} parentId={parentId} />;
             case '_VerticalGroup':
-                return <Verticalgroup functions={functions} verticalgroup={children} key={index} index={index} dragType={dragType} />;
+                return <Verticalgroup functions={functions} verticalgroup={children} key={index} index={index} isDropDisabled={isDropDisabled} parentId={parentId} />;
             case '_Column':
-                return <Column functions={functions} column={children} key={index} index={index} dragType={dragType} />;
+                return <Column functions={functions} column={children} key={index} index={index} isDropDisabled={isDropDisabled} parentId={parentId} />;
             default:
                 return undefined;
         }
     };
 
     const functions = {
-        'addItem': (itemType, parentId) => addItem(itemType, parentId),
+        'addItem': (itemType, parentId, index) => addItem(itemType, parentId, index),
         'updateColumn': (swimlaneId, columnId, newprops) => updateColumn(swimlaneId, columnId, newprops),
         'updateCard': (swimlaneId, columnId, cardId, newprops) => updateCard(swimlaneId, columnId, cardId, newprops),
         'returnContentElement': (contentElement, cIndex, func) => returnContentElement(contentElement, cIndex, func),
-        'getParentId': (sourceType, id) => getElementInfo(sourceType, id),
-        'renderSwitch': (children, index, dragType) => renderSwitch(children, index, dragType)
+        'getElementInfo': (sourceType, id) => getElementInfo(sourceType, id),
+        'renderSwitch': (children, index, isDropDisabled) => renderSwitch(children, index, isDropDisabled)
     };
 
     return (
         <div className="App" ref={appRef}>
-            <DragDropContext onDragEnd={(result) => onDragEnd(result)} onBeforeCapture={(captured) => onBeforeCapture(captured)}>
-                <Droppable droppableId={board.id} direction="horizontal" isDropDisabled={!(['_Column', '_Verticalgroup'].includes(dragType.type) && dragType.parentType === '_Board')}>
+            <DragDropContext onDragEnd={(result) => onDragEnd(result)} onDragStart={(dragInfo) => onDragStart(dragInfo)}>
+                <ExpandingButtons vertical={true} alwaysOn={!board.childrens.array.length} buttons={['_Column', '_Swimlane']} parentId={board.id} addItem={functions.addItem}/>
+                <Droppable droppableId={board.id} direction="horizontal" isDropDisabled={isDropDisabled.board}>
                     {(provided, snapshot) => (
                         <div
                             {...provided.droppableProps}
                             ref={provided.innerRef}
                             className={snapshot.isDraggingOver ? 'board-childrens column-visible' : 'board-childrens'}
                         >
-                            {board.childrens.array.map((children, index) => renderSwitch(children, index, dragType))}
+                            {board.childrens.array.map((children, index) => renderSwitch(children, index, isDropDisabled, board.id))}
                             {provided.placeholder}
                         </div>
                     )}
                 </Droppable>
-                <div className="buttons_container buttons_container-right">
-                    <button className="add-icon add-icon_column" onClick={() => functions.addItem('_Column')} >
-                        <AiOutlineInsertRowRight />
-                    </button>
-
-                    <button className="add-icon add-icon_column" onClick={() => functions.addItem('_Swimlane')} >
-                        <AiOutlineInsertRowAbove />
-                    </button>
-                </div>
             </DragDropContext>
         </div>
     );

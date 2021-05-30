@@ -1,3 +1,8 @@
+.column-wrapper{
+    display: flex;
+    flex-direction: row;
+}
+
 .columns_add{
     display: flex;
     flex-direction: column;
@@ -14,12 +19,13 @@
     flex-direction: column;
 
     width: 300px;
-
-    margin: 0 10px;
-    margin-top: 5px;
+    margin: 0 5px;
 
     background: #1C1C20;
 }
+
+.column:first-child{margin-left: 0;}
+.column:last-child{margin-right: 0;}
 
 .column-visible {
     background: rgba(255, 255, 255, 0.4);
@@ -80,85 +86,9 @@
     margin: 3px 0;
 }
 
-.column_cards {
+.column-childrens {
     display: flex;
     flex-direction: column;
 
-    padding: 10px;
-}
-
-.expanding-button-container{
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    width: 100% - 20px;
-    min-height: 10px;
     padding: 0 10px;
-}
-
-.expanding-add-button{
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    overflow: hidden;
-    height: 0px;
-    transition: height ease 1.0s;
-}
-
-.expanding-add-button::before, .expanding-add-button::after {
-    display: block;
-    content: '';
-    height: 1px;
-    background: red;
-    flex-grow: 0;
-    transition: flex-grow ease 0.25s;
-}
-
-.expanding-button-container:hover .expanding-add-button{
-    height: 15px;
-    transition: height ease 0.25s;
-}
-.expanding-button-container:hover .expanding-add-button::before,
-.expanding-button-container:hover .expanding-add-button::after {
-    flex-grow: 1;
-    transition: flex-grow ease 1.75s;
-}
-
-.expanding-add-button button {
-    border: none;
-    font-size: 1.2em;
-    line-height: 0.9em;   
-}
-
-.expanding-add-button button:hover:not(:active) svg{
-    color:  red;
-    animation: rotateBackAndForth 0.5s 0s linear infinite;
-}
-
-.expanding-add-button button:active svg{
-    animation: rotateClockwise 0.75s 0s linear infinite;
-    pointer-events: none;
-}
-
-@keyframes rotateBackAndForth {
-    0% {
-        transform: rotate(10deg);
-    }
-    50% {
-        transform: rotate(-20deg);
-    }
-    100% {
-        transform: rotate(10deg);
-    }
-}
-
-@keyframes rotateClockwise {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
 }

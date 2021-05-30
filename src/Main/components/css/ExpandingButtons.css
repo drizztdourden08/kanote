@@ -1,0 +1,108 @@
+.expanding-button-container{
+    display: flex;
+    justify-content: center;
+    cursor:cell;    
+}
+.expanding-button-container_horizontal {
+    flex-direction: row;
+    width: 100% - 20px;
+    min-height: 10px;
+    padding: 0 10px;
+}
+.expanding-button-container_vertical {
+    flex-direction: column;
+    height: 100% - 20px;
+    min-width: 10px;
+    padding: 10px 0;
+}
+
+.expanding-add-button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    
+    cursor: default;
+}
+
+.expanding-add-button_horizontal{
+    flex-direction: row;
+    width: 100%;
+    height: 0px;
+    transition: height ease 1.0s 1s;
+}
+.expanding-add-button_horizontal-alwayson{height: 30px;}
+.expanding-add-button_vertical{
+    flex-direction: column;
+    height: 100%;
+    width: 0px;
+    margin: 10px 0;
+    transition: width ease 1.0s 1s;
+}
+.expanding-add-button_vertical-alwayson{width: 30px;}
+
+.expanding-add-button button {
+    cursor:pointer;
+}
+
+.expanding-add-button::before, .expanding-add-button::after {
+    display: block;
+    content: '';
+    background: #F05D60;
+    flex-grow: 0;
+    transition: flex-grow ease 0.5s;
+}
+.expanding-add-button_horizontal::before, .expanding-add-button_horizontal::after {height: 1px;}
+.expanding-add-button_vertical::before, .expanding-add-button_vertical::after {width: 1px;}
+
+.expanding-button-container:hover .expanding-add-button_horizontal{
+    height: 30px;
+    transition: height ease 0.1s 0.3s;
+}
+
+.expanding-button-container:hover .expanding-add-button_vertical{
+    width: 30px;
+    transition: width ease 0.1s 0.3s;
+}
+
+.expanding-button-container:hover .expanding-add-button::before,
+.expanding-button-container:hover .expanding-add-button::after {
+    flex-grow: 1;
+    transition: flex-grow ease 1s;
+}
+
+.expanding-add-button button {
+    border: none;
+    font-size: 1.5em;
+    line-height: 0.9em;   
+}
+
+.expanding-add-button button:hover:not(:active) svg{
+    color:  #F05D60;
+    animation: rotateBackAndForth 0.5s 0s linear infinite;
+}
+
+.expanding-add-button button:active svg{
+    animation: rotateClockwise 0.75s 0s linear infinite;
+}
+
+@keyframes rotateBackAndForth {
+    0% {
+        transform: rotate(10deg);
+    }
+    50% {
+        transform: rotate(-20deg);
+    }
+    100% {
+        transform: rotate(10deg);
+    }
+}
+
+@keyframes rotateClockwise {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

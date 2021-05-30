@@ -18,7 +18,7 @@ const Swimlane = (props) => {
                         <span>{props.swimlane.title}</span>
                     </div>
                     <div className="swimlane-content">
-                        <Droppable droppableId={props.swimlane.id} direction="horizontal" isDropDisabled={!(['_Column'].includes(props.dragType) && props.dragType.parentType === '_Swimlane')}>
+                        <Droppable droppableId={props.swimlane.id} direction="horizontal" isDropDisabled={props.isDropDisabled.swimlane}>
                             {(provided, snapshot) => (
                                 <div
                                     {...provided.droppableProps}
@@ -26,7 +26,7 @@ const Swimlane = (props) => {
                                     className={snapshot.isDraggingOver ? 'swimlane-childrens column-visible' : 'swimlane-childrens'}
                                 >
                                     {props.swimlane.childrens ?
-                                        props.swimlane.childrens.array.map((children, index) => props.functions.renderSwitch(children, index, props.dragType))
+                                        props.swimlane.childrens.array.map((children, index) => props.functions.renderSwitch(children, index, props.isDropDisabled, props.swimlane.id))
                                         :null}
                                     {provided.placeholder}
                                 </div>
