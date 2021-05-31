@@ -1,106 +1,87 @@
-.card{
+.card {
     display: flex;
+    box-sizing: border-box;
     flex-direction: column;
-    
-    position: relative;
-    
     padding: 0;
-
+    border-left: 4px solid #f05d60;
+    background: #202024;
     color: #eee;
-    border-left: 4px solid #F05D60;
 }
 
-.card::before{
-    content: '';
-    position:absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: -2;
-}
-
-.add-icon_card{
-    margin-top: 10px;
+.add-icon_card {
     align-self: center;
+    margin-top: 10px;
 }
 
-.card-wrapper{
+.card-wrapper {
     display: flex;
     flex-direction: column;
     align-items: stretch;
 }
 
-.card-top{
+.card-top {
     display: grid;
 }
 
-.card-image{
+.card-image {
     display: flex;
-    justify-content: stretch;
     align-content: stretch;
-
+    justify-content: stretch;
     grid-column: 1;
     grid-row: 1;
 }
 
-.card-image img{
+.card-image img {
     width: 100%;
     max-height: 150px;
-    object-fit:cover;
+    object-fit: cover;
 }
 
-.card-main{
+.card-main {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
     align-items: stretch;
-
+    justify-content: flex-start;
     grid-column: 1;
     grid-row: 1;
 }
 
-.card-main_wrapper{
+.card-main_wrapper {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
     align-items: center;
-
+    justify-content: space-between;
     padding: 5px 10px;
 }
 
 .card_priority {
     padding: 2px 10px;
     border-radius: 3px;
-
+    color: white;
     font-family: 'Poppins';
     font-size: 0.8em;
-
-    color:white;
 }
 
 .card_title {
     display: flex;
-    font-weight: 200;
-    font-family: 'kufam';
-    justify-content: center;
     align-content: center;
+    justify-content: center;
+    font-family: 'kufam, sans-serif';
+    font-weight: 200;
 }
 
-.card-editing{
+.card-editing {
     font-size: 1.5em;
 }
 
-.card_footer{
+.card_footer {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-
     padding: 5px 10px 0 10px;
 }
 
-.card_footer-left{
+.card_footer-left {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -109,57 +90,53 @@
 .card_tags {
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;    
+    flex-wrap: wrap;
 }
 
 .tag {
-    padding: 0px 10px;
+    padding: 0 10px;
+    margin-right: 3px;
+    margin-bottom: 5px;
+    background: #bbb;
+    border-radius: 10px;
+    color: #555;
     font-family: 'Poppins';
     font-size: 0.7em;
-    background: #bbb;
-    color: #555;
-    border-radius: 10px;
-    margin-right: 3px;
-
-    margin-bottom: 5px;
 }
 
 .tag::before {
     content: '#';
 }
 
-.card_footer_assignees{
+.card_footer_assignees {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
 }
 
-.assignee{
+.assignee {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
     width: 35px;
     height: 35px;
-
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     margin-right: 5px;
     margin-bottom: 5px;
-
     border-radius: 50px;
-
 }
 
-.card_footer_notes-counter{
+.card_footer_notes-counter {
     display: flex;
     flex-direction: row;
+    align-items: center;
     align-self: flex-end;
     justify-content: center;
-    align-items: center;
-
     margin-bottom: 5px;
 }
 
-.card_footer_notes-counter span{
+.card_footer_notes-counter span {
+    width: 0;
+    height: 0;
     margin-left: 3px;
 }

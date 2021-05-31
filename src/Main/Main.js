@@ -1093,7 +1093,7 @@ const Main = (props) => {
         'updateCard': (swimlaneId, columnId, cardId, newprops) => updateCard(swimlaneId, columnId, cardId, newprops),
         'returnContentElement': (contentElement, cIndex, func) => returnContentElement(contentElement, cIndex, func),
         'getElementInfo': (sourceType, id) => getElementInfo(sourceType, id),
-        'renderSwitch': (children, index, isDropDisabled) => renderSwitch(children, index, isDropDisabled)
+        'renderSwitch': (children, index, isDropDisabled, parentId) => renderSwitch(children, index, isDropDisabled, parentId)
     };
 
     return (

@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Kufam:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
 /* Kufam */
 
 /* Roboto */
@@ -6,38 +7,42 @@
 /* Poppins */
 
 /* Montserrat */
-html{height: 100%;}
+html { height: 100%; }
+
 body {
+    height: 100%;
+    padding: 0;
+    background: transparent;
     overflow-x: hidden;
     overflow-y: hidden;
-    height: 100%;
-    background: transparent;
-    padding: 0;
 }
 
-html, body, #root, .App, .columns, .column{
-    pointer-events: none; 
+html,
+body,
+#root,
+.App,
+.columns,
+.column {
+    pointer-events: none;
 }
-#root{display:flex; justify-content: center;}
+#root { display: flex; justify-content: center; }
 
-* {pointer-events: all;}
-.draggable {-webkit-app-region: drag;}
+* { pointer-events: all; }
+.draggable { -webkit-app-region: drag; }
 
 button {
+    border: solid 1px #ccc;
     background: none;
-    border: solid 1px #cccccc;;
-    color: #cccccc;
+    color: #ccc;
 }
 
 .App {
     display: flex;
+    box-sizing: border-box;
     flex-direction: row;
     justify-content: center;
-    
-    color: #cccccc;
-
-    box-sizing: border-box;
     padding-top: 20px;
+    color: #ccc;
 }
 
 .board-childrens {
@@ -46,79 +51,78 @@ button {
     justify-content: center;
 }
 
-.add-icon, .add-icon:active {
+.add-icon,
+.add-icon:active {
     display: flex;
     align-items: flex-start;
     justify-content: center;
-
     padding: 0;
-
+    border: solid 1px #f05d60;
     background: rgba(0, 0, 0, 0.5);
     color: #fff;
-    border: solid 1px #F05D60;
-
-    font-size: 1.1em;
-
     cursor: pointer;
+    font-size: 1.1em;
 }
 
 .add-icon:hover {
-    background: linear-gradient(#F05D60, #CE4F51);
+    background: linear-gradient(#f05d60, #ce4f51);
 }
 
 .add-icon:active {
-    background: linear-gradient(#CE4F51, #F05D60);
+    background: linear-gradient(#ce4f51, #f05d60);
 }
 
-.accept-button, .cancel-button, .standard-button{
+.accept-button,
+.cancel-button,
+.standard-button {
     display: flex;
     align-items: center;
     justify-content: center;
-
-    color: #ddd;
-
-    font-size: 1.5em;
-    cursor: pointer;
-
     border: none;
+    color: #ddd;
+    cursor: pointer;
+    font-size: 1.5em;
 }
 
-.accept-button:hover{
-    color:#7add7a;
+.accept-button:hover {
+    color: #7add7a;
 }
 
-.cancel-button:hover{
-    color:#dd7a7a;
+.cancel-button:hover {
+    color: #dd7a7a;
 }
 
-.standard-button:hover{
-    color:#fff;
+.standard-button:hover {
+    color: #fff;
 }
 
-input[type="text"]{
+.card-field {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    border: solid 1px #353539;
     margin: 0;
-    padding: 5px;
+    border-radius: 2px;
+}
+
+input[type="text"] {
     width: calc(100% - 14px);
-
-    border:none;
-    border-left:solid 4px #F05D60;
-    border-bottom:solid 1px #F05D60;
+    padding: 0;
+    border: none;
+    margin: 0;
     background: none;
-
+    color: #ddd;
     font-family: 'kufam';
     font-size: 1.05em;
-    color:#ddd;
 }
 
-input[type="text"]:focus{
+input[type="text"]:focus {
+    background: #0005;
+    color: #f05d60;
     outline: none;
-
-    background: #00000055;
-
-    color:#F05D60;
 }
 
-button{
+button {
     outline: none;
 }
 
@@ -126,26 +130,22 @@ button{
     display: flex;
     align-items: center;
     justify-content: center;
-
-    background: #00000044;
+    background: #0004;
 }
 
 .buttons_container-bottom {
     flex-direction: row;
-
     margin-top: 5px;
 }
 
 .buttons_container-right {
     flex-direction: column;
-
     margin-left: 10px;
 }
 
 .buttons_container button {
     padding: 2px;
-    border-radius: 2px;
-
     margin: 5px;
+    border-radius: 2px;
     font-size: 1.5em;
 }

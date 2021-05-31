@@ -10,7 +10,6 @@ import { RiCheckboxCircleLine, RiCloseCircleLine, RiArrowLeftCircleLine, RiArrow
 import { MdDeleteForever } from 'react-icons/md';
 
 const Column = (props) => {
-    const buttonClassName = props.column.childrens.array.lenght > 0 ? false : true;
     return (
         <div className="column-wrapper">
             <Draggable key={props.column.id} draggableId={props.column.id} index={props.index} >

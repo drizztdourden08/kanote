@@ -1,22 +1,23 @@
+.verticalgroup-wrapper {
+    display: flex;
+    flex-direction: row;
+}
+
 .verticalgroup {
     position: relative;
-
     display: flex;
     flex-direction: column;
     align-items: stretch;
     justify-content: stretch;
-
-    margin: 0 5px;
 }
 
-.verticalgroup:first-child{margin-left: 0;}
-.verticalgroup:last-child{margin-right: 0;}
+.verticalgroup:first-child { margin-left: 0; }
+.verticalgroup:last-child { margin-right: 0; }
 
 .verticalgroup-icon {
     position: absolute;
     top: 5px;
     right: 5px;
-
     font-size: 20px;
 }
 

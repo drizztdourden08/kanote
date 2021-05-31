@@ -1,9 +1,9 @@
 .content-element hr {
     width: 80%;
     height: 1px;
-    margin: 0 auto;
     border: none;
-    background: linear-gradient(to left, transparent, #F05D60 10%, #F05D60 90%, transparent);
+    margin: 0 auto;
+    background: linear-gradient(to left, transparent, #f05d60 10%, #f05d60 90%, transparent);
 }
 
 .cTasklist {
@@ -13,11 +13,11 @@
 .cTasklist-title {
     padding: 0;
     margin: 0;
-    text-align: center;
-    font-family: 'Roboto';
-    font-weight: 400;
-    font-size: 1.5em;
     color: #ddd;
+    font-family: 'Roboto';
+    font-size: 1.5em;
+    font-weight: 400;
+    text-align: center;
 }
 
 .cTask {
@@ -26,56 +26,56 @@
 
 .form-checkbox {
     display: flex;
-    justify-content: flex-start;
     align-items: center;
+    justify-content: flex-start;
 }
 
 input[type="checkbox"] {
     display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    appearance: none;
-    height: 20px;
     width: 20px;
-    border: 1px solid #F05D60;
+    height: 20px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #f05d60;
+    appearance: none;
     border-radius: 3px;
     outline: none;
 }
 
 input[type="checkbox"]::after {
     display: block;
-    content: '\2713';
     color: transparent;
+    content: '\2713';
 }
 
 input[type="checkbox"]:checked {
     display: inline-flex;
-    justify-content: center;
     align-items: center;
-    background-color: #F05D60;
+    justify-content: center;
+    background-color: #f05d60;
     outline: none;
 }
 
 input[type="checkbox"]:checked::after {
     display: block;
-    content: '\2713';
     color: #ddd;
-    font-weight: bold;
+    content: '\2713';
     font-size: 1em;
+    font-weight: bold;
 }
 
-input[type="checkbox"]+label {
-    font-family: 'Roboto';
-    font-weight: 100;
-    font-size: 1em;
+input[type="checkbox"] + label {
     color: #ddd;
+    font-family: 'Roboto';
+    font-size: 1em;
+    font-weight: 100;
 }
 
 .cText {
     padding: 5px 10px;
+    color: #ddd;
     font-family: 'Roboto';
     font-size: 1em;
-    color: #ddd;
 }
 
 .cMarkdownText {
@@ -85,30 +85,30 @@ input[type="checkbox"]+label {
 }
 
 .cMarkdownText ul {
-    margin-right: 0;
     padding-left: 0;
+    margin-right: 0;
     list-style: none;
 }
 
-.cMarkdownText ul>li {
+.cMarkdownText ul > li {
     margin: 5px 0;
     margin-left: 15px;
 }
 
-.cMarkdownText ul li:before {
+.cMarkdownText ul li::before {
     display: inline-block;
-    content: '';
     width: 2px;
     height: 2px;
-    border: 2px solid #F05D60;
-    border-radius: 100%;
     padding: 0.1em;
-    line-height: 1.0;
+    border: 2px solid #f05d60;
     margin-right: 0.5em;
+    border-radius: 100%;
+    content: '';
+    line-height: 1;
 }
 
 .cMarkdownText a {
-    color: #F05D60;
+    color: #f05d60;
     font-weight: 500;
 }
 
@@ -118,72 +118,73 @@ input[type="checkbox"]+label {
 .cMarkdownText h4,
 .cMarkdownText h5,
 .cMarkdownText h6 {
-    color: #F05D60;
+    color: #f05d60;
     text-transform: uppercase;
 }
 
-.cMarkdownText h1{
-    font-weight: 500;
+.cMarkdownText h1 {
     font-size: 2em;
+    font-weight: 500;
 }
 
-.cMarkdownText h2{
-    font-weight: 400;
+.cMarkdownText h2 {
     font-size: 1.5em;
+    font-weight: 400;
 }
 
-.cMarkdownText h3{
-    font-weight: 300;
+.cMarkdownText h3 {
     font-size: 1.25em;
+    font-weight: 300;
 }
 
-.cMarkdownText h4{
-    font-weight: 250;
+.cMarkdownText h4 {
     font-size: 1.15em;
+    font-weight: 250;
 }
 
-.cMarkdownText h5{
-    font-weight: 200;
+.cMarkdownText h5 {
     font-size: 1.1em;
+    font-weight: 200;
 }
 
-.cMarkdownText h6{
-    font-weight: 100;
+.cMarkdownText h6 {
     font-size: 1.05em;
+    font-weight: 100;
 }
 
-.cMarkdownText blockquote{
-    margin: 0;
+.cMarkdownText blockquote {
     padding: 0;
     padding: 4px 10px;
-    border-left: 4px solid #F05D60;
-
+    border-left: 4px solid #f05d60;
+    margin: 0;
     background: #0003;
 }
 
-.cMarkdownText blockquote p{
-    margin: 0;
+.cMarkdownText blockquote p {
     padding: 0;
+    margin: 0;
 }
 
 table {
     position: relative;
-    border-collapse: collapse;
     overflow: hidden;
-}
-table thead{
-    background: linear-gradient(45deg, #F05D60, #773032);
+    border-collapse: collapse;
 }
 
-table tbody tr:nth-child(even){
+table thead {
+    background: linear-gradient(45deg, #f05d60, #773032);
+}
+
+table tbody tr:nth-child(even) {
     background-color: rgba(0, 0, 0, 0.5);
 }
 
-table tbody tr:nth-child(odd){
+table tbody tr:nth-child(odd) {
     background-color: rgba(0, 0, 0, 0.3);
 }
 
-table th, .cMarkdownText table td {
+table th,
+.cMarkdownText table td {
     padding: 10px;
     color: #fff;
 }
@@ -201,31 +202,23 @@ table tbody td {
 }
 
 table tbody td:hover::before {
-    content: "";
     position: absolute;
-    left: 0;
-    right: 0;
-    top: -9999px;
-    bottom: -9999px;
-    background-color: rgba(255, 255, 255, 0.2);
     z-index: -1;
+    top: -9999px;
+    right: 0;
+    bottom: -9999px;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.2);
+    content: "";
 }
 
 .cImage {
-    padding: 5px 10px;
     width: calc(100% - 20px);
     max-height: 150px;
+    padding: 5px 10px;
     object-fit: cover;
 }
 
-.card-field{
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 3px 10px;
-}
-
-.card-field svg{
+.card-field svg {
     font-size: 2em;
 }

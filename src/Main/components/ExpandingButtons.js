@@ -28,7 +28,7 @@ const ExpandingButtons = (props) => {
     };
 
     return (
-        <div className={containerClasses}>
+        <div className={containerClasses} style={props.hidden ? { minHeight: '0px' } : undefined}>
             {props.buttons.map((button, index) => (
                 <div key={index} className={buttonClasses}>
                     <button onClick={() => props.addItem(button, props.parentId, props.insertAt)}>

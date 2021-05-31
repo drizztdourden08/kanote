@@ -1,31 +1,26 @@
-.column-wrapper{
+.column-wrapper {
     display: flex;
     flex-direction: row;
 }
 
-.columns_add{
+.columns_add {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-
+    justify-content: center;
     padding: 20px;
-
-    background: #00000022;
+    background: #0002;
 }
 
 .column {
     display: flex;
-    flex-direction: column;
-
     width: 300px;
-    margin: 0 5px;
-
-    background: #1C1C20;
+    flex-direction: column;
+    background: #1c1c20;
 }
 
-.column:first-child{margin-left: 0;}
-.column:last-child{margin-right: 0;}
+.column:first-child { margin-left: 0; }
+.column:last-child { margin-right: 0; }
 
 .column-visible {
     background: rgba(255, 255, 255, 0.4);
@@ -35,60 +30,54 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    
     padding: 10px;
-    
+    border-top: solid 3px #f05d60;
     color: #fefefe;
-    border-top: solid 3px #F05D60;
-
     font-family: 'kufam';
     font-size: 1.25em;
 }
 
-.column_title div{
+.column_title div {
     width: 100%;
 }
 
-.column_title div div:first-child{
+.column_title div div:first-child {
     display: flex;
-    flex-direction: row;
-    
     width: 100%;
+    flex-direction: row;
     margin: 3px 0;
 }
 
-.column_title div div:first-child img{
+.column_title div div:first-child img {
     width: 50px;
     height: 50px;
 }
 
-.column_title div div:first-child span{
+.column_title div div:first-child span {
     display: flex;
-    align-self: center;
     flex-grow: 1;
-
+    align-self: center;
     margin-left: 10px;
 }
 
-.column_title div div:first-child div{
+.column_title div div:first-child div {
     display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
     flex-basis: 3em;
+    flex-direction: row;
     flex-shrink: 0;
+    justify-content: flex-end;
 }
 
-.column_title div div:nth-child(2){
+.column_title div div:nth-child(2) {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;   
     width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
     margin: 3px 0;
 }
 
 .column-childrens {
     display: flex;
     flex-direction: column;
-
     padding: 0 10px;
 }

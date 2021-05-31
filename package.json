@@ -138,6 +138,15 @@
       ]
     }
   },
+  "stylelint": {
+    "extends": ["stylelint-config-standard", "stylelint-config-idiomatic-order"],
+    "rules": {
+      "indentation": 4
+    },
+    "plugins": [
+      "stylelint-order"
+    ]
+  },
   "browserslist": {
     "production": [
       ">0.2%",
@@ -152,6 +161,10 @@
   },
   "devDependencies": {
     "eslint-plugin-react": "^7.23.2",
-    "react-syntax-highlighter": "^15.4.3"
+    "react-syntax-highlighter": "^15.4.3",
+    "stylelint": "^13.13.1",
+    "stylelint-config-idiomatic-order": "^8.1.0",
+    "stylelint-config-standard": "^22.0.0",
+    "stylelint-order": "^4.1.0"
   }
 }
