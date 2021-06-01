@@ -9,13 +9,13 @@ const ExpandingButtons = (props) => {
     let containerClasses = 'expanding-button-container';
     let buttonClasses = 'expanding-add-button';
     if (props.vertical) {
-        containerClasses += ' expanding-button-container_vertical';
-        buttonClasses += props.alwaysOn ? ' expanding-add-button_vertical-alwayson' : '';
-        buttonClasses += ' expanding-add-button_vertical';
+        containerClasses += ' expanding-button-container-vertical';
+        buttonClasses += props.alwaysOn ? ' expanding-add-button-vertical-alwayson' : '';
+        buttonClasses += ' expanding-add-button-vertical';
     } else {
-        containerClasses += ' expanding-button-container_horizontal';
-        buttonClasses += props.alwaysOn ? ' expanding-add-button_horizontal-alwayson' : '';
-        buttonClasses += ' expanding-add-button_horizontal';
+        containerClasses += ' expanding-button-container-horizontal';
+        buttonClasses += props.alwaysOn ? ' expanding-add-button-horizontal-alwayson' : '';
+        buttonClasses += ' expanding-add-button-horizontal';
     }
 
     const getButtonIcon = (button) => {

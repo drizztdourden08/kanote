@@ -19,9 +19,9 @@ const Column = (props) => {
                         {...provided.draggableProps}
                         ref={provided.innerRef}
                     >
-                        <div {...provided.dragHandleProps} className="column_title">
+                        <div {...provided.dragHandleProps} className="column-title">
                             {
-                                props.column.editing===false
+                                props.column.editing === false
                                     ?
                                     <div>
                                         <div>
@@ -36,7 +36,7 @@ const Column = (props) => {
                                     :
                                     <div>
                                         <div>
-                                            <span><input type="text" value={props.column.title} onChange={event => props.functions.updateColumn(props.column.swimlaneId, props.column.id, [{ 'property': 'title', 'newValue': event.target.value }])}/></span>
+                                            <span><input type="text" value={props.column.title} onChange={event => props.functions.updateColumn(props.column.swimlaneId, props.column.id, [{ 'property': 'title', 'newValue': event.target.value }])} /></span>
                                             <div>
                                                 <button className="cancel-button" onClick={() => props.functions.updateColumn(props.column.swimlaneId, props.column.id, [{ 'property': 'cancelChanges', 'newValue': true }, { 'property': 'editing', 'newValue': !props.column.editing }])}><RiCloseCircleLine /></button>
                                                 <button className="accept-button" onClick={() => props.functions.updateColumn(props.column.swimlaneId, props.column.id, [{ 'property': 'title', 'newValue': props.column.title }, { 'property': 'editing', 'newValue': !props.column.editing }])}><RiCheckboxCircleLine /></button>
@@ -50,7 +50,7 @@ const Column = (props) => {
                                     </div>
                             }
                         </div>
-                        <ExpandingButtons vertical={false} alwaysOn={!props.column.childrens.array.length} buttons={['_Card']} parentId={props.column.id} addItem={props.functions.addItem}/>
+                        <ExpandingButtons vertical={false} alwaysOn={!props.column.childrens.array.length} buttons={['_Card']} parentId={props.column.id} addItem={props.functions.addItem} />
                         <Droppable droppableId={props.column.id} type="CARD">
                             {(provided, snapshot) => (
                                 <div
@@ -60,13 +60,25 @@ const Column = (props) => {
                                 >
                                     {props.column.childrens ? props.column.childrens.array.map((c, index) => (<Card functions={props.functions} card={c} key={index} index={index} parentId={props.column.id} />)) : null}
                                     {provided.placeholder}
+                                    {props.placeholderprops && snapshot.isDraggingOver && (
+                                        <div
+                                            className="card-placeholder"
+                                            style={{
+                                                top: props.placeholderprops.clientY,
+                                                left: props.placeholderprops.clientX,
+                                                height: props.placeholderprops.clientHeight,
+                                                width: props.placeholderprops.clientWidth
+                                            }}
+                                        >
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </Droppable>
                     </div>
                 )}
             </Draggable>
-            <ExpandingButtons vertical={true} alwaysOn={false} buttons={['_Column', '_Swimlane']} parentId={props.parentId} addItem={props.functions.addItem} insertAt={props.index + 1}/>
+            <ExpandingButtons vertical={true} alwaysOn={false} buttons={['_Column', '_Swimlane']} parentId={props.parentId} addItem={props.functions.addItem} insertAt={props.index + 1} />
         </div>
     );
 };

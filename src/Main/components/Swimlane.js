@@ -1,12 +1,9 @@
 import React from 'react';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 
-import Column from './Column';
 import ExpandingButtons from './ExpandingButtons';
 
 import './css/Swimlane.css';
-
-import { AiOutlinePlus, AiOutlineInsertRowRight, AiOutlineInsertRowAbove } from 'react-icons/ai';
 
 const Swimlane = (props) => {
     return (
@@ -17,7 +14,7 @@ const Swimlane = (props) => {
                         {...DragProvided.draggableProps}
                         ref={DragProvided.innerRef}
                     >
-                        <div {...DragProvided.dragHandleProps} className="swimlane_title">
+                        <div {...DragProvided.dragHandleProps} className="swimlane-title">
                             <span>{props.swimlane.title}</span>
                         </div>
                         <div className="swimlane-content">
@@ -30,7 +27,7 @@ const Swimlane = (props) => {
                                         className={snapshot.isDraggingOver ? 'swimlane-childrens column-visible' : 'swimlane-childrens'}
                                     >
                                         {props.swimlane.childrens ?
-                                            props.swimlane.childrens.array.map((children, index) => props.functions.renderSwitch(children, index, props.isDropDisabled, props.swimlane.id))
+                                            props.swimlane.childrens.array.map((children, index) => props.functions.renderSwitch(children, index, props.isDropDisabled, props.swimlane.id, props.placeholderprops))
                                             :null}
                                         {provided.placeholder}
                                     </div>

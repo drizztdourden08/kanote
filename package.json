@@ -1,6 +1,6 @@
 {
   "name": "kanote",
-  "version": "0.1.320",
+  "version": "0.1.328",
   "private": true,
   "description": "Kaban Board Quick personal app",
   "author": "Johnny Prescott",
@@ -139,12 +139,49 @@
     }
   },
   "stylelint": {
-    "extends": ["stylelint-config-standard", "stylelint-config-idiomatic-order"],
+    "extends": [
+      "stylelint-config-standard",
+      "stylelint-config-rational-order"
+    ],
     "rules": {
-      "indentation": 4
+      "selector-class-pattern": "^([a-z][a-z0-9]*)(-[a-z0-9]+)*$",
+      "value-keyword-case": [
+        "lower",
+        {
+          "ignoreKeywords": [
+            "/.*/"
+          ]
+        }
+      ],
+      "color-hex-case": "upper",
+      "declaration-empty-line-before": [
+        "always",
+        {
+          "ignore": [
+            "after-declaration",
+            "first-nested"
+          ]
+        }
+      ],
+      "indentation": 4,
+      "order/properties-order": [
+        [],
+        {
+          "severity": "warning"
+        }
+      ],
+      "plugin/rational-order": [
+        true,
+        {
+          "border-in-box-model": false,
+          "empty-line-between-groups": true,
+          "severity": "warning"
+        }
+      ]
     },
     "plugins": [
-      "stylelint-order"
+      "stylelint-order",
+      "stylelint-config-rational-order/plugin"
     ]
   },
   "browserslist": {
@@ -163,7 +200,7 @@
     "eslint-plugin-react": "^7.23.2",
     "react-syntax-highlighter": "^15.4.3",
     "stylelint": "^13.13.1",
-    "stylelint-config-idiomatic-order": "^8.1.0",
+    "stylelint-config-rational-order": "^0.1.2",
     "stylelint-config-standard": "^22.0.0",
     "stylelint-order": "^4.1.0"
   }

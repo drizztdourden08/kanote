@@ -3,7 +3,6 @@ import { Draggable, Droppable } from 'react-beautiful-dnd';
 
 import ExpandingButtons from './ExpandingButtons';
 
-import { AiOutlineInsertRowAbove } from 'react-icons/ai';
 import { RiLayoutRowLine } from 'react-icons/ri';
 
 import './css/Verticalgroup.css';
@@ -27,7 +26,7 @@ const VerticalGroup = (props) => {
                                     className={snapshot.isDraggingOver ? 'verticalgroup-childrens column-visible' : 'verticalgroup-childrens'}
                                 >
                                     {props.verticalgroup.childrens ?
-                                        props.verticalgroup.childrens.array.map((children, index) => props.functions.renderSwitch(children, index, props.isDropDisabled, props.verticalgroup.id))
+                                        props.verticalgroup.childrens.array.map((children, index) => props.functions.renderSwitch(children, index, props.isDropDisabled, props.verticalgroup.id, props.placeholderprops))
                                         : null}
                                     {provided.placeholder}
                                 </div>

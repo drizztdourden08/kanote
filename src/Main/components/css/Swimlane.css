@@ -24,27 +24,29 @@
 
 .swimlane-content {
     display: flex;
-    min-width: 300px;
     flex-direction: row;
     align-items: stretch;
     justify-content: center;
+    min-width: 300px;
 }
 
-.swimlane_title {
+.swimlane-title {
     display: flex;
-    height: 30px;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    border-top: solid 3px #f05d60;
+    height: 30px;
+
+    color: #FEFEFE;
+
     background: #111;
-    color: #fefefe;
+    border-top: solid 3px #F05D60;
 }
 
-.swimlane_title span {
-    color: #fff;
-    font-family: 'kufam';
-    font-size: 1em;
+.swimlane-title span {
+    color: #FFF;
     font-weight: 200;
+    font-size: 1em;
+    font-family: 'kufam', sans-serif;
     text-align: center;
 }

@@ -6,9 +6,8 @@ import gfm from 'remark-gfm';
 import CodeBlock from './components/CodeBlock';
 
 import { mouseMoveDetect } from '../scripts/ElectronClickThrough';
-import { dateAdd } from '../scripts/DateTime';
 
-import { loremIpsum, name, surname, fullname, username } from 'react-lorem-ipsum';
+import { loremIpsum, name, surname } from 'react-lorem-ipsum';
 
 import './Main.css';
 
@@ -18,8 +17,6 @@ import Column from './components/Column';
 import ExpandingButtons from './components/ExpandingButtons';
 
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
-
-import { AiOutlineInsertRowRight, AiOutlineInsertRowAbove } from 'react-icons/ai';
 
 const imageToBase64 = require('image-to-base64');
 const ba64 = require('ba64');
@@ -288,8 +285,7 @@ class _Card {
                 this._imageSource = pathToSave + ext;
             },
             fromUrl(url) {
-                //
-                const expressionTest = '^(?<scheme>[A-Za-z][A-Za-z0-9\+\.\-]+?\:)?(?:\/\/)?(?<Authority>(?<userinfo>[A-Za-z0-9\-\.\_\~\%\!\$\&\'\(\)\*\+\,\;\=]+\:?\@)?(?<host>\[?(?:(?:[0-9]{3}\.){3}[0-9]{3}|(?:[A-Fa-f0-9]*\:?){1,8}|[A-Za-z0-9\-\.\_\~\%\!\$\&\'\(\)\*\+\,\;\=]+)\]?)?\:?(?<port>[0-9]+)?)?\/?(?<path>(?<segment>\/?:?[A-Za-z0-9\-\.\_\~\%\!\$\&\'\(\)\*\+\,\;\=]*)+)?(?<query>\?[A-Za-z0-9\-\.\_\~\%\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]+)?(?<fragment>\#[A-Za-z0-9\-\.\_\~\%\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]+)?$';
+                //const expressionTest = '^(?<scheme>[A-Za-z][A-Za-z0-9\+\.\-]+?\:)?(?:\/\/)?(?<Authority>(?<userinfo>[A-Za-z0-9\-\.\_\~\%\!\$\&\'\(\)\*\+\,\;\=]+\:?\@)?(?<host>\[?(?:(?:[0-9]{3}\.){3}[0-9]{3}|(?:[A-Fa-f0-9]*\:?){1,8}|[A-Za-z0-9\-\.\_\~\%\!\$\&\'\(\)\*\+\,\;\=]+)\]?)?\:?(?<port>[0-9]+)?)?\/?(?<path>(?<segment>\/?:?[A-Za-z0-9\-\.\_\~\%\!\$\&\'\(\)\*\+\,\;\=]*)+)?(?<query>\?[A-Za-z0-9\-\.\_\~\%\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]+)?(?<fragment>\#[A-Za-z0-9\-\.\_\~\%\!\$\&\'\(\)\*\+\,\;\=\:\@\/\?]+)?$';
                 const expression = '(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})';
                 const rgx = new RegExp(expression);
                 if (rgx.test(url)) {
@@ -769,6 +765,7 @@ window.onscroll = function () {
 };
 
 const Main = (props) => {
+    const [placeholderProps, setPlaceholderProps] = useState({});
     const [board, setBoard] = useState(new _Board());
     const [isDropDisabled, setIsDropDisabled] = useState({ board: false, verticalgroup: false, swimlane: false });
     const appRef = useRef(null);
@@ -969,8 +966,54 @@ const Main = (props) => {
         return null;
     };
 
+    const getDraggedDom = (draggableId) => {
+        const queryAttr = 'data-rbd-draggable-id';
+        const domQuery = `[${queryAttr}='${draggableId}']`;
+        const draggedDom = document.querySelector(domQuery);
+        return draggedDom;
+    };
+
+    const setPlaceHolderPosition = (draggableId, sourceIndex, destinationIndex = null) => {
+        const draggedDom = getDraggedDom(draggableId);
+        if (!draggedDom) {
+            return;
+        }
+
+        const clientHeight = draggedDom.clientHeight - 10;
+        const clientWidth = draggedDom.clientWidth - 10;
+
+        let childrenArray = [...draggedDom.parentNode.children];
+
+        if (destinationIndex !== null) {
+            const movedItem = childrenArray[sourceIndex];
+            childrenArray.splice(sourceIndex, 1);
+
+            childrenArray = [
+                ...childrenArray.slice(0, destinationIndex),
+                movedItem,
+                ...childrenArray.slice(destinationIndex + 1)
+            ];
+        }
+
+        const clientX = parseFloat(window.getComputedStyle(draggedDom.parentNode).paddingLeft);
+        var clientY =
+            parseFloat(window.getComputedStyle(draggedDom.parentNode).paddingTop) +
+            childrenArray.slice(0, destinationIndex !== null ? destinationIndex : sourceIndex).reduce((total, curr) => {
+                const style = curr.currentStyle || window.getComputedStyle(curr);
+                const marginBottom = parseFloat(style.marginBottom);
+                return total + curr.clientHeight + marginBottom;
+            }, 0);
+
+        setPlaceholderProps({
+            clientHeight,
+            clientWidth,
+            clientY,
+            clientX
+        });
+    };
+
     const onDragStart = (dragInfo) => {
-        if (!dragInfo){
+        if (!dragInfo) {
             return;
         }
 
@@ -995,14 +1038,26 @@ const Main = (props) => {
         }
 
         setIsDropDisabled({ board: board, verticalgroup: verticalgroup, swimlane: swimlane });
+
+        setPlaceHolderPosition(dragInfo.draggableId, dragInfo.source.index);
     };
 
-    const onDragEnd = (result) => {
-        if (!result.destination) {
+    const onDragUpdate = (dragInfo) => {
+        if (!dragInfo.destination) {
             return;
         }
 
-        moveItem(result.source.droppableId, result.draggableId, result.destination.droppableId, result.destination.index);
+        setPlaceHolderPosition(dragInfo.draggableId, dragInfo.source.index, dragInfo.destination.index);
+    };
+
+    const onDragEnd = (dragInfo) => {
+        setPlaceholderProps({});
+        // dropped outside the list
+        if (!dragInfo.destination) {
+            return;
+        }
+
+        moveItem(dragInfo.source.droppableId, dragInfo.draggableId, dragInfo.destination.droppableId, dragInfo.destination.index);
         setIsDropDisabled({ board: true, verticalgroup: true, swimlane: true });
     };
 
@@ -1074,14 +1129,14 @@ const Main = (props) => {
         callResizeUpdate(appWidth, appHeight);
     }, [appRef, board]);
 
-    const renderSwitch = (children, index, isDropDisabled, parentId) => {
+    const renderSwitch = (children, index, isDropDisabled, parentId, placeholderprops) => {
         switch (children.constructor.name) {
             case '_Swimlane':
-                return <Swimlane functions={functions} swimlane={children} key={index} index={index} isDropDisabled={isDropDisabled} parentId={parentId} />;
+                return <Swimlane functions={functions} swimlane={children} key={index} index={index} isDropDisabled={isDropDisabled} parentId={parentId} placeholderprops={placeholderprops}/>;
             case '_VerticalGroup':
-                return <Verticalgroup functions={functions} verticalgroup={children} key={index} index={index} isDropDisabled={isDropDisabled} parentId={parentId} />;
+                return <Verticalgroup functions={functions} verticalgroup={children} key={index} index={index} isDropDisabled={isDropDisabled} parentId={parentId} placeholderprops={placeholderprops}/>;
             case '_Column':
-                return <Column functions={functions} column={children} key={index} index={index} isDropDisabled={isDropDisabled} parentId={parentId} />;
+                return <Column functions={functions} column={children} key={index} index={index} isDropDisabled={isDropDisabled} parentId={parentId} placeholderprops={placeholderprops}/>;
             default:
                 return undefined;
         }
@@ -1093,13 +1148,13 @@ const Main = (props) => {
         'updateCard': (swimlaneId, columnId, cardId, newprops) => updateCard(swimlaneId, columnId, cardId, newprops),
         'returnContentElement': (contentElement, cIndex, func) => returnContentElement(contentElement, cIndex, func),
         'getElementInfo': (sourceType, id) => getElementInfo(sourceType, id),
-        'renderSwitch': (children, index, isDropDisabled, parentId) => renderSwitch(children, index, isDropDisabled, parentId)
+        'renderSwitch': (children, index, isDropDisabled, parentId, placeholderprops) => renderSwitch(children, index, isDropDisabled, parentId, placeholderprops)
     };
 
     return (
-        <div className="App" ref={appRef}>
-            <DragDropContext onDragEnd={(result) => onDragEnd(result)} onDragStart={(dragInfo) => onDragStart(dragInfo)}>
-                <ExpandingButtons vertical={true} alwaysOn={!board.childrens.array.length} buttons={['_Column', '_Swimlane']} parentId={board.id} addItem={functions.addItem}/>
+        <div className="app" ref={appRef}>
+            <DragDropContext onDragEnd={(dragInfo) => onDragEnd(dragInfo)} onDragStart={(dragInfo) => onDragStart(dragInfo)} onDragUpdate={(dragInfo) => onDragUpdate(dragInfo)}>
+                <ExpandingButtons vertical={true} alwaysOn={!board.childrens.array.length} buttons={['_Column', '_Swimlane']} parentId={board.id} addItem={functions.addItem} />
                 <Droppable droppableId={board.id} direction="horizontal" isDropDisabled={isDropDisabled.board}>
                     {(provided, snapshot) => (
                         <div
@@ -1107,7 +1162,7 @@ const Main = (props) => {
                             ref={provided.innerRef}
                             className={snapshot.isDraggingOver ? 'board-childrens column-visible' : 'board-childrens'}
                         >
-                            {board.childrens.array.map((children, index) => renderSwitch(children, index, isDropDisabled, board.id))}
+                            {board.childrens.array.map((children, index) => renderSwitch(children, index, isDropDisabled, board.id, placeholderProps))}
                             {provided.placeholder}
                         </div>
                     )}

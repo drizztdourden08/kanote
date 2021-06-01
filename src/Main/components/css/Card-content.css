@@ -1,26 +1,28 @@
 .content-element hr {
     width: 80%;
     height: 1px;
-    border: none;
     margin: 0 auto;
-    background: linear-gradient(to left, transparent, #f05d60 10%, #f05d60 90%, transparent);
+
+    background: linear-gradient(to left, transparent, #F05D60 10%, #F05D60 90%, transparent);
+    border: none;
 }
 
-.cTasklist {
+.content-tasklist {
     padding: 5px 10px;
 }
 
-.cTasklist-title {
-    padding: 0;
+.content-tasklist-title {
     margin: 0;
-    color: #ddd;
-    font-family: 'Roboto';
-    font-size: 1.5em;
+    padding: 0;
+
+    color: #DDD;
     font-weight: 400;
+    font-size: 1.5em;
+    font-family: 'Roboto', sans-serif;
     text-align: center;
 }
 
-.cTask {
+.content-task {
     padding-left: 10px;
 }
 
@@ -32,19 +34,23 @@
 
 input[type="checkbox"] {
     display: inline-flex;
-    width: 20px;
-    height: 20px;
     align-items: center;
     justify-content: center;
-    border: 1px solid #f05d60;
-    appearance: none;
+    width: 20px;
+    height: 20px;
+
+    border: 1px solid #F05D60;
     border-radius: 3px;
     outline: none;
+
+    appearance: none;
 }
 
 input[type="checkbox"]::after {
     display: block;
+
     color: transparent;
+
     content: '\2713';
 }
 
@@ -52,127 +58,139 @@ input[type="checkbox"]:checked {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background-color: #f05d60;
+
+    background-color: #F05D60;
     outline: none;
 }
 
 input[type="checkbox"]:checked::after {
     display: block;
-    color: #ddd;
-    content: '\2713';
-    font-size: 1em;
+
+    color: #DDD;
     font-weight: bold;
+    font-size: 1em;
+
+    content: '\2713';
 }
 
 input[type="checkbox"] + label {
-    color: #ddd;
-    font-family: 'Roboto';
-    font-size: 1em;
+    color: #DDD;
     font-weight: 100;
-}
-
-.cText {
-    padding: 5px 10px;
-    color: #ddd;
-    font-family: 'Roboto';
     font-size: 1em;
+    font-family: 'Roboto', sans-serif;
 }
 
-.cMarkdownText {
+.content-text {
     padding: 5px 10px;
-    font-family: 'Roboto';
-    font-weight: 100;
+
+    color: #DDD;
+    font-size: 1em;
+    font-family: 'Roboto', sans-serif;
 }
 
-.cMarkdownText ul {
-    padding-left: 0;
+.content-markdown-text {
+    padding: 5px 10px;
+
+    font-weight: 100;
+    font-family: 'Roboto', sans-serif;
+}
+
+.content-markdown-text ul {
     margin-right: 0;
+    padding-left: 0;
+
     list-style: none;
 }
 
-.cMarkdownText ul > li {
+.content-markdown-text ul > li {
     margin: 5px 0;
     margin-left: 15px;
 }
 
-.cMarkdownText ul li::before {
+.content-markdown-text ul li::before {
     display: inline-block;
     width: 2px;
     height: 2px;
-    padding: 0.1em;
-    border: 2px solid #f05d60;
     margin-right: 0.5em;
-    border-radius: 100%;
-    content: '';
+    padding: 0.1em;
+
     line-height: 1;
+
+    border: 2px solid #F05D60;
+    border-radius: 100%;
+
+    content: '';
 }
 
-.cMarkdownText a {
-    color: #f05d60;
+.content-markdown-text a {
+    color: #F05D60;
     font-weight: 500;
 }
 
-.cMarkdownText h1,
-.cMarkdownText h2,
-.cMarkdownText h3,
-.cMarkdownText h4,
-.cMarkdownText h5,
-.cMarkdownText h6 {
-    color: #f05d60;
+.content-markdown-text h1,
+.content-markdown-text h2,
+.content-markdown-text h3,
+.content-markdown-text h4,
+.content-markdown-text h5,
+.content-markdown-text h6 {
+    color: #F05D60;
     text-transform: uppercase;
 }
 
-.cMarkdownText h1 {
-    font-size: 2em;
+.content-markdown-text h1 {
     font-weight: 500;
+    font-size: 2em;
 }
 
-.cMarkdownText h2 {
-    font-size: 1.5em;
+.content-markdown-text h2 {
     font-weight: 400;
+    font-size: 1.5em;
 }
 
-.cMarkdownText h3 {
-    font-size: 1.25em;
+.content-markdown-text h3 {
     font-weight: 300;
+    font-size: 1.25em;
 }
 
-.cMarkdownText h4 {
-    font-size: 1.15em;
+.content-markdown-text h4 {
     font-weight: 250;
+    font-size: 1.15em;
 }
 
-.cMarkdownText h5 {
-    font-size: 1.1em;
+.content-markdown-text h5 {
     font-weight: 200;
+    font-size: 1.1em;
 }
 
-.cMarkdownText h6 {
-    font-size: 1.05em;
+.content-markdown-text h6 {
     font-weight: 100;
+    font-size: 1.05em;
 }
 
-.cMarkdownText blockquote {
+.content-markdown-text blockquote {
+    margin: 0;
     padding: 0;
     padding: 4px 10px;
-    border-left: 4px solid #f05d60;
-    margin: 0;
+
     background: #0003;
+    border-left: 4px solid #F05D60;
 }
 
-.cMarkdownText blockquote p {
-    padding: 0;
+.content-markdown-text blockquote p {
     margin: 0;
+    padding: 0;
 }
 
 table {
     position: relative;
+
     overflow: hidden;
+
     border-collapse: collapse;
 }
 
 table thead {
-    background: linear-gradient(45deg, #f05d60, #773032);
+    background: linear-gradient(45deg, #F05D60, #773032);
 }
 
 table tbody tr:nth-child(even) {
@@ -184,9 +202,12 @@ table tbody tr:nth-child(odd) {
 }
 
 table th,
-.cMarkdownText table td {
+.content-markdown-text table td {
+    position: relative;
+
     padding: 10px;
-    color: #fff;
+
+    color: #FFF;
 }
 
 table th {
@@ -197,22 +218,20 @@ table tbody tr:hover {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
-table tbody td {
-    position: relative;
-}
-
 table tbody td:hover::before {
     position: absolute;
-    z-index: -1;
     top: -9999px;
     right: 0;
     bottom: -9999px;
     left: 0;
+    z-index: -1;
+
     background-color: rgba(255, 255, 255, 0.2);
+
     content: "";
 }
 
-.cImage {
+.content-image {
     width: calc(100% - 20px);
     max-height: 150px;
     padding: 5px 10px;
