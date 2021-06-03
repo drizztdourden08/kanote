@@ -3,7 +3,7 @@ import { Droppable, Draggable } from 'react-beautiful-dnd';
 
 import Card from './Card';
 import ExpandingButtons from './ExpandingButtons';
-import './css/Column.css';
+import '../css/Column.css';
 
 import { BiDotsVerticalRounded } from 'react-icons/bi';
 import { RiCheckboxCircleLine, RiCloseCircleLine, RiArrowLeftCircleLine, RiArrowRightCircleLine } from 'react-icons/ri';

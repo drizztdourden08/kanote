@@ -5,7 +5,7 @@ import ExpandingButtons from './ExpandingButtons';
 
 import { RiLayoutRowLine } from 'react-icons/ri';
 
-import './css/Verticalgroup.css';
+import '../css/Verticalgroup.css';
 
 const VerticalGroup = (props) => {
     return (

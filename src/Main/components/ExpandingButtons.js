@@ -1,6 +1,6 @@
 import React from 'react';
 
-import './css/ExpandingButtons.css';
+import '../css/ExpandingButtons.css';
 
 import { BsCardHeading } from 'react-icons/bs';
 import { AiOutlineInsertRowAbove, AiOutlineInsertRowRight } from 'react-icons/ai';

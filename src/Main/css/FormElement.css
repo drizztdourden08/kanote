@@ -1,0 +1,58 @@
+.form-element-input {
+    display: flex;
+    align-items: stretch;
+    justify-content: flex-start;
+    margin: 5px;
+    padding: 4px 0;
+    padding-left: 4px;
+
+    color: #DDD;
+    font-size: 1.5em;
+
+    background: #41414A;
+    border: none;
+    border-radius: 5px;
+}
+
+.form-element-input input {
+    flex-grow: 1;
+    padding-left: 4px;
+
+    color: #DDD;
+    font-size: 18px;
+
+    background: none;
+    border: none;
+}
+
+.form-element-input input:focus {
+    background: none;
+    border: none;
+}
+
+.form-element-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 5px;
+
+    color: #DDD;
+    font-size: 1.5em;
+
+    border: none;
+    cursor: pointer;
+}
+
+.form-element-button-nostyle {
+    background: none;
+    border: none;
+}
+
+.form-element-acceptbutton:hover {
+    color: #7ADD7A;
+}
+
+.form-element-cancelbutton:hover {
+    color: #C91313;
+}

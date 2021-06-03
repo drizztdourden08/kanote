@@ -3,7 +3,7 @@ import { Draggable, Droppable } from 'react-beautiful-dnd';
 
 import ExpandingButtons from './ExpandingButtons';
 
-import './css/Swimlane.css';
+import '../css/Swimlane.css';
 
 const Swimlane = (props) => {
     return (

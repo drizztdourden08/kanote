@@ -9,7 +9,9 @@ import { mouseMoveDetect } from '../scripts/ElectronClickThrough';
 
 import { loremIpsum, name, surname } from 'react-lorem-ipsum';
 
-import './Main.css';
+import './css/Main.css';
+import './css/Board.css';
+import './css/General.css';
 
 import Verticalgroup from './components/Verticalgroup';
 import Swimlane from './components/Swimlane';
@@ -966,15 +968,15 @@ const Main = (props) => {
         return null;
     };
 
-    const getDraggedDom = (draggableId) => {
-        const queryAttr = 'data-rbd-draggable-id';
-        const domQuery = `[${queryAttr}='${draggableId}']`;
-        const draggedDom = document.querySelector(domQuery);
-        return draggedDom;
+    const getDragDropdDom = (queryAttr, Id) => {
+        const domQuery = `[${queryAttr}='${Id}']`;
+        const dragDropdDom = document.querySelector(domQuery);
+        return dragDropdDom;
     };
 
-    const setPlaceHolderPosition = (draggableId, sourceIndex, destinationIndex = null) => {
-        const draggedDom = getDraggedDom(draggableId);
+    const setPlaceHolderPosition = (draggableId, droppableId, sourceIndex, destinationIndex = null) => {
+        const draggedDom = getDragDropdDom('data-rbd-draggable-id', draggableId);
+        const droppedDom = getDragDropdDom('data-rbd-droppable-id', droppableId);
         if (!draggedDom) {
             return;
         }
@@ -988,6 +990,7 @@ const Main = (props) => {
             const movedItem = childrenArray[sourceIndex];
             childrenArray.splice(sourceIndex, 1);
 
+            if (draggableId !== droppableId) childrenArray = [...droppedDom.children];
             childrenArray = [
                 ...childrenArray.slice(0, destinationIndex),
                 movedItem,
@@ -1039,7 +1042,7 @@ const Main = (props) => {
 
         setIsDropDisabled({ board: board, verticalgroup: verticalgroup, swimlane: swimlane });
 
-        setPlaceHolderPosition(dragInfo.draggableId, dragInfo.source.index);
+        setPlaceHolderPosition(dragInfo.draggableId, null, dragInfo.source.index);
     };
 
     const onDragUpdate = (dragInfo) => {
@@ -1047,7 +1050,7 @@ const Main = (props) => {
             return;
         }
 
-        setPlaceHolderPosition(dragInfo.draggableId, dragInfo.source.index, dragInfo.destination.index);
+        setPlaceHolderPosition(dragInfo.draggableId, dragInfo.destination.droppableId, dragInfo.source.index, dragInfo.destination.index);
     };
 
     const onDragEnd = (dragInfo) => {
@@ -1152,7 +1155,7 @@ const Main = (props) => {
     };
 
     return (
-        <div className="app" ref={appRef}>
+        <div className="board" ref={appRef}>
             <DragDropContext onDragEnd={(dragInfo) => onDragEnd(dragInfo)} onDragStart={(dragInfo) => onDragStart(dragInfo)} onDragUpdate={(dragInfo) => onDragUpdate(dragInfo)}>
                 <ExpandingButtons vertical={true} alwaysOn={!board.childrens.array.length} buttons={['_Column', '_Swimlane']} parentId={board.id} addItem={functions.addItem} />
                 <Droppable droppableId={board.id} direction="horizontal" isDropDisabled={isDropDisabled.board}>
@@ -1160,7 +1163,7 @@ const Main = (props) => {
                         <div
                             {...provided.droppableProps}
                             ref={provided.innerRef}
-                            className={snapshot.isDraggingOver ? 'board-childrens column-visible' : 'board-childrens'}
+                            className={snapshot.isDraggingOver ? 'board-childrens' : 'board-childrens'}
                         >
                             {board.childrens.array.map((children, index) => renderSwitch(children, index, isDropDisabled, board.id, placeholderProps))}
                             {provided.placeholder}

@@ -1,0 +1,15 @@
+.board {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    box-sizing: border-box;
+    padding-top: 20px;
+
+    color: #CCC;
+}
+
+.board-childrens {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}

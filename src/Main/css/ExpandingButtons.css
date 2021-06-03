@@ -48,11 +48,14 @@
 .expanding-add-button-vertical-alwayson { width: 30px; }
 
 .expanding-add-button button {
+    color: white;
     font-size: 1.5em;
     line-height: 0.9em;
 
+    background: none;
     border: none;
     cursor: pointer;
+    filter: drop-shadow(0 0 2px #222);
 }
 
 .expanding-add-button::before,
