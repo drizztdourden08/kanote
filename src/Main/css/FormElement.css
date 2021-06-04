@@ -147,10 +147,6 @@
 
 .form-element-select .dropdown-select__menu {
     background: #41414A;
-
-    overflow: visible;
-
-    z-index: 999999;
 }
 
 .dropdown-select__option {
