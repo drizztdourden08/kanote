@@ -30,6 +30,8 @@
 }
 
 .card-header-main {
+    position: relative;
+
     display: flex;
     flex-direction: column;
     grid-row: 1;
@@ -82,11 +84,20 @@
     box-shadow: inset 0 0 5px #222, inset -10px -40px 50px #222;
 }
 
+.card-header-main .form-element {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
 .card-options {
     padding: 5px;
+    overflow: hidden;
 
     background: #491B1B;
     box-shadow: inset 0 0 10px #000;
+
+    transition: height 0.5s, padding 0.5s;
 }
 
 .card-options h3 {

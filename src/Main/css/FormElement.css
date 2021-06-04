@@ -1,13 +1,18 @@
+.form-element {
+    display: flex;
+    justify-content: stretch;
+}
+
 .form-element-input {
     display: flex;
     align-items: stretch;
     justify-content: flex-start;
     margin: 5px;
-    padding: 4px 0;
+    padding: 4px;
     padding-left: 4px;
 
     color: #DDD;
-    font-size: 1.5em;
+    font-size: 24px;
 
     background: #41414A;
     border: none;
@@ -34,19 +39,20 @@
     display: flex;
     align-items: center;
     justify-content: center;
-
     margin: 5px;
+    padding: 3px;
 
     color: #DDD;
-    font-size: 1.5em;
+    font-size: 24px;
 
-    border: none;
+    background: #222;
+    border: solid 1px #F05D60;
     cursor: pointer;
 }
 
 .form-element-button-nostyle {
     background: none;
-    border: none;
+    border: solid 1px transparent;
 }
 
 .form-element-acceptbutton:hover {
@@ -55,4 +61,106 @@
 
 .form-element-cancelbutton:hover {
     color: #C91313;
+}
+
+.form-element-button:active {
+    color: #000;
+}
+
+.form-element-select {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    align-items: center;
+    margin: 5px;
+    padding: 4px 0;
+    padding-left: 4px;
+
+    color: #DDD;
+    font-size: 24px;
+
+    background: #41414A;
+    border: none;
+    border-radius: 5px;
+}
+
+.form-element-select .dropdown-select-container {
+    flex-grow: 1;
+    height: auto;
+
+    color: #DDD;
+    font-size: 18px;
+
+    background: none;
+}
+
+.form-element-select .dropdown-select__control {
+    flex-grow: 1;
+    min-height: auto;
+
+    color: #DDD;
+    font-size: 18px;
+
+    background: none;
+    border: none;
+}
+
+.form-element-select .dropdown-select__control--is-focused {
+    flex-grow: 1;
+
+    color: #DDD;
+    font-size: 18px;
+
+    box-shadow: none;
+}
+
+.form-element-select .dropdown-select__value-container {
+    padding: 0;
+    padding-left: 2px;
+}
+
+.form-element-select .css-b8ldur-Input {
+    margin: 0;
+    padding: 0;
+}
+
+.form-element-select .dropdown-select__input,
+.form-element-select .dropdown-select__single-value {
+    margin: 0;
+    padding: 0;
+
+    color: #DDD;
+}
+
+.form-element-select .dropdown-select__indicator {
+    padding: 0 4px;
+
+    color: #F05D60;
+}
+
+.dropdown-select__indicator-separator {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+
+    background-color: #F05D60 !important;
+}
+
+.form-element-select .dropdown-select__menu {
+    background: #41414A;
+
+    overflow: visible;
+
+    z-index: 999999;
+}
+
+.dropdown-select__option {
+    /* d */
+}
+
+.form-element-select .dropdown-select__option--is-focused {
+    background-color: #202024;
+}
+
+.dropdown-select__option--is-selected {
+    background-color: #F05D60 !important;
 }

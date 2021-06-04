@@ -8,7 +8,7 @@ import { AiFillTag } from 'react-icons/ai';
 import { BiImage } from 'react-icons/bi';
 import { MdLowPriority } from 'react-icons/md';
 import { TiCancel } from 'react-icons/ti';
-import { IoCheckmarkSharp } from 'react-icons/io5';
+import { IoCheckmarkSharp, IoOptions } from 'react-icons/io5';
 
 const Icon = (props) => {
     switch (props.iconName) {
@@ -17,36 +17,41 @@ const Icon = (props) => {
         case 'MdLowPriority': return <MdLowPriority />;
         case 'TiCancel': return <TiCancel />;
         case 'IoCheckmarkSharp': return <IoCheckmarkSharp />;
+        case 'IoOptions': return <IoOptions />;
         default: break;
     }
 };
 
 const Input = (props) => {
     return (
-        <div className="form-element-input">
-            <Icon iconName={props.iconName} />
-            <input type="text" />
+        <div className="form-element">
+            <div className="form-element-input">
+                <Icon iconName={props.iconName} />
+                <input type="text" />
+            </div>
         </div>
     );
 };
 
 const DropDown = (props) => {
     return (
-        <div className="form-element-select">
-            <Icon iconName={props.iconName} />
-            <Select options={[
-                { value: 'High', label: 'High' },
-                { value: 'Medium', label: 'Medium' },
-                { value: 'Low', label: 'Low' }
-            ]} />
+        <div className="form-element">
+            <div className="form-element-select">
+                <Icon iconName={props.iconName} />
+                <Select className="dropdown-select-container" classNamePrefix="dropdown-select" options={[
+                    { value: 'High', label: 'High' },
+                    { value: 'Medium', label: 'Medium' },
+                    { value: 'Low', label: 'Low' }
+                ]} />
 
+            </div>
         </div>
     );
 };
 
 const Button = (props) => {
     let iconName, text;
-    let classes = 'form-element-button';
+    let classes;
     if (props.noStyle) classes += ' form-element-button-nostyle';
     switch (props.specialStyle) {
         case 'AcceptButton':
@@ -64,8 +69,11 @@ const Button = (props) => {
             text = props.text;
             break;
     }
+    classes += ' form-element-button';
     return (
-        <button className={classes}><Icon iconName={iconName} />{text}</button>
+        <div className="form-element">
+            <button className={classes} onClick={props.onClick}><Icon iconName={iconName} />{text}</button>
+        </div>
     );
 };
 

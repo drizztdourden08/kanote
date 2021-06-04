@@ -1,7 +1,13 @@
 button,
 input,
 input[type="text"],
-input[type="button"],
+input[type="button"] {
+    margin: 0;
+    padding: 0;
+
+    outline: none;
+}
+
 button:focus,
 input:focus,
 input[type="text"]:focus,
@@ -10,11 +16,5 @@ button:active,
 input:active,
 input[type="text"]:active,
 input[type="button"]:active {
-    color: #FFF;
-
-    background: #222;
-
-    border: solid 1px #F05D60;
-    border-radius: 0;
     outline: none;
 }

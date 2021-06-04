@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 
 import '../css/Card.css';
@@ -13,6 +13,21 @@ import { IoCheckmarkSharp } from 'react-icons/io5';
 import { TiCancel } from 'react-icons/ti';
 
 const Card = (props) => {
+    const optionBlockRef = useRef(null);
+    const [isEditingHidden, setisEditingHidden] = useState(true);
+
+    const getTotalHeightOfChilds = (domRef) => {
+        let totalHeight = 0;
+        const childrenArray = [...domRef.current.children];
+        childrenArray.forEach(element => {
+            totalHeight += element.offsetHeight;
+            var style = window.getComputedStyle ? getComputedStyle(element, null) : element.currentStyle;
+            totalHeight += (parseFloat(style.marginTop) || 0) + (parseFloat(style.marginBottom) || 0);
+        });
+
+        return totalHeight;
+    };
+
     return (
         <Draggable key={props.card.id} draggableId={props.card.id} index={props.index} >
             {(provided, snapshot) => (
@@ -37,10 +52,11 @@ const Card = (props) => {
                                         </div>
                                         : undefined
                                 }
+                                <Button iconName="IoOptions" noStyle={true} onClick={() => setisEditingHidden(!isEditingHidden)} />
                             </div>
                         </div>
 
-                        <div className="card-options">
+                        <div ref={optionBlockRef} className="card-options" style={isEditingHidden ? { height: 0, paddingTop: 0, paddingBottom: 0 } : { height: getTotalHeightOfChilds(optionBlockRef), paddingTop: 5, paddingBottom: 5 }}>
                             <h3>Edit Card</h3>
                             <Input iconName="AiFillTag" />
                             <Input iconName="BiImage" />
