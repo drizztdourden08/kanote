@@ -1,23 +1,25 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
+import { Transition } from 'react-transition-group';
+import { ContentElement } from './ContentElements';
+import ExpandingButtons from './ExpandingButtons';
+import { Input, DropDown, Button } from './FormElements';
 
 import '../css/Card.css';
 import '../css/Card-content.css';
 
-import ExpandingButtons from './ExpandingButtons';
-import { Input, DropDown, Button } from './FormElement';
 
-import { BiDotsVerticalRounded, BiCommentDetail, BiImageAlt } from 'react-icons/bi';
-import { MdTitle } from 'react-icons/md';
-import { IoCheckmarkSharp } from 'react-icons/io5';
-import { TiCancel } from 'react-icons/ti';
+import { BiCommentDetail } from 'react-icons/bi';
 
 const Card = (props) => {
     const optionBlockRef = useRef(null);
-    const [isEditingHidden, setisEditingHidden] = useState(true);
+    const [isEditing, setisEditing] = useState(false);
 
     const getTotalHeightOfChilds = (domRef) => {
         let totalHeight = 0;
+
+        if (!domRef.current) return;
+
         const childrenArray = [...domRef.current.children];
         childrenArray.forEach(element => {
             totalHeight += element.offsetHeight;
@@ -27,6 +29,17 @@ const Card = (props) => {
 
         return totalHeight;
     };
+
+    const OptionsTransitionStyles = (state) => {
+        switch (state) {
+            case 'entering': return { transition: 'height 0.25s, padding 0.25s', height: getTotalHeightOfChilds(optionBlockRef), overflow: 'hidden', paddingTop: 5, paddingBottom: 5 };
+            case 'entered': return { height: getTotalHeightOfChilds(optionBlockRef), overflow: 'visible', paddingTop: 5, paddingBottom: 5 };
+            case 'exiting': return { transition: 'height 0.25s 0.3s, padding 0.25s 0.3s', height: 0, overflow: 'hidden', paddingTop: 0, paddingBottom: 0 };
+            case 'exited': return { height: 0, overflow: 'hidden', paddingTop: 0, paddingBottom: 0 };
+            default: break;
+        }
+    };
+
 
     return (
         <Draggable key={props.card.id} draggableId={props.card.id} index={props.index} >
@@ -52,22 +65,59 @@ const Card = (props) => {
                                         </div>
                                         : undefined
                                 }
-                                <Button iconName="IoOptions" noStyle={true} onClick={() => setisEditingHidden(!isEditingHidden)} />
+                                <Button iconName="IoOptions" noStyle={true} onClick={() => setisEditing(!isEditing)} />
                             </div>
                         </div>
-
-                        <div ref={optionBlockRef} className="card-options" style={isEditingHidden ? { height: 0, paddingTop: 0, paddingBottom: 0 } : { height: getTotalHeightOfChilds(optionBlockRef), paddingTop: 5, paddingBottom: 5 }}>
-                            <h3>Edit Card</h3>
-                            <Input iconName="AiFillTag" />
-                            <Input iconName="BiImage" />
-                            <DropDown iconName="MdLowPriority" />
-                            <div className="acceptance-buttons">
-                                <Button specialStyle="CancelButton" />
-                                <Button specialStyle="AcceptButton" />
-                            </div>
-                        </div>
+                        <Transition in={isEditing} timeout={500}>
+                            {stateParent => (
+                                <div
+                                    className="card-options"
+                                    style={{ ...OptionsTransitionStyles(stateParent) }} >
+                                    <Transition in={isEditing} timeout={1500}>
+                                        {stateChildren => (
+                                            <div
+                                                ref={optionBlockRef}
+                                                className="card-options-childrens"
+                                                style={
+                                                    { ...{
+                                                        entering: { transition: 'opacity 0.25s 0.3s', opacity: 1 }
+                                                        ,entered: { opacity: 1 }
+                                                        , exiting: { transition: 'opacity 0.25s', opacity: 0 }
+                                                        , exited: { opacity: 0 }
+                                                    }[stateChildren] }
+                                                }>
+                                                <h3>Edit Card</h3>
+                                                <Input iconName="AiFillTag" />
+                                                <Input iconName="BiImage" />
+                                                <DropDown iconName="MdLowPriority" />
+                                                <div className="acceptance-buttons">
+                                                    <Button specialStyle="CancelButton" />
+                                                    <Button specialStyle="AcceptButton" />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </Transition>
+                                </div>
+                            )}
+                        </Transition>
                         <div className="card-content">
-
+                            <div className="card-content-add">
+                                <ExpandingButtons type="CardContent" vertical={false} alwaysOn={true} buttons={['_cTaskList', '_cText', '_cMarkdownText', '_cImage']} addContentItem={props.functions.addContentItem} cardId={props.card.id} />
+                            </div>
+                            {props.card.content ?
+                                <div className="card-content-childrens">
+                                    {props.card.content.array.length > 0 ? props.card.content.array.map((element, index) => {
+                                        return (
+                                            <div className="content-element" key={index}>
+                                                <ContentElement content={element} />
+                                                <hr />
+                                            </div>
+                                        );
+                                    })
+                                        : undefined}
+                                </div>
+                                : undefined
+                            }
                         </div>
                         <div className="card-footer">
                             <div className="card-footer-left">
@@ -90,71 +140,6 @@ const Card = (props) => {
                             </div>
                             <div className="card-footer-notes-counter"><BiCommentDetail /><span>{props.card.comments.array.length}</span></div>
                         </div>
-                        {/*
-
-                            <div className="card-main">
-                                <div className="card-main-wrapper">
-
-                                    <div className="card-editing" >
-                                        <button className="standard-button" onClick={() => props.functions.updateCard(props.functions.getParentId('COLUMN', props.card.columnId), props.card.columnId, props.card.id, [{ 'property': 'editing', 'newValue': !props.card.editing }])} ><BiDotsVerticalRounded /></button>
-                                    </div>
-                                </div>
-                            </div>
-
-                        <div className="card-wrapper2">
-                            <div className="card-field">
-                                <MdTitle />
-                                <input type="text" value={props.card.title} onChange={event => props.functions.updateCard(props.functions.getParentId('COLUMN', props.card.columnId), props.card.columnId, props.card.id, [{ 'property': 'title', 'newValue': event.target.value }])} />
-                            </div>
-                            <div className="card-field">
-                                <BiImageAlt />
-                                <input type="text" value={props.card.image} onChange={event => props.functions.updateCard(props.functions.getParentId('COLUMN', props.card.columnId), props.card.columnId, props.card.id, [{ 'property': 'image', 'newValue': event.target.value }])} />
-                            </div>
-                            <div className="card-field">
-                                <BiImageAlt />
-                                <input type="text" name="priority" value={props.card.priority} onChange={event => props.functions.updateCard(props.functions.getParentId('COLUMN', props.card.columnId), props.card.columnId, props.card.id, [{ 'property': 'priority', 'newValue': event.target.value }])} />
-                                <datalist id="priority">
-                                    <option value="Boston" />
-                                    <option value="Cambridge" />
-                                </datalist>
-                            </div>
-                        </div>
-                        {props.card.content.length > 0 ?
-                            <div className="card-content">
-                                {props.card.content.array.map((element, index) => {
-                                    return (
-                                        <div className="content-element" key={index}>
-                                            {props.functions.returnContentElement(element, index)}
-                                            <hr />
-                                        </div>
-                                    );
-                                })
-                                }
-                            </div>
-                            : undefined
-                        }
-
-                        <div className="card-footer">
-                            <div className="card-footer-left">
-                                {props.card.tags.length > 0 ?
-                                    <div className="card-tags">
-                                        {props.card.tags.array.map((tag, index) =>
-                                            <div key={index} className="tag">{tag}</div>)}
-                                    </div>
-                                    : undefined
-                                }
-                                {props.card.assignees.length > 0 ?
-                                    <div className="card-footer-assignees">
-                                        {props.card.assignees.array.map((assignee, index) =>
-                                            <div className="assignee-wrapper" key={index}>
-                                                <div className="assignee" style={{ background: assignee.color }}>{assignee.initial}</div>
-                                            </div>)}
-                                    </div>
-                                    : undefined
-                                }
-                            </div>
-                            <div className="card-footer-notes-counter"><BiCommentDetail /><span>{props.card.comments.array.length}</span></div>
-                        </div> */}
                     </div>
                     <ExpandingButtons vertical={false} alwaysOn={false} buttons={['_Card']} parentId={props.parentId} addItem={props.functions.addItem} insertAt={props.index + 1} />
                 </div>

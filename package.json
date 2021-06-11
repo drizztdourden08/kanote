@@ -1,6 +1,6 @@
 {
   "name": "kanote",
-  "version": "0.1.335",
+  "version": "0.1.338",
   "private": true,
   "description": "Kaban Board Quick personal app",
   "author": "Johnny Prescott",
@@ -27,6 +27,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "^4.0.3",
     "react-select": "^4.3.1",
+    "react-transition-group": "^4.4.2",
     "remark-gfm": "^1.0.0",
     "uuid": "^8.3.2",
     "wait-on": "^5.3.0",
