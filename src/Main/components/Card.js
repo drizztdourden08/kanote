@@ -68,38 +68,40 @@ const Card = (props) => {
                                 <Button iconName="IoOptions" noStyle={true} onClick={() => setisEditing(!isEditing)} />
                             </div>
                         </div>
-                        <Transition in={isEditing} timeout={500}>
-                            {stateParent => (
-                                <div
-                                    className="card-options"
-                                    style={{ ...OptionsTransitionStyles(stateParent) }} >
-                                    <Transition in={isEditing} timeout={1500}>
-                                        {stateChildren => (
-                                            <div
-                                                ref={optionBlockRef}
-                                                className="card-options-childrens"
-                                                style={
-                                                    { ...{
-                                                        entering: { transition: 'opacity 0.25s 0.3s', opacity: 1 }
-                                                        ,entered: { opacity: 1 }
-                                                        , exiting: { transition: 'opacity 0.25s', opacity: 0 }
-                                                        , exited: { opacity: 0 }
-                                                    }[stateChildren] }
-                                                }>
-                                                <h3>Edit Card</h3>
-                                                <Input iconName="AiFillTag" />
-                                                <Input iconName="BiImage" />
-                                                <DropDown iconName="MdLowPriority" />
-                                                <div className="acceptance-buttons">
-                                                    <Button specialStyle="CancelButton" />
-                                                    <Button specialStyle="AcceptButton" />
+                        {!snapshot.isDragging ? //Fixing lag problem by disabling this while dragging
+                            <Transition in={isEditing} timeout={500}>
+                                {stateParent => (
+                                    <div
+                                        className="card-options"
+                                        style={{ ...OptionsTransitionStyles(stateParent) }} >
+                                        <Transition in={isEditing} timeout={1500}>
+                                            {stateChildren => (
+                                                <div
+                                                    ref={optionBlockRef}
+                                                    className="card-options-childrens"
+                                                    style={
+                                                        { ...{
+                                                            entering: { transition: 'opacity 0.25s 0.3s', opacity: 1 }
+                                                            ,entered: { opacity: 1 }
+                                                            , exiting: { transition: 'opacity 0.25s', opacity: 0 }
+                                                            , exited: { opacity: 0 }
+                                                        }[stateChildren] }
+                                                    }>
+                                                    <h3>Edit Card</h3>
+                                                    <Input iconName="AiFillTag" />
+                                                    <Input iconName="BiImage" />
+                                                    <DropDown iconName="MdLowPriority" />
+                                                    <div className="acceptance-buttons">
+                                                        <Button specialStyle="CancelButton" />
+                                                        <Button specialStyle="AcceptButton" />
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        )}
-                                    </Transition>
-                                </div>
-                            )}
-                        </Transition>
+                                            )}
+                                        </Transition>
+                                    </div>
+                                )}
+                            </Transition>
+                            : undefined}
                         <div className="card-content">
                             <div className="card-content-add">
                                 <ExpandingButtons type="CardContent" vertical={false} alwaysOn={true} buttons={['_cTaskList', '_cText', '_cMarkdownText', '_cImage']} addContentItem={props.functions.addContentItem} cardId={props.card.id} />

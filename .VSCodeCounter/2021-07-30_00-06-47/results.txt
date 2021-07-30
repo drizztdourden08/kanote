@@ -1,0 +1,75 @@
+Date : 2021-07-30 00:06:47
+Directory : e:\Coding\kanote
+Total : 38 files,  49928 codes, 159 comments, 588 blanks, all 50675 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| JSON       |          3 |     47,206 |          0 |          3 |     47,209 |
+| JavaScript |         19 |      1,817 |         49 |        312 |      2,178 |
+| CSS        |         13 |        843 |         87 |        240 |      1,170 |
+| Markdown   |          1 |         41 |          0 |         32 |         73 |
+| HTML       |          1 |         20 |         23 |          1 |         44 |
+| XML        |          1 |          1 |          0 |          0 |          1 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++----------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                     | files      | code       | comment    | blank      | total      |
++----------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                        |         38 |     49,928 |        159 |        588 |     50,675 |
+| public                                                   |          4 |        270 |         24 |         55 |        349 |
+| public\scripts                                           |          1 |         44 |          0 |         12 |         56 |
+| src                                                      |         31 |      2,436 |        135 |        499 |      3,070 |
+| src\handle                                               |          2 |        145 |          0 |         39 |        184 |
+| src\main                                                 |         19 |      2,174 |        126 |        435 |      2,735 |
+| src\main\components                                      |          8 |        513 |          1 |         53 |        567 |
+| src\main\css                                             |         10 |        731 |         87 |        209 |      1,027 |
+| src\scripts                                              |          2 |         37 |          0 |          5 |         42 |
++----------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++----------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                 | language   | code       | comment    | blank      | total      |
++----------------------------------------------------------+------------+------------+------------+------------+------------+
+| e:\Coding\kanote\README.md                               | Markdown   |         41 |          0 |         32 |         73 |
+| e:\Coding\kanote\package-lock.json                       | JSON       |     46,972 |          0 |          1 |     46,973 |
+| e:\Coding\kanote\package.json                            | JSON       |        209 |          0 |          1 |        210 |
+| e:\Coding\kanote\public\electron.js                      | JavaScript |        181 |          1 |         41 |        223 |
+| e:\Coding\kanote\public\index.html                       | HTML       |         20 |         23 |          1 |         44 |
+| e:\Coding\kanote\public\manifest.json                    | JSON       |         25 |          0 |          1 |         26 |
+| e:\Coding\kanote\public\scripts\DataManagement.js        | JavaScript |         44 |          0 |         12 |         56 |
+| e:\Coding\kanote\src\App.css                             | CSS        |          0 |          0 |          1 |          1 |
+| e:\Coding\kanote\src\App.js                              | JavaScript |         21 |          0 |          8 |         29 |
+| e:\Coding\kanote\src\App.test.js                         | JavaScript |          7 |          0 |          2 |          9 |
+| e:\Coding\kanote\src\handle\Handle.css                   | CSS        |         86 |          0 |         27 |        113 |
+| e:\Coding\kanote\src\handle\Handle.js                    | JavaScript |         59 |          0 |         12 |         71 |
+| e:\Coding\kanote\src\index.css                           | CSS        |         26 |          0 |          3 |         29 |
+| e:\Coding\kanote\src\index.js                            | JavaScript |         12 |          4 |          3 |         19 |
+| e:\Coding\kanote\src\logo.svg                            | XML        |          1 |          0 |          0 |          1 |
+| e:\Coding\kanote\src\main\Main.js                        | JavaScript |        930 |         38 |        173 |      1,141 |
+| e:\Coding\kanote\src\main\components\Card.js             | JavaScript |        141 |          0 |         14 |        155 |
+| e:\Coding\kanote\src\main\components\CodeBlock.js        | JavaScript |         11 |          0 |          2 |         13 |
+| e:\Coding\kanote\src\main\components\Column.js           | JavaScript |         81 |          0 |          5 |         86 |
+| e:\Coding\kanote\src\main\components\ContentElements.js  | JavaScript |         72 |          0 |          8 |         80 |
+| e:\Coding\kanote\src\main\components\ExpandingButtons.js | JavaScript |         58 |          0 |          7 |         65 |
+| e:\Coding\kanote\src\main\components\FormElements.js     | JavaScript |         71 |          1 |          8 |         80 |
+| e:\Coding\kanote\src\main\components\Swimlane.js         | JavaScript |         41 |          0 |          4 |         45 |
+| e:\Coding\kanote\src\main\components\Verticalgroup.js    | JavaScript |         38 |          0 |          5 |         43 |
+| e:\Coding\kanote\src\main\css\Board.css                  | CSS        |         13 |          0 |          3 |         16 |
+| e:\Coding\kanote\src\main\css\Card-content.css           | CSS        |        187 |          0 |         57 |        244 |
+| e:\Coding\kanote\src\main\css\Card.css                   | CSS        |        128 |         81 |         31 |        240 |
+| e:\Coding\kanote\src\main\css\Column.css                 | CSS        |         72 |          1 |         18 |         91 |
+| e:\Coding\kanote\src\main\css\ExpandingButtons.css       | CSS        |         99 |          0 |         32 |        131 |
+| e:\Coding\kanote\src\main\css\FormElement.css            | CSS        |        123 |          1 |         39 |        163 |
+| e:\Coding\kanote\src\main\css\General.css                | CSS        |         18 |          0 |          3 |         21 |
+| e:\Coding\kanote\src\main\css\Main.css                   | CSS        |         23 |          4 |         10 |         37 |
+| e:\Coding\kanote\src\main\css\Swimlane.css               | CSS        |         44 |          0 |          9 |         53 |
+| e:\Coding\kanote\src\main\css\Verticalgroup.css          | CSS        |         24 |          0 |          7 |         31 |
+| e:\Coding\kanote\src\reportWebVitals.js                  | JavaScript |         12 |          1 |          2 |         15 |
+| e:\Coding\kanote\src\scripts\DateTime.js                 | JavaScript |         21 |          0 |          1 |         22 |
+| e:\Coding\kanote\src\scripts\ElectronClickThrough.js     | JavaScript |         16 |          0 |          4 |         20 |
+| e:\Coding\kanote\src\setupTests.js                       | JavaScript |          1 |          4 |          1 |          6 |
+| Total                                                    |            |     49,928 |        159 |        588 |     50,675 |
++----------------------------------------------------------+------------+------------+------------+------------+------------+
