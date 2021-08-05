@@ -63,8 +63,8 @@ class Color {
 }
 
 class ArrayOf {
-    constructor(objTypes) {
-        this.value = [];
+    constructor(objTypes, value = []) {
+        this.value = value;
         this.objTypes = objTypes;
     }
 
@@ -118,7 +118,7 @@ class _Board {
         this.id = uuidv4();
         this._title = 'Board ' + Math.floor(Math.random() * Math.floor(100)) + '';
         this._childrens = new ArrayOf(['_Swimlane', '_Column', '_VerticalGroup']);
-        this._priorities = new ArrayOf(['_Priority']);
+        this._priorities = new ArrayOf(['_Priority'], [new _Priority('High'), new _Priority('Medium'), new _Priority('Low')]);
         this._tags = new ArrayOf(['_Tag']);
     }
 
@@ -209,7 +209,7 @@ class _Column {
         this.editing = false;
         this.toDelete = false;
         this.cancelChanges = false;
-        this.originalColumn = {};
+        this.original = {};
     }
 
     set title(value) {
@@ -287,7 +287,7 @@ class _Card {
         this.editing = false;
         this.toDelete = false;
         this.cancelChanges = false;
-        this.originalCard = {};
+        this.original = {};
     }
 
     set title(value) {
@@ -379,9 +379,9 @@ class _Card {
 }
 
 class _Priority {
-    constructor() {
+    constructor(title) {
         this.id = uuidv4();
-        this._title = ['High', 'Medium', 'Low'][Math.floor(Math.random() * Math.floor(3))];
+        this._title = title;
         this._color = new Color(Math.floor(Math.random() * 16777215).toString(16));
         this._level = Math.floor(Math.random() * Math.floor(10));
     }
@@ -766,7 +766,7 @@ const Main = (props) => {
                     functions.forEach((f) => {
                         switch (f.functionName) {
                             case 'set':
-                                results.push(objects[i - 1][0][f.arguments[1]] = f.arguments[0]);
+                                results.push(objects[i - 1][0][f.arguments[0]] = f.arguments[1]);
                                 break;
                             default:
                                 results.push(objects[i - 1][0].childrens[f.functionName](...f.arguments));
@@ -855,79 +855,17 @@ const Main = (props) => {
     };
 
     const updateItem = (itemId, newProps) => {
-        const tempBoard = new _Board();
-        Object.assign(tempBoard, board);
-    };
-
-    const updateColumn = (swimlaneId, columnId, newProps) => {
-        const tempBoard = new _Board();
+        let tempBoard = new _Board();
         Object.assign(tempBoard, board);
 
-        const [swimlane, sIndex] = tempBoard.childrens.extract(swimlaneId);
-        const [column, cIndex] = swimlane.columns.extract(columnId);
+        const targetInfo = getElementInfo(itemId);
 
         newProps.map((prop) => {
-            column[prop.property] = prop.newValue;
-            if (prop.property === 'editing' && prop.newValue === true) column.originalColumn = { ...column };
+            [tempBoard] = modifySubItem(tempBoard, targetInfo, [{ functionName: 'set', arguments: [prop.property, prop.newValue] }]);
         });
-
-        if (!column.toDelete) {
-            if (column.cancelChanges) {
-                column.title = column.originalColumn.title;
-                column.originalColumn = {};
-                column.cancelChanges = false;
-            }
-
-            let moveMod = 0;
-            if (column.moveColumnBy !== 0 && (((cIndex + column.moveColumnBy) >= 0) && ((cIndex + column.moveColumnBy) <= swimlane.columns.length))) {
-                //If moveColumnBy is required
-                moveMod = column.moveColumnBy;
-                column.moveColumnBy = 0;
-            }
-
-            // eslint-disable-next-line no-constant-condition
-            if (true) {
-                //If moveSwimlaneBy is required
-            }
-
-            swimlane.columns.insert(column, cIndex + moveMod);
-        }
-        tempBoard.childrens.insert(swimlane, sIndex);
 
         setBoard(tempBoard);
     };
-
-    const updateCard = (swimlaneId, columnId, cardId, newProps) => {
-        const tempBoard = new _Board();
-        Object.assign(tempBoard, board);
-
-        console.log('sl: ', swimlaneId, ' c: ', columnId, 'ca: ', cardId, 'np: ', newProps);
-        const sIndex = tempBoard.childrens.findIndex((s) => s.id === swimlaneId);
-        if (sIndex > -1) {
-            const swimlane = tempBoard.childrens.splice(sIndex, 1)[0];
-
-            const cIndex = swimlane.columns.findIndex((c) => c.id === columnId);
-            if (cIndex > -1) {
-                const column = swimlane.columns.splice(cIndex, 1)[0];
-
-                const caIndex = column.cards.findIndex((ca) => ca.id === cardId);
-                if (caIndex > -1) {
-                    const card = column.cards.splice(caIndex, 1)[0];
-
-                    newProps.map((prop) => {
-                        card[prop.property] = prop.newValue;
-                        if (prop.property === 'editing' && prop.newValue === true) column.originalColumn = { ...column };
-                    });
-
-                    column.cards.splice(caIndex, 0, card);
-                    swimlane.columns.splice(cIndex, 0, column);
-                    tempBoard.childrens.splice(sIndex, 0, swimlane);
-                    setBoard(tempBoard);
-                } else console.log('undefined card: ' + columnId);
-            } else console.log('undefined column: ' + columnId);
-        } else console.log('undefined Swimlane: ' + swimlaneId);
-    };
-
 
     const addContentItem = (itemType, cardId, index) => {
         const card = getElementInfo(cardId);
@@ -1102,7 +1040,7 @@ const Main = (props) => {
             case '_VerticalGroup':
                 return <Verticalgroup functions={functions} verticalgroup={children} key={index} index={index} isDropDisabled={isDropDisabled} parentId={parentId} placeholderprops={placeholderprops} />;
             case '_Column':
-                return <Column functions={functions} column={children} key={index} index={index} isDropDisabled={isDropDisabled} parentId={parentId} placeholderprops={placeholderprops} />;
+                return <Column functions={functions} column={children} key={index} index={index} isDropDisabled={isDropDisabled} parentId={parentId} placeholderprops={placeholderprops} priorities={board.priorities} tags={board.tags} />;
             default:
                 return undefined;
         }
@@ -1110,8 +1048,7 @@ const Main = (props) => {
 
     const functions = {
         'addItem': (itemType, parentId, index) => addItem(itemType, parentId, index),
-        'updateColumn': (swimlaneId, columnId, newprops) => updateColumn(swimlaneId, columnId, newprops),
-        'updateCard': (swimlaneId, columnId, cardId, newprops) => updateCard(swimlaneId, columnId, cardId, newprops),
+        'updateItem': (itemId, newProps) => updateItem(itemId, newProps),
         'getElementInfo': (sourceType, id) => getElementInfo(sourceType, id),
         'renderSwitch': (children, index, isDropDisabled, parentId, placeholderprops) => renderSwitch(children, index, isDropDisabled, parentId, placeholderprops),
         'addContentItem': (itemType, cardId, index) => addContentItem(itemType, cardId, index)

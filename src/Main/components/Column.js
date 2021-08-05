@@ -58,7 +58,7 @@ const Column = (props) => {
                                     ref={provided.innerRef}
                                     className={snapshot.isDraggingOver ? 'column-childrens column-visible' : 'column-childrens'}
                                 >
-                                    {props.column.childrens ? props.column.childrens.array.map((c, index) => (<Card functions={props.functions} card={c} key={index} index={index} parentId={props.column.id} />)) : null}
+                                    {props.column.childrens ? props.column.childrens.array.map((c, index) => (<Card functions={props.functions} card={c} key={index} index={index} parentId={props.column.id} priorities={props.priorities} tags={props.tags} />)) : null}
                                     {provided.placeholder}
                                     {props.placeholderprops && snapshot.isDraggingOver && (
                                         <div

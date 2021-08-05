@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import { Transition } from 'react-transition-group';
 import { ContentElement } from './ContentElements';
@@ -7,7 +7,6 @@ import { Input, DropDown, Button } from './FormElements';
 
 import '../css/Card.css';
 import '../css/Card-content.css';
-
 
 import { BiCommentDetail } from 'react-icons/bi';
 
@@ -40,7 +39,6 @@ const Card = (props) => {
         }
     };
 
-
     return (
         <Draggable key={props.card.id} draggableId={props.card.id} index={props.index} >
             {(provided, snapshot) => (
@@ -68,6 +66,7 @@ const Card = (props) => {
                                 <Button iconName="IoOptions" noStyle={true} onClick={() => setisEditing(!isEditing)} />
                             </div>
                         </div>
+
                         {!snapshot.isDragging ? //Fixing lag problem by disabling this while dragging
                             <Transition in={isEditing} timeout={500}>
                                 {stateParent => (
@@ -83,14 +82,14 @@ const Card = (props) => {
                                                         { ...{
                                                             entering: { transition: 'opacity 0.25s 0.3s', opacity: 1 }
                                                             ,entered: { opacity: 1 }
-                                                            , exiting: { transition: 'opacity 0.25s', opacity: 0 }
-                                                            , exited: { opacity: 0 }
+                                                            ,exiting: { transition: 'opacity 0.25s', opacity: 0 }
+                                                            ,exited: { opacity: 0 }
                                                         }[stateChildren] }
                                                     }>
                                                     <h3>Edit Card</h3>
-                                                    <Input iconName="AiFillTag" />
-                                                    <Input iconName="BiImage" />
-                                                    <DropDown iconName="MdLowPriority" />
+                                                    <Input iconName="AiFillTag" content={props.card.title} itemId={props.card.id} property="title" updateFunction={props.functions.updateItem} />
+                                                    <Input iconName="BiImage"  />
+                                                    <DropDown iconName="MdLowPriority" items={props.priorities} content={props.priority} itemId={props.card.id} property="priority" updateFunction={props.functions.updateItem} />
                                                     <div className="acceptance-buttons">
                                                         <Button specialStyle="CancelButton" />
                                                         <Button specialStyle="AcceptButton" />
