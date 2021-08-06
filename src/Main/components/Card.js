@@ -49,7 +49,7 @@ const Card = (props) => {
                     <div className="card">
                         <div className="card-header">
                             <div className="card-header-image">
-                                <img src="https://thevirtualinstructor.com/blog/wp-content/uploads/2014/12/the-creative-process.jpg" alt="something" />
+                                <img src={props.card.image.source} alt="something" />
                                 <div></div>
                             </div>
                             <div className="card-header-main">
