@@ -1,9 +1,11 @@
 import React, { useRef, useState } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import { Transition } from 'react-transition-group';
+
 import { ContentElement } from './ContentElements';
 import ExpandingButtons from './ExpandingButtons';
 import { Input, DropDown, Button } from './FormElements';
+
 
 import '../css/Card.css';
 import '../css/Card-content.css';
@@ -13,6 +15,7 @@ import { BiCommentDetail } from 'react-icons/bi';
 const Card = (props) => {
     const optionBlockRef = useRef(null);
     const [isEditing, setisEditing] = useState(false);
+    const [cardEditingProps, setcardEditingProps] = useState(props.card);
 
     const getTotalHeightOfChilds = (domRef) => {
         let totalHeight = 0;
@@ -39,6 +42,40 @@ const Card = (props) => {
         }
     };
 
+    const ToggleEditing = () => {
+        if (!isEditing) {
+            setisEditing(!isEditing);
+        } else {
+            CancelEditing();
+        }
+    };
+
+    const CancelEditing = () => {
+        setisEditing(!isEditing);
+        setcardEditingProps(props.card);
+    };
+
+    const updateCardEditingProps = (id, newProps) => {
+        const tempCardEditingProps = { ...cardEditingProps };
+
+        newProps.forEach((prop) => {
+            tempCardEditingProps[prop.property] = prop.newValue;
+        });
+
+        setcardEditingProps(tempCardEditingProps);
+    };
+
+    const SaveCardProperties = () => {
+        const newProps = [];
+        for (const key in cardEditingProps){
+            if (props.card[key] !== cardEditingProps[key]) {
+                newProps.push({ property: key, newValue: cardEditingProps[key] });
+            }
+        }
+        props.functions.updateItem(props.card.id, newProps);
+        CancelEditing();
+    };
+
     return (
         <Draggable key={props.card.id} draggableId={props.card.id} index={props.index} >
             {(provided, snapshot) => (
@@ -63,7 +100,7 @@ const Card = (props) => {
                                         </div>
                                         : undefined
                                 }
-                                <Button iconName="IoOptions" noStyle={true} onClick={() => setisEditing(!isEditing)} />
+                                <Button iconName="IoOptions" noStyle={true} onClick={() => ToggleEditing()} />
                             </div>
                         </div>
 
@@ -87,12 +124,12 @@ const Card = (props) => {
                                                         }[stateChildren] }
                                                     }>
                                                     <h3>Edit Card</h3>
-                                                    <Input iconName="AiFillTag" content={props.card.title} itemId={props.card.id} property="title" updateFunction={props.functions.updateItem} />
+                                                    <Input iconName="AiFillTag" content={cardEditingProps.title} property="title" updateFunction={updateCardEditingProps} />
                                                     <Input iconName="BiImage"  />
-                                                    <DropDown iconName="MdLowPriority" items={props.priorities} content={props.priority} itemId={props.card.id} property="priority" updateFunction={props.functions.updateItem} />
+                                                    <DropDown iconName="MdLowPriority" items={props.priorities} content={cardEditingProps.priority} itemId={props.card.id} property="priority" updateFunction={updateCardEditingProps} />
                                                     <div className="acceptance-buttons">
-                                                        <Button specialStyle="CancelButton" />
-                                                        <Button specialStyle="AcceptButton" />
+                                                        <Button specialStyle="CancelButton" onClick={CancelEditing} />
+                                                        <Button specialStyle="AcceptButton" onClick={SaveCardProperties} />
                                                     </div>
                                                 </div>
                                             )}
@@ -105,20 +142,22 @@ const Card = (props) => {
                             <div className="card-content-add">
                                 <ExpandingButtons type="CardContent" vertical={false} alwaysOn={true} buttons={['_cTaskList', '_cText', '_cMarkdownText', '_cImage']} addContentItem={props.functions.addContentItem} cardId={props.card.id} />
                             </div>
-                            {props.card.content ?
-                                <div className="card-content-childrens">
-                                    {props.card.content.array.length > 0 ? props.card.content.array.map((element, index) => {
-                                        return (
-                                            <div className="content-element" key={index}>
-                                                <ContentElement content={element} />
-                                                <hr />
-                                            </div>
-                                        );
-                                    })
-                                        : undefined}
-                                </div>
-                                : undefined
-                            }
+                            <div className="card-content-elements">
+                                {props.card.content ?
+                                    <div className="card-content-childrens">
+                                        {props.card.content.array.length > 0 ? props.card.content.array.map((element, index) => {
+                                            return (
+                                                <div className="content-element" key={index}>
+                                                    <ContentElement content={element} />
+                                                    <hr />
+                                                </div>
+                                            );
+                                        })
+                                            : undefined}
+                                    </div>
+                                    : undefined
+                                }
+                            </div>
                         </div>
                         <div className="card-footer">
                             <div className="card-footer-left">

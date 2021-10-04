@@ -18,3 +18,12 @@ input[type="text"]:active,
 input[type="button"]:active {
     outline: none;
 }
+
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #D76261;
+}

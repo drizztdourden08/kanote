@@ -81,11 +81,34 @@ input[type="checkbox"] + label {
 }
 
 .content-text {
+    width: calc(100% - 20px);
     padding: 5px 10px;
+    overflow: none;
 
     color: #DDD;
     font-size: 1em;
     font-family: 'Roboto', sans-serif;
+
+    background: none;
+    border: none;
+    outline: none;
+
+    cursor: default;
+
+    resize: none;
+    user-select: text;
+}
+
+.content-text::-webkit-scrollbar {
+    width: 5px;
+}
+
+.content-text::-webkit-scrollbar-thumb {
+    background: #F05D60;
+}
+
+.content-text:focus {
+    border: none;
 }
 
 .content-markdown-text {

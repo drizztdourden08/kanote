@@ -2,6 +2,7 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import gfm from 'remark-gfm';
 import CodeBlock from './CodeBlock';
+import ExpandingButtons from './ExpandingButtons';
 
 const Task = (props) => {
     const content = props.content;
@@ -46,8 +47,14 @@ const TaskList = (props) => {
 
 const Text = (props) => {
     const content = props.content;
+    let editable = false;
+
+    const ToggleEditing = () => {
+        editable = !editable;
+    };
+
     return (
-        <p className="content-text">{content.text}</p>
+        <div contentEditable={editable} onDoubleClick={ToggleEditing} onfocusout={ToggleEditing} className="content-text">{content.text}</div>
     );
 };
 
@@ -67,14 +74,26 @@ const Image = (props) => {
 
 
 const ContentElement = (props) => {
-    switch (props.content.constructor.name) {
-        case '_cTaskList': return <TaskList content={props.content} />;
-        case '_cTask': return <Task content={props.content} />;
-        case '_cText': return <Text content={props.content} />;
-        case '_cMarkdownText': return <MarkdownText content={props.content} />;
-        case '_cImage': return <Image content={props.content} />;
-        default: return undefined;
-    }
+    const renderEl = () => {
+        switch (props.content.constructor.name) {
+            case '_cTaskList': return (<TaskList content={props.content} />);
+            case '_cTask': return (<Task content={props.content} />);
+            case '_cText': return (<Text content={props.content} />);
+            case '_cMarkdownText': return (<MarkdownText content={props.content} />);
+            case '_cImage': return (<Image content={props.content} />);
+            default: return undefined;
+        }
+    };
+
+
+    return (
+        <div>
+            <div className="content-options">
+                <ExpandingButtons type="CardContent" vertical={false} alwaysOn={true} buttons={['move', 'Edit']} cardId={props.cardId} />
+            </div>
+            {renderEl()}
+        </div>
+    );
 };
 
 export { ContentElement, TaskList, Task, Text, MarkdownText, Image };
