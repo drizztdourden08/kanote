@@ -25,5 +25,10 @@ input[type="button"]:active {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #D76261;
+    background: var(--scrollbar-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-corner {
+    background: none;
 }

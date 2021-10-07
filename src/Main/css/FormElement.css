@@ -4,35 +4,42 @@
 }
 
 .form-element-input {
-    display: flex;
-    align-items: stretch;
-    justify-content: flex-start;
+    display: grid;
+    grid-template: "x";
+    align-items: center;
+    justify-items: start;
+
     margin: 5px;
-    padding: 4px;
-    padding-left: 4px;
 
     color: #DDD;
     font-size: 24px;
 
-    background: #41414A;
     border: none;
-    border-radius: 5px;
+
+}
+
+.form-element svg {
+    grid-area: x;
+    margin-left: 6px;
 }
 
 .form-element-input input {
-    flex-grow: 1;
-    padding-left: 4px;
+    grid-area: x;
+    padding: 6px;
+    padding-left: 36px;
 
     color: #DDD;
     font-size: 18px;
+    line-height: 22px;
 
-    background: none;
-    border: none;
+    background: var(--input-bg-color);
+    border: solid 2px var(--input-border-color);
+    border-radius: 5px;
 }
 
 .form-element-input input:focus {
-    background: none;
-    border: none;
+    background: var(--input-bgfocus-color);
+    border-bottom-color: var(--secondary-color);
 }
 
 .form-element-button {
@@ -68,10 +75,11 @@
 }
 
 .form-element-select {
-    display: flex;
-    flex-direction: row;
-    flex-grow: 1;
+    display: grid;
+    grid-template: "x";
     align-items: center;
+    justify-items: start;
+    width: 100%;
     margin: 5px;
     padding: 4px 0;
     padding-left: 4px;
@@ -79,14 +87,15 @@
     color: #DDD;
     font-size: 24px;
 
-    background: #41414A;
-    border: none;
     border-radius: 5px;
 }
 
 .form-element-select .dropdown-select-container {
-    flex-grow: 1;
+    grid-area: x;
+    width: 100%;
     height: auto;
+    padding: 6px;
+    padding-left: 36px;
 
     color: #DDD;
     font-size: 18px;

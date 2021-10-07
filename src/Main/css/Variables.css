@@ -1,0 +1,16 @@
+:root {
+    --main-color: #A30C19;
+    --secondary-color: #F05D60;
+    --main-bg-color: #202020;
+    --secondary1-bg-color: #1E1E1E;
+    --secondary2-bg-color: #292929;
+    --secondary1-bghover-color: #292929;
+    --secondary2-bghover-color: #323232;
+    --main-font-color: #FFF;
+    --secondary-font-color: #D0D0D0;
+    --link-font-color: #F05D60;
+    --input-bg-color: #3C3C3C;
+    --input-bgfocus-color: #222;
+    --input-border-color: #3C3C3C;
+    --scrollbar-color: #9F9F9F;
+}

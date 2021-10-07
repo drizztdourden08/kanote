@@ -16,9 +16,11 @@
 .column {
     display: flex;
     flex-direction: column;
-    width: 300px;
+    width: 400px;
 
-    background: #1C1C20;
+    background: var(--main-bg-color);
+    border: solid 2px var(--main-color);
+    border-radius: 8px;
 }
 
 .column:first-child { margin-left: 0; }
@@ -37,8 +39,6 @@
     color: #FEFEFE;
     font-size: 1.25em;
     font-family: 'kufam', sans-serif;
-
-    border-top: solid 3px #F05D60;
 }
 
 .column-title div {

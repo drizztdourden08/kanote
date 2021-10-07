@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import gfm from 'remark-gfm';
 import CodeBlock from './CodeBlock';
-import ExpandingButtons from './ExpandingButtons';
 
 const Task = (props) => {
     const content = props.content;
@@ -47,14 +46,33 @@ const TaskList = (props) => {
 
 const Text = (props) => {
     const content = props.content;
-    let editable = false;
+    const [editable, setEditable] = useState(false);
+    const textRef = useRef(null);
 
-    const ToggleEditing = () => {
-        editable = !editable;
+    useEffect(() => {
+        if (editable) {
+            textRef.current.focus();
+            document.execCommand('selectAll', false, null);
+            document.getSelection().collapseToEnd();
+        }
+    });
+
+    const ToggleEditing = (value) => {
+        let newValue;
+        if (value) newValue = value;
+        else newValue = !editable;
+
+        setEditable(newValue);
+
+        if (!newValue) {
+            props.updateItem(content.id, [{ property: 'text', newValue: textRef.current.innerText }]);
+        }
+
+
     };
 
     return (
-        <div contentEditable={editable} onDoubleClick={ToggleEditing} onfocusout={ToggleEditing} className="content-text">{content.text}</div>
+        <div ref={textRef} contentEditable={editable} onDoubleClick={() => ToggleEditing(true)} onBlur={() => ToggleEditing(false)} className="content-text">{content.text}</div>
     );
 };
 
@@ -78,7 +96,7 @@ const ContentElement = (props) => {
         switch (props.content.constructor.name) {
             case '_cTaskList': return (<TaskList content={props.content} />);
             case '_cTask': return (<Task content={props.content} />);
-            case '_cText': return (<Text content={props.content} />);
+            case '_cText': return (<Text content={props.content} updateItem={props.updateItem} />);
             case '_cMarkdownText': return (<MarkdownText content={props.content} />);
             case '_cImage': return (<Image content={props.content} />);
             default: return undefined;
@@ -88,9 +106,6 @@ const ContentElement = (props) => {
 
     return (
         <div>
-            <div className="content-options">
-                <ExpandingButtons type="CardContent" vertical={false} alwaysOn={true} buttons={['move', 'Edit']} cardId={props.cardId} />
-            </div>
             {renderEl()}
         </div>
     );

@@ -81,16 +81,15 @@ input[type="checkbox"] + label {
 }
 
 .content-text {
-    width: calc(100% - 20px);
+    width: calc(100% - 22px);
     padding: 5px 10px;
-    overflow: none;
 
     color: #DDD;
     font-size: 1em;
     font-family: 'Roboto', sans-serif;
 
     background: none;
-    border: none;
+    border: solid 1px #F05D6000;
     outline: none;
 
     cursor: default;
@@ -108,7 +107,7 @@ input[type="checkbox"] + label {
 }
 
 .content-text:focus {
-    border: none;
+    border-color: #F05D60;
 }
 
 .content-markdown-text {

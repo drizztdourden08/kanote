@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
-
-
 import { mouseMoveDetect } from '../scripts/ElectronClickThrough';
 
 import { loremIpsum, name, surname } from 'react-lorem-ipsum';
@@ -10,6 +8,7 @@ import { loremIpsum, name, surname } from 'react-lorem-ipsum';
 import './css/Main.css';
 import './css/Board.css';
 import './css/General.css';
+import './css/Variables.css';
 
 import Verticalgroup from './components/Verticalgroup';
 import Swimlane from './components/Swimlane';
@@ -306,7 +305,7 @@ class _Card {
         this._priority = new _Priority();
         this._image = new Image();
         this._tags = new ArrayOf(['_Tags']);
-        this._content = new ArrayOf(['_cTaskList', '_cText', '_cMarkdownText', '_cImage']);
+        this._childrens = new ArrayOf(['_cTaskList', '_cText', '_cMarkdownText', '_cImage']);
         this._created = Date.now();
         this._dueDate =
             this._comments = new ArrayOf(['_Comment']);
@@ -337,7 +336,13 @@ class _Card {
             'https://www.eggcelerate.com/egg/wp-content/uploads/2016/03/photodune-2196491-big-and-small-goldfish-l-scaled.jpg',
             'https://ksassets.timeincuk.net/wp/uploads/sites/56/2019/01/Small-living-room.jpg',
             'https://post.healthline.com/wp-content/uploads/2019/02/bunch_of_two_large_and_one_small_bananas-1200x628-facebook.jpg',
-            'https://www.edgeip.com/images/FCK/Image/202002/00-SFG-SmallScholarshipsBigRewardsSFSCSIC.jpg'
+            'https://www.edgeip.com/images/FCK/Image/202002/00-SFG-SmallScholarshipsBigRewardsSFSCSIC.jpg',
+            '',
+            '',
+            '',
+            '',
+            '',
+            ''
         ][Math.floor(Math.random() * Math.floor(11))]);
     }
 
@@ -372,8 +377,8 @@ class _Card {
         return this._tags;
     }
 
-    get content() {
-        return this._content;
+    get childrens() {
+        return this._childrens;
     }
 
     get created() {
@@ -898,7 +903,7 @@ const Main = (props) => {
                 break;
         }
 
-        card.object.content.add(objectToAdd);
+        card.object.childrens.add(objectToAdd);
 
         const tempBoard = new _Board();
         Object.assign(tempBoard, board);

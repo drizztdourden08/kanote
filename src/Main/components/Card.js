@@ -85,16 +85,19 @@ const Card = (props) => {
                 >
                     <div className="card">
                         <div className="card-header">
-                            <div className="card-header-image">
-                                <img src={props.card.image.source} alt="something" />
-                                <div></div>
-                            </div>
+                            {
+                                props.card.image.source ?
+                                    <div className="card-header-image">
+                                        <img src={props.card.image.source} alt={props.card.image.alt} />
+                                        <div></div>
+                                    </div>: undefined
+                            }
                             <div className="card-header-main">
                                 <div {...provided.dragHandleProps} className="card-title">
                                     <span>{props.card.title}</span>
                                 </div>
                                 {
-                                    props.card.priority !== null ?
+                                    props.card.priority.title ?
                                         <div className="card-priority" style={{ background: props.card.priority.color }}>
                                             <span>{props.card.priority.title}</span>
                                         </div>
@@ -143,13 +146,12 @@ const Card = (props) => {
                                 <ExpandingButtons type="CardContent" vertical={false} alwaysOn={true} buttons={['_cTaskList', '_cText', '_cMarkdownText', '_cImage']} addContentItem={props.functions.addContentItem} cardId={props.card.id} />
                             </div>
                             <div className="card-content-elements">
-                                {props.card.content ?
+                                {props.card.childrens ?
                                     <div className="card-content-childrens">
-                                        {props.card.content.array.length > 0 ? props.card.content.array.map((element, index) => {
+                                        {props.card.childrens.array.length > 0 ? props.card.childrens.array.map((element, index) => {
                                             return (
                                                 <div className="content-element" key={index}>
-                                                    <ContentElement content={element} />
-                                                    <hr />
+                                                    <ContentElement content={element} updateItem={props.functions.updateItem} />
                                                 </div>
                                             );
                                         })

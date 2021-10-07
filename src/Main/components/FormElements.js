@@ -26,8 +26,8 @@ const Input = (props) => {
     return (
         <div className="form-element">
             <div className="form-element-input">
-                <Icon iconName={props.iconName} />
                 <input type="text" value={props.content} onChange={(event) => props.updateFunction(props.itemId, [{ property: props.property, newValue: event.target.value }])} />
+                <Icon iconName={props.iconName} />
             </div>
         </div>
     );
@@ -37,7 +37,6 @@ const DropDown = (props) => {
     return (
         <div className="form-element">
             <div className="form-element-select">
-                <Icon iconName={props.iconName} />
                 <Select className="dropdown-select-container" classNamePrefix="dropdown-select" onChange={(item) => props.updateFunction(props.itemId, [{ property: props.property, newValue: item.value }])}
                     options={props.items.array.map(
                         (item) => {
@@ -47,7 +46,7 @@ const DropDown = (props) => {
                             return newitem;
                         })
                     } />
-
+                <Icon iconName={props.iconName} />
             </div>
         </div>
     );
